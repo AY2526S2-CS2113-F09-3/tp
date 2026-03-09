@@ -6,6 +6,7 @@ import seedu.duke.ui.UiTable;
 import seedu.duke.ui.UiTableRow;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class UiTableTest {
     @Test
@@ -38,5 +39,19 @@ public class UiTableTest {
                 """.trim();
 
         assertEquals(expectedOutput, uiTable.toString().trim());
+    }
+
+    @Test
+    public void uiTableTestLong() {
+        UiTable uiTable = new UiTable();
+        for(int i=0;i<100;i++){
+            uiTable.addRow(new UiTableRow(new Equipment("STM32 Development Board", 50, 45, 5)));
+        }
+
+        String finalString = uiTable.toString();
+        System.out.println(finalString);
+        assertTrue(finalString.contains("1.   STM32 Development Board | Total: 50 | Available: 45 | Loaned: 5"));
+        assertTrue(finalString.contains("14.  STM32 Development Board | Total: 50 | Available: 45 | Loaned: 5"));
+        assertTrue(finalString.contains("100. STM32 Development Board | Total: 50 | Available: 45 | Loaned: 5"));
     }
 }
