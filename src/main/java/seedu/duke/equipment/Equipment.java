@@ -13,6 +13,13 @@ public class Equipment {
         this.loaned = 0;
     }
 
+    public Equipment(String name, int quantity, int available, int loaned) {
+        this.name = name;
+        this.quantity = quantity;
+        this.available = available;
+        this.loaned = loaned;
+    }
+
     public String getName() {
         return name;
     }
