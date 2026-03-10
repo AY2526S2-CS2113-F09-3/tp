@@ -1,6 +1,5 @@
 package seedu.duke.commands;
 
-import seedu.duke.equipment.Equipment;
 import seedu.duke.equipmentlist.EquipmentList;
 import seedu.duke.storage.Storage;
 import seedu.duke.ui.Ui;
@@ -22,7 +21,7 @@ public class ListCommand extends Command {
                 .mapToObj(i -> new UiTableRow(equipments.getEquipment(i)))
                 .forEach(table::addRow);
 
-        ui.showMessage("Here are the equipments in your list:");
+        ui.showMessage("Here is the equipment log:");
         ui.showMessage(table.toString().trim());
     }
 }

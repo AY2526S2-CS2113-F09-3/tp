@@ -29,7 +29,7 @@ public class UiTable {
         if (rows.isEmpty()) {
             rows.add(row);
         } else {
-            if (rows.getFirst().size() != row.size()) {
+            if (rows.get(0).size() != row.size()) {
                 throw new IllegalArgumentException("All rows must have the same number of columns");
             }
 
@@ -66,7 +66,7 @@ public class UiTable {
         if (rows.isEmpty()) {
             throw new IllegalArgumentException("No rows have been added");
         }
-        return rows.getFirst().size();
+        return rows.get(0).size();
     }
 
     /**

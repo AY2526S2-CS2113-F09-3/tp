@@ -47,7 +47,6 @@ public class UiTableTest {
         }
 
         String finalString = uiTable.toString();
-        System.out.println(finalString);
         assertTrue(finalString.contains("1.   STM32 Development Board | Total: 50 | Available: 45 | Loaned: 5"));
         assertTrue(finalString.contains("14.  STM32 Development Board | Total: 50 | Available: 45 | Loaned: 5"));
         assertTrue(finalString.contains("100. STM32 Development Board | Total: 50 | Available: 45 | Loaned: 5"));
