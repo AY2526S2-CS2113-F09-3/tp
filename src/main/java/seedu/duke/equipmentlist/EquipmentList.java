@@ -26,4 +26,8 @@ public class EquipmentList {
     public int getSize() {
         return equipments.size();
     }
+
+    public boolean isEmpty() {
+        return equipments.isEmpty();
+    }
 }

@@ -54,6 +54,6 @@ public class Equipment {
 
     @Override
     public String toString() {
-        return name + "| Total: " + quantity + " | Available: " + available + " | loaned: " + loaned;
+        return name + " | Total: " + quantity + " | Available: " + available + " | loaned: " + loaned;
     }
 }
