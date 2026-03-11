@@ -8,9 +8,9 @@ import java.io.PrintStream;
 import java.util.Scanner;
 
 public class Ui {
+    private static final String DIVIDER = "===================================================";
     private final Scanner in;
     private final PrintStream out;
-    private static final String DIVIDER = "===================================================";
 
     public Ui() {
         this(System.in, System.out);
@@ -30,7 +30,7 @@ public class Ui {
     }
 
     public void showWelcomeMessage() {
-        showMessage(MESSAGE_GOODBYE);
+        showMessage(MESSAGE_WELCOME);
     }
 
     public void showGoodByeMessage() {
