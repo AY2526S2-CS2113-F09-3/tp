@@ -24,16 +24,29 @@ public class FindCommand extends Command {
 
     /**
      * Extracts the core logic of finding matching equipment so it can be tested easily.
-     * * @param equipments The current list of equipment to search through.
+     * @param equipments The current list of equipment to search through.
      * @return An ArrayList containing only the equipment that matches the keyword.
      */
     public ArrayList<Equipment> getMatchingEquipments(EquipmentList equipments) {
         ArrayList<Equipment> matchingEquipments = new ArrayList<>();
-
+        // Normalize the keyword for case-insensitive, multi-word matching
+        String rawKeyword = (this.keyword == null) ? "" : this.keyword.trim();
+        // Preserve original behavior: if keyword is empty, all equipments match
+        if (rawKeyword.isEmpty()) {
+            for (int i = 0; i < equipments.getSize(); i++) {
+                matchingEquipments.add(equipments.getEquipment(i));
+            }
+            return matchingEquipments;
+        }
+        String[] tokens = rawKeyword.toLowerCase().split("\\s+");
         for (int i = 0; i < equipments.getSize(); i++) {
             Equipment eq = equipments.getEquipment(i);
-            if (eq.getName().toLowerCase().contains(this.keyword.toLowerCase())) {
-                matchingEquipments.add(eq);
+            String equipmentNameLower = eq.getName().toLowerCase();
+            for (String token : tokens) {
+                if (!token.isEmpty() && equipmentNameLower.contains(token)) {
+                    matchingEquipments.add(eq);
+                    break; // Avoid adding the same equipment multiple times
+                }
             }
         }
         return matchingEquipments;
@@ -64,7 +77,11 @@ public class FindCommand extends Command {
             }
 
             for (int i = 0; i < matchingEquipments.size(); i++) {
-                ui.showMessage((i + 1) + ". " + matchingEquipments.get(i).toString());
+                if (matchingEquipments.size() == 1) {
+                    ui.showMessage(matchingEquipments.get(i).toString());
+                } else {
+                    ui.showMessage((i + 1) + ". " + matchingEquipments.get(i).toString());
+                }
             }
         }
     }

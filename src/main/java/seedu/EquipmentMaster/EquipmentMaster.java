@@ -16,10 +16,14 @@ public class EquipmentMaster {
     private EquipmentList equipments;
 
     public EquipmentMaster(String filePath) {
-        //storage = new Storage(FILE_PATH);
         ui = new Ui();
         storage = new Storage(filePath);
-        equipments = new EquipmentList(storage.load());
+        try {
+            equipments = new EquipmentList(storage.load());
+        } catch (EquipmentMasterException e) {
+            ui.showMessage(e.getMessage());
+            equipments = new EquipmentList(); // Fallback to empty list
+        }
     }
 
 

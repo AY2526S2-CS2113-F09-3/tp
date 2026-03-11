@@ -1,6 +1,7 @@
 package seedu.EquipmentMaster.storage;
 
 import seedu.EquipmentMaster.equipment.Equipment;
+import seedu.EquipmentMaster.exception.EquipmentMasterException;
 
 import java.io.File;
 import java.io.FileWriter;
@@ -27,7 +28,7 @@ public class Storage {
      * Saves the current list of equipment to the .txt file.
      * @param equipments The current list of equipment.
      */
-    public void save(ArrayList<Equipment> equipments) {
+    public void save(ArrayList<Equipment> equipments) throws EquipmentMasterException{
         try {
             File file = new File(filePath);
             File directory = file.getParentFile();
@@ -44,7 +45,7 @@ public class Storage {
                 }
             }
         } catch (IOException e) {
-            System.out.println("Error saving equipment data: " + e.getMessage());
+            throw new EquipmentMasterException("Failed to save data to " + filePath + ": " + e.getMessage());
         }
     }
 
@@ -52,7 +53,7 @@ public class Storage {
      * Loads the equipment list stored in the .txt file.
      * @return The list of equipment from the file. Returns an empty list if the file is not found.
      */
-    public ArrayList<Equipment> load() {
+    public ArrayList<Equipment> load() throws EquipmentMasterException{
         ArrayList<Equipment> equipments = new ArrayList<>();
         File file = new File(filePath);
 
@@ -72,7 +73,7 @@ public class Storage {
                 }
             }
         } catch (Exception e) {
-            System.out.println("Error loading file: " + e.getMessage());
+            throw new EquipmentMasterException("Failed to save data to " + filePath + ": " + e.getMessage());
         }
         return equipments;
     }
@@ -84,20 +85,34 @@ public class Storage {
      */
     private Equipment parseEquipment(String line) {
         // Expected format: Name | Total | Available | Loaned
-        String[] parts = line.split(" \\| ");
-
-        // We expect exactly 4 parts now
-        if (parts.length < 4) {
+        if (line == null) {
             return null;
         }
 
-        try {
-            String name = parts[0];
-            int totalQuantity = Integer.parseInt(parts[1]);
-            int availableQuantity = Integer.parseInt(parts[2]);
-            int loanedQuantity = Integer.parseInt(parts[3]);
+        final String delimiter = " | ";
+        // Find separators from the end: Name [delim] Total [delim] Available [delim] Loaned
+        int lastSep = line.lastIndexOf(delimiter);
+        if (lastSep == -1) {
+            return null;
+        }
+        int secondSep = line.lastIndexOf(delimiter, lastSep - 1);
+        if (secondSep == -1) {
+            return null;
+        }
 
-            // Use the 4-argument constructor to perfectly restore the data
+        int firstSep = line.lastIndexOf(delimiter, secondSep - 1);
+        if (firstSep == -1) {
+            return null;
+        }
+
+        String name = line.substring(0, firstSep);
+        String totalStr = line.substring(firstSep + delimiter.length(), secondSep);
+        String availableStr = line.substring(secondSep + delimiter.length(), lastSep);
+        String loanedStr = line.substring(lastSep + delimiter.length());
+        try {
+            int totalQuantity = Integer.parseInt(totalStr.trim());
+            int availableQuantity = Integer.parseInt(availableStr.trim());
+            int loanedQuantity = Integer.parseInt(loanedStr.trim());
             return new Equipment(name, totalQuantity, availableQuantity, loanedQuantity);
 
         } catch (NumberFormatException e) {

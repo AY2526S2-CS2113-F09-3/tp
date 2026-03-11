@@ -43,4 +43,27 @@ public class FindCommandTest {
         assertTrue(matches.isEmpty());
         assertEquals(0, matches.size());
     }
+
+    @Test
+    public void getMatchingEquipments_multipleKeywords_returnsMatchedList() {
+        // Arrange
+        EquipmentList equipments = new EquipmentList();
+        equipments.addEquipment(new Equipment("STM32 Development Board", 50));
+        equipments.addEquipment(new Equipment("HDMI Cable", 100));
+        equipments.addEquipment(new Equipment("Digital Multimeter", 10));
+
+        // Act: Search with multiple keywords separated by spaces
+        FindCommand command = new FindCommand("Board Cable");
+        ArrayList<Equipment> matches = command.getMatchingEquipments(equipments);
+
+        // Assert: Should find exactly 2 items, ignoring "Digital Multimeter"
+        assertEquals(2, matches.size());
+
+        // Verify both items were caught regardless of keyword order
+        boolean hasBoard = matches.stream().anyMatch(eq -> eq.getName().equals("STM32 Development Board"));
+        boolean hasCable = matches.stream().anyMatch(eq -> eq.getName().equals("HDMI Cable"));
+
+        assertTrue(hasBoard);
+        assertTrue(hasCable);
+    }
 }
