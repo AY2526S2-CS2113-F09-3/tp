@@ -43,4 +43,8 @@ public class EquipmentMaster {
     public static void main(String[] args) throws EquipmentMasterException{
         new EquipmentMaster("data/equipment.txt").run();
     }
+
+    public EquipmentList getEquipmentList() {
+        return this.equipments;
+    }
 }

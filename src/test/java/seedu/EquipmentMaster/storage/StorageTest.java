@@ -1,8 +1,5 @@
 package seedu.EquipmentMaster.storage;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 
@@ -10,7 +7,11 @@ import seedu.EquipmentMaster.equipment.Equipment;
 import seedu.EquipmentMaster.ui.Ui;
 
 import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.ArrayList;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 public class StorageTest {
 
@@ -67,5 +68,28 @@ public class StorageTest {
 
         // Assert: The returned list should be empty, not null, preventing NullPointerExceptions
         assertTrue(loadedList.isEmpty());
+    }
+
+    @Test
+    public void parseEquipment_nameWithDelimiters_success() {
+        Storage storage = new Storage(TEST_FILE_PATH, new Ui());
+
+        // Simulating a tricky line where the name itself contains " | "
+        String trickyLine = "Special | Adapter | 50 | 45 | 5";
+
+        // We need to use reflection or make parseEquipment protected to test it directly,
+        // OR just test it through the load() method:
+        try (FileWriter writer = new FileWriter(TEST_FILE_PATH)) {
+            writer.write(trickyLine + System.lineSeparator());
+        } catch (IOException e) {
+            fail("Setup failed");
+        }
+
+        ArrayList<Equipment> loaded = storage.load();
+
+        assertEquals(1, loaded.size());
+        // The name should correctly include the first "|"
+        assertEquals("Special | Adapter", loaded.get(0).getName());
+        assertEquals(50, loaded.get(0).getQuantity());
     }
 }
