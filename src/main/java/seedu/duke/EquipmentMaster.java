@@ -1,6 +1,5 @@
 package seedu.duke;
 
-import java.io.IOException;
 
 import seedu.duke.commands.Command;
 import seedu.duke.equipmentlist.EquipmentList;
