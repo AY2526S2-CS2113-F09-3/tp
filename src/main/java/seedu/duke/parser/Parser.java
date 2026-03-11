@@ -6,6 +6,7 @@ import static seedu.duke.common.Messages.MESSAGE_INVALID_INPUT;
 import seedu.duke.commands.AddCommand;
 import seedu.duke.commands.ByeCommand;
 import seedu.duke.commands.Command;
+import seedu.duke.commands.ListCommand;
 import seedu.duke.exception.EquipmentMasterException;
 
 public class Parser {
@@ -15,11 +16,12 @@ public class Parser {
         switch (words[0]) {
         case "add":
             return parseAdd(fullCommand);
-
+        case "list":
+            return new ListCommand();
         case "bye":
             return new ByeCommand();
 
-            default:
+        default:
             throw new EquipmentMasterException(MESSAGE_INVALID_INPUT);
         }
     }
@@ -32,11 +34,10 @@ public class Parser {
         int quantityIndex = fullCommand.indexOf("q/");
         String name = "";
         String qtString = "";
-        if(nameIndex < quantityIndex) {
+        if (nameIndex < quantityIndex) {
             name = fullCommand.substring(nameIndex + 2, quantityIndex - 1);
             qtString = fullCommand.substring(quantityIndex + 2);
-        }
-        else {
+        } else {
             qtString = fullCommand.substring(quantityIndex + 2, nameIndex - 1);
             name = fullCommand.substring((nameIndex + 2));
         }
@@ -46,7 +47,7 @@ public class Parser {
                 throw new EquipmentMasterException("Equipment quantity cannot be negative.");
             }
             return new AddCommand(name, quantity);
-        }catch (NumberFormatException e) {
+        } catch (NumberFormatException e) {
             throw new EquipmentMasterException("Please enter a valid whole number for quantity");
         }
     }
