@@ -57,12 +57,12 @@ public class SetStatusCommand extends Command {
     @Override
     public void execute(EquipmentList equipments, Ui ui, Storage storage) {
         if (quantity <= 0) {
-            ui.showMessage("ERROR: Quantity must be greater than 0.");
+            ui.showMessage("Quantity must be greater than 0.");
             return;
         }
 
         if (!status.equalsIgnoreCase("loaned") && !status.equalsIgnoreCase("available")) {
-            ui.showMessage("ERROR: Invalid status. Status must be 'loaned' or 'available'.");
+            ui.showMessage("Invalid status. Status must be 'loaned' or 'available'.");
             return;
         }
 
@@ -73,7 +73,7 @@ public class SetStatusCommand extends Command {
             if (index > 0 && index <= equipments.getSize()) {
                 targetEquipment = equipments.getEquipment(index - 1);
             } else {
-                ui.showMessage("ERROR: Invalid index. Please provide an index between 1 and "
+                ui.showMessage("Invalid index. Please provide an index between 1 and "
                         + equipments.getSize() + ".");
                 return;
             }
@@ -87,11 +87,11 @@ public class SetStatusCommand extends Command {
                 }
             }
             if (targetEquipment == null) {
-                ui.showMessage("ERROR: Equipment with name '" + name + "' not found.");
+                ui.showMessage("Equipment with name '" + name + "' not found.");
                 return;
             }
         } else {
-            ui.showMessage("ERROR: No equipment identifier provided (index or name).");
+            ui.showMessage("No equipment identifier provided (index or name).");
             return;
         }
 
@@ -103,30 +103,28 @@ public class SetStatusCommand extends Command {
         switch (status.toLowerCase()) {
         case "loaned":
             if (quantity > available) {
-                ui.showMessage("ERROR: Insufficient available units. Only "
+                ui.showMessage("Insufficient available units. Only "
                         + available + " units available.");
                 return;
             }
             targetEquipment.setAvailable(available - quantity);
             targetEquipment.setLoaned(loaned + quantity);
-            ui.showMessage("Status updated: " + quantity + " units of "
-                    + equipmentName + " are now LOANED.");
+            ui.showMessage(quantity + " units of " + equipmentName + " are now LOANED.");
             break;
 
         case "available":
             if (quantity > loaned) {
-                ui.showMessage("ERROR: Cannot return more than currently loaned. Only "
+                ui.showMessage("Cannot return more than currently loaned. Only "
                         + loaned + " units on loan.");
                 return;
             }
             targetEquipment.setAvailable(available + quantity);
             targetEquipment.setLoaned(loaned - quantity);
-            ui.showMessage("Status updated: " + quantity + " units of "
-                    + equipmentName + " are now AVAILABLE.");
+            ui.showMessage(quantity + " units of " + equipmentName + " are now AVAILABLE.");
             break;
 
         default:
-            ui.showMessage("ERROR: Invalid status.");
+            ui.showMessage("Invalid status.");
             return;
         }
 
