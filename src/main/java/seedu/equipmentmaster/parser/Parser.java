@@ -157,7 +157,7 @@ public class Parser {
             throw new EquipmentMasterException("Status must be 'loaned' or 'available'.");
         }
 
-        return new seedu.equipmentmaster.commands.SetStatusCommand(name, quantity, status);
+        return new SetStatusCommand(name, quantity, status);
     }
 
     /**
