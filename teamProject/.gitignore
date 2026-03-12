@@ -28,3 +28,6 @@ bin/
 
 ### Mac OS ###
 .DS_Store
+
+### Data Generated in Runtime ###
+data/equipment.txt
