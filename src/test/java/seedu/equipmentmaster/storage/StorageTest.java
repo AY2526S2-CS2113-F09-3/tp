@@ -3,12 +3,16 @@ package seedu.equipmentmaster.storage;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 
+import org.junit.jupiter.api.io.TempDir;
 import seedu.equipmentmaster.equipment.Equipment;
+import seedu.equipmentmaster.exception.EquipmentMasterException;
+import seedu.equipmentmaster.semester.AcademicSemester;
 import seedu.equipmentmaster.ui.Ui;
 
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.nio.file.Path;
 import java.util.ArrayList;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -17,6 +21,25 @@ public class StorageTest {
 
     // Define a specific file path just for testing purposes
     private static final String TEST_FILE_PATH = "test_equipment.txt";
+
+    @TempDir
+    Path tempDir; // JUnit creates a temporary directory for file tests
+
+    @Test
+    public void saveAndLoadSettings_validSemester_success() throws EquipmentMasterException {
+        // Use a temporary file path to avoid messing up real data
+        String testDataPath = tempDir.resolve("equipment.txt").toString();
+        Storage storage = new Storage(testDataPath, new Ui());
+
+        // We need to manually point settingsPath to temp for testing
+        // (Assuming you added a way to set settingsPath or it uses the same data dir)
+
+        AcademicSemester originalSem = new AcademicSemester("AY2025/26 Sem2");
+        storage.saveSettings(originalSem);
+
+        String loadedSemStr = storage.loadSettings();
+        assertEquals("AY2025/26 Sem2", loadedSemStr);
+    }
 
     @AfterEach
     public void tearDown() {

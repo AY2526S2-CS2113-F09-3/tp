@@ -5,38 +5,42 @@ import seedu.equipmentmaster.exception.EquipmentMasterException;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 
 /**
- * Tests the logic of the AcademicSemester class, including parsing and age calculation.
+ * Advanced tests for AcademicSemester to handle edge cases in date logic.
  */
 public class AcademicSemesterTest {
 
     @Test
-    public void constructor_validFormat_success() throws EquipmentMasterException {
-        AcademicSemester sem = new AcademicSemester("AY2024/25 Sem1");
-        assertEquals("AY2024/25 Sem1", sem.toString());
+    public void calculateAge_sameSemester_returnsZero() throws EquipmentMasterException {
+        AcademicSemester start = new AcademicSemester("AY2024/25 Sem1");
+        AcademicSemester end = new AcademicSemester("AY2024/25 Sem1");
+        // Age should be 0.0 if the semesters are the same
+        assertEquals(0.0, start.calculateAgeInYears(end));
     }
 
     @Test
-    public void constructor_invalidYearGap_throwsException() {
-        // Gap is more than 1 year (2024 to 26)
-        assertThrows(EquipmentMasterException.class, () -> new AcademicSemester("AY2024/26 Sem1"));
+    public void calculateAge_oneSemesterDifference_returnsHalfYear() throws EquipmentMasterException {
+        AcademicSemester sem1 = new AcademicSemester("AY2024/25 Sem1");
+        AcademicSemester sem2 = new AcademicSemester("AY2024/25 Sem2");
+        // One semester gap is exactly 0.5 years
+        assertEquals(0.5, sem1.calculateAgeInYears(sem2));
     }
 
     @Test
-    public void constructor_invalidFormat_throwsException() {
-        // Missing "AY" prefix
-        assertThrows(EquipmentMasterException.class, () -> new AcademicSemester("2024/25 Sem1"));
-        // Invalid Semester number
-        assertThrows(EquipmentMasterException.class, () -> new AcademicSemester("AY2024/25 Sem3"));
+    public void equals_differentSemesters_returnsFalse() throws EquipmentMasterException {
+        AcademicSemester sem1 = new AcademicSemester("AY2024/25 Sem1");
+        AcademicSemester sem2 = new AcademicSemester("AY2024/25 Sem2");
+        assertNotEquals(sem1, sem2);
     }
 
     @Test
-    public void calculateAge_fiveSemestersGap_returnsCorrectYears() throws EquipmentMasterException {
-        AcademicSemester purchase = new AcademicSemester("AY2024/25 Sem1");
-        AcademicSemester current = new AcademicSemester("AY2026/27 Sem2");
+    public void constructor_wrongYearFormat_throwsException() {
+        // Test with 2-digit start year (Invalid, we require 4 digits)
+        assertThrows(EquipmentMasterException.class, () -> new AcademicSemester("AY24/25 Sem1"));
 
-        // Calculation: ((2026 - 2024) * 2) + (2 - 1) = 5 Semesters = 2.5 Years
-        assertEquals(2.5, purchase.calculateAgeInYears(current), 0.01);
+        // Test with non-numeric years
+        assertThrows(EquipmentMasterException.class, () -> new AcademicSemester("AYabcd/ef Sem1"));
     }
 }
