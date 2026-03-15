@@ -14,10 +14,10 @@ import java.util.logging.Logger;
 
 public class EquipmentMaster {
     private static Storage storage;
-    private Ui ui;
-    private EquipmentList equipments;
     private static AcademicSemester currentSystemSemester;
     private static final Logger logger = Logger.getLogger(EquipmentMaster.class.getName());
+    private Ui ui;
+    private EquipmentList equipments;
 
     /**
      * Initializes the application, loads system settings, and populates the equipment list.

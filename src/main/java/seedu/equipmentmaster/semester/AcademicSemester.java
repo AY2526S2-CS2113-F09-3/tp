@@ -23,7 +23,8 @@ public class AcademicSemester {
         Matcher matcher = pattern.matcher(rawInput.trim());
 
         if (!matcher.matches()) {
-            throw new EquipmentMasterException("Invalid format! Use AY[YYYY]/[YY] Sem[1/2] (e.g., AY2024/25 Sem1)");
+            throw new EquipmentMasterException("Invalid format! "
+                    + "Use AY[YYYY]/[YY] Sem[1/2] (e.g., AY2024/25 Sem1)");
         }
 
         this.startYear = Integer.parseInt(matcher.group(1));
@@ -32,7 +33,8 @@ public class AcademicSemester {
 
         // Validation: Ensure the start year and end year are consecutive (e.g., 2024 and 25)
         if ((startYear + 1) % 100 != endYearShort) {
-            throw new EquipmentMasterException("Academic Year mismatch! The years must be consecutive (e.g., 2024/25).");
+            throw new EquipmentMasterException("Academic Year mismatch! "
+                    + "The years must be consecutive (e.g., 2024/25).");
         }
     }
 

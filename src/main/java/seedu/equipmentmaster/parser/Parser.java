@@ -241,7 +241,7 @@ public class Parser {
 
     /**
      * Parses the arguments for the 'delete' command.
-     * * @param fullCommand The complete input string.
+     * @param fullCommand The complete input string.
      * @return A DeleteCommand object.
      * @throws EquipmentMasterException If the format is invalid.
      */
