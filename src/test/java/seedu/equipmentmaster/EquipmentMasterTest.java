@@ -58,7 +58,9 @@ public class EquipmentMasterTest {
         // Arrange
         String missingPath = "data/non_existent.txt";
         File file = new File(missingPath);
-        if (file.exists()) file.delete();
+        if (file.exists()) {
+            file.delete();
+        }
 
         // Act
         EquipmentMaster app = new EquipmentMaster(missingPath);

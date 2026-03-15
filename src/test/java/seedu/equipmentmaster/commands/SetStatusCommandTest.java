@@ -31,7 +31,7 @@ public class SetStatusCommandTest {
     }
 
     @Test
-    public void execute_byName_loanQuantityPositive_updatesCorrectly() {
+    public void executeByName_loanPositive_updates() {
         // Arrange
         equipments.addEquipment(new Equipment("BasyS3 FPGA", 40, 40, 0));
         SetStatusCommand command = new SetStatusCommand("BasyS3 FPGA", 5, "loaned");
@@ -46,7 +46,7 @@ public class SetStatusCommandTest {
     }
 
     @Test
-    public void execute_byName_loanQuantityNegative_noChange() {
+    public void executeByName_loanNegative_noChange() {
         // Arrange
         equipments.addEquipment(new Equipment("BasyS3 FPGA", 40, 40, 0));
         SetStatusCommand command = new SetStatusCommand("BasyS3 FPGA", -5, "loaned");
@@ -61,7 +61,7 @@ public class SetStatusCommandTest {
     }
 
     @Test
-    public void execute_byIndex_returnQuantityPositive_updatesCorrectly() {
+    public void executeByIndex_returnPositive_updates() {
         // Arrange
         equipments.addEquipment(new Equipment("BasyS3 FPGA", 40, 30, 10));
         SetStatusCommand command = new SetStatusCommand(1, 3, "available");
@@ -76,7 +76,7 @@ public class SetStatusCommandTest {
     }
 
     @Test
-    public void execute_byIndex_returnQuantityNegative_noChange() {
+    public void executeByIndex_returnNegative_noChange() {
         // Arrange
         equipments.addEquipment(new Equipment("BasyS3 FPGA", 40, 30, 10));
         SetStatusCommand command = new SetStatusCommand(1, -3, "available");
