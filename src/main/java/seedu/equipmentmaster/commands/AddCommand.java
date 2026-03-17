@@ -1,7 +1,6 @@
 package seedu.equipmentmaster.commands;
 
 
-import jdk.internal.logger.BootstrapLogger;
 import seedu.equipmentmaster.equipment.Equipment;
 import seedu.equipmentmaster.equipmentlist.EquipmentList;
 import seedu.equipmentmaster.exception.EquipmentMasterException;
@@ -9,7 +8,6 @@ import seedu.equipmentmaster.semester.AcademicSemester;
 import seedu.equipmentmaster.storage.Storage;
 import seedu.equipmentmaster.ui.Ui;
 
-import static seedu.equipmentmaster.EquipmentMaster.logger;
 import static seedu.equipmentmaster.common.Messages.MESSAGE_INVALID_ADD_FORMAT;
 
 import java.util.logging.Level;
@@ -34,6 +32,8 @@ public class AddCommand extends Command{
      *
      * @param name Name of the equipment to add.
      * @param quantity Number of items to add.
+     * @param purchaseSem Sem that the item was bought
+     * @param lifespanYears Lifespan of the item in year
      */
     public AddCommand(String name, int quantity, AcademicSemester purchaseSem, double lifespanYears) {
         this.name = name;

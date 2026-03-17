@@ -27,7 +27,13 @@ public class Equipment {
         this.loaned = 0;
     }
 
-
+    /**
+     * Constructs an Equipment object with initial available and loaned quantity.
+     * @param name Name of the equipment.
+     * @param quantity Initial total quantity.
+     * @param available Initial available quantity
+     * @param loaned Initial loaned quantity
+     */
     public Equipment(String name, int quantity, int available, int loaned) {
         this.name = name;
         this.quantity = quantity;
