@@ -3,8 +3,11 @@ package seedu.equipmentmaster.commands;
 
 import seedu.equipmentmaster.equipment.Equipment;
 import seedu.equipmentmaster.equipmentlist.EquipmentList;
+import seedu.equipmentmaster.exception.EquipmentMasterException;
 import seedu.equipmentmaster.storage.Storage;
 import seedu.equipmentmaster.ui.Ui;
+
+import static seedu.equipmentmaster.common.Messages.MESSAGE_INVALID_ADD_FORMAT;
 
 /**
  * Represents a command that adds new equipment to the equipment list.
@@ -25,6 +28,39 @@ public class AddCommand extends Command{
     public AddCommand(String name, int quantity) {
         this.name = name;
         this.quantity = quantity;
+    }
+
+    /**
+     * Parses the arguments for the 'add' command and creates an AddCommand object.
+     *
+     * @param fullCommand The complete input string containing the 'add' command and its arguments.
+     * @return An AddCommand object containing the parsed equipment name and quantity.
+     * @throws EquipmentMasterException If the format is incorrect, quantity is missing/invalid, or negative.
+     */
+    public static AddCommand parse(String fullCommand) throws EquipmentMasterException {
+        if (!fullCommand.contains("n/") || (!fullCommand.contains("q/"))) {
+            throw new EquipmentMasterException(MESSAGE_INVALID_ADD_FORMAT);
+        }
+        int nameIndex = fullCommand.indexOf("n/");
+        int quantityIndex = fullCommand.indexOf("q/");
+        String name = "";
+        String qtString = "";
+        if (nameIndex < quantityIndex) {
+            name = fullCommand.substring(nameIndex + 2, quantityIndex - 1);
+            qtString = fullCommand.substring(quantityIndex + 2);
+        } else {
+            qtString = fullCommand.substring(quantityIndex + 2, nameIndex - 1);
+            name = fullCommand.substring((nameIndex + 2));
+        }
+        try {
+            int quantity = Integer.parseInt(qtString);
+            if (quantity < 0) {
+                throw new EquipmentMasterException("Equipment quantity cannot be negative.");
+            }
+            return new AddCommand(name, quantity);
+        } catch (NumberFormatException e) {
+            throw new EquipmentMasterException("Please enter a valid whole number for quantity");
+        }
     }
 
     /**

@@ -22,6 +22,25 @@ public class SetSemCommand extends Command {
     }
 
     /**
+     * Parses the arguments for the 'setsem' command and creates a SetSemCommand object.
+     *
+     * @param fullCommand The complete input string containing the 'setsem' command and the semester.
+     * @return A SetSemCommand object containing the target academic semester.
+     * @throws EquipmentMasterException If the semester argument is missing.
+     */
+    public static Command parse(String fullCommand) throws EquipmentMasterException {
+        String[] words = fullCommand.trim().split("\\s+", 2);
+
+        // Check if the user provided the semester string after "setsem"
+        if (words.length < 2 || words[1].trim().isEmpty()) {
+            throw new EquipmentMasterException("Please specify a semester. Usage: setsem AY[YYYY]/[YY] Sem[1/2]");
+        }
+
+        String rawSemester = words[1].trim();
+        return new SetSemCommand(rawSemester);
+    }
+
+    /**
      * Executes the command to update the global system semester.
      * @param equipments The list of equipment (not used in this command).
      * @param ui The user interface to display messages.
