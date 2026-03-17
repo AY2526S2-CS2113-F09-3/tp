@@ -40,8 +40,10 @@ class HelpCommandTest {
 
         // Check for presence of all registered commands
         for (Parser.CommandSpec spec : Parser.getCommandSpecs()) {
-            assertTrue(output.contains(spec.getKeyword()), "Output should contain command keyword: " + spec.getKeyword());
-            assertTrue(output.contains(spec.getFormat()), "Output should contain command format: " + spec.getFormat());
+            assertTrue(output.contains(spec.getKeyword()), "Output should contain command keyword: "
+                    + spec.getKeyword());
+            assertTrue(output.contains(spec.getFormat()), "Output should contain command format: "
+                    + spec.getFormat());
         }
     }
 }
