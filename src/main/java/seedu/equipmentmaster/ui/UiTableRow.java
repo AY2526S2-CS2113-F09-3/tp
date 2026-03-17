@@ -4,6 +4,7 @@ import seedu.equipmentmaster.equipment.Equipment;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Objects;
 
 /**
  * Represents a row in the UiTable.
@@ -24,7 +25,9 @@ public class UiTableRow {
         this(equipment.getName(),
                 "Total: " + equipment.getQuantity(),
                 "Available: " + equipment.getAvailable(),
-                "Loaned: " + equipment.getLoaned());
+                "Loaned: " + equipment.getLoaned(),
+                "Purchase: " + equipment.getPurchaseSem(),
+                "Life: " + equipment.getLifespanYears() + (equipment.getLifespanYears() == 1.0 ? " year" : " years"));
     }
 
     /**
