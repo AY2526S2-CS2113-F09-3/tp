@@ -6,6 +6,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 import seedu.equipmentmaster.equipment.Equipment;
 import seedu.equipmentmaster.equipmentlist.EquipmentList;
+import seedu.equipmentmaster.semester.AcademicSemester;
 import seedu.equipmentmaster.storage.Storage;
 import seedu.equipmentmaster.ui.Ui;
 import seedu.equipmentmaster.exception.EquipmentMasterException;
@@ -40,10 +41,9 @@ public class DeleteCommandTest {
 
     @Test
     public void execute_deleteAvailableQuantity_success() throws EquipmentMasterException {
-        // Setup: Total 10, Available 10
-        Equipment eq = new Equipment("Oscilloscope", 10);
-        eq.setAvailable(10);
-        eq.setLoaned(0);
+        // Setup: Total 10, Available 10, Loaned 0
+        AcademicSemester testSem = new AcademicSemester("AY2024/25 Sem1");
+        Equipment eq = new Equipment("Oscilloscope", 10, 10, 0, testSem, 5.0);
         equipments.addEquipment(eq);
 
         // Action: Delete 3 available
@@ -59,9 +59,8 @@ public class DeleteCommandTest {
     @Test
     public void execute_deleteLoanedQuantity_success() throws EquipmentMasterException {
         // Setup: Total 10, Available 6, Loaned 4
-        Equipment eq = new Equipment("Multimeter", 10);
-        eq.setAvailable(6);
-        eq.setLoaned(4);
+        AcademicSemester testSem = new AcademicSemester("AY2024/25 Sem1");
+        Equipment eq = new Equipment("Multimeter", 10, 6, 4, testSem, 3.0);
         equipments.addEquipment(eq);
 
         // Action: Delete 2 loaned
@@ -127,13 +126,13 @@ public class DeleteCommandTest {
         assertTrue(cmd2 instanceof DeleteCommand);
     }
 
+
     @Test
     public void execute_validIndex_reducesQuantity() throws EquipmentMasterException {
         // Arrange
-        EquipmentList equipments = new EquipmentList();
-        Ui ui = new Ui();
-        Storage storage = new Storage(TEST_FILE_PATH, ui);
-        equipments.addEquipment(new Equipment("Basys3 FPGA", 10));
+        // (equipments, ui, and storage are safely set up in @BeforeEach)
+        AcademicSemester testSem = new AcademicSemester("AY2025/26 Sem2"); // Adjust to your expected format
+        equipments.addEquipment(new Equipment("Basys3 FPGA", 10, 10, 0, testSem, 5.0));
 
         // Act: Delete 4 units from index 1
         DeleteCommand command = new DeleteCommand(1, 4, "available");
@@ -141,15 +140,14 @@ public class DeleteCommandTest {
 
         // Assert
         assertEquals(6, equipments.getEquipment(0).getQuantity());
+        assertEquals(6, equipments.getEquipment(0).getAvailable());
     }
 
     @Test
     public void execute_validName_reducesQuantity() throws EquipmentMasterException {
         // Arrange
-        EquipmentList equipments = new EquipmentList();
-        Ui ui = new Ui();
-        Storage storage = new Storage(TEST_FILE_PATH, ui);
-        equipments.addEquipment(new Equipment("STM32 Board", 20));
+        AcademicSemester testSem = new AcademicSemester("AY2025/26 Sem2");
+        equipments.addEquipment(new Equipment("STM32 Board", 20, 20, 0, testSem, 3.0));
 
         // Act: Delete 5 units by name
         DeleteCommand command = new DeleteCommand("STM32 Board", 5, "available");
@@ -157,6 +155,7 @@ public class DeleteCommandTest {
 
         // Assert
         assertEquals(15, equipments.getEquipment(0).getQuantity());
+        assertEquals(15, equipments.getEquipment(0).getAvailable());
     }
 
     @Test
