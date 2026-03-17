@@ -1,5 +1,7 @@
 package seedu.equipmentmaster.equipment;
 
+import seedu.equipmentmaster.semester.AcademicSemester;
+
 /**
  * Represents a piece of equipment in the EquipmentMaster system.
  * Each equipment has a name, total quantity, number of available items,
@@ -10,6 +12,8 @@ public class Equipment {
     private int quantity;
     private int available;
     private int loaned;
+    private AcademicSemester purchaseSem;
+    private double lifespanYears;
 
     /**
      * Constructs an Equipment object with full lifecycle attributes.
@@ -23,6 +27,13 @@ public class Equipment {
         this.loaned = 0;
     }
 
+
+    public Equipment(String name, int quantity, int available, int loaned) {
+        this.name = name;
+        this.quantity = quantity;
+        this.available = available;
+        this.loaned = loaned;
+    }
     /**
      * Creates Equipment with full details.
      *
@@ -31,11 +42,13 @@ public class Equipment {
      * @param available Number of available items.
      * @param loaned Number of loaned items.
      */
-    public Equipment(String name, int quantity, int available, int loaned) {
+    public Equipment(String name, int quantity, int available, int loaned, AcademicSemester purchaseSem, double lifespanYears) {
         this.name = name;
         this.quantity = quantity;
         this.available = available;
         this.loaned = loaned;
+        this.purchaseSem = purchaseSem;
+        this.lifespanYears = lifespanYears;
     }
 
     /**
@@ -72,6 +85,12 @@ public class Equipment {
      */
     public int getLoaned() {
         return loaned;
+    }
+
+    public AcademicSemester getPurchaseSem() { return purchaseSem; }
+
+    public double getLifespanYears() {
+        return lifespanYears;
     }
 
     /**
@@ -117,7 +136,7 @@ public class Equipment {
      */
     @Override
     public String toString() {
-        return name + " | Total: " + quantity + " | Available: " + available + " | loaned: " + loaned;
+        return name + " | Total: " + quantity + " | Available: " + available + " | loaned: " + loaned + " | Purchase: " + purchaseSem + " | Lifespan: " + lifespanYears;
     }
 
     /**
@@ -126,6 +145,6 @@ public class Equipment {
      * @return Equipment data formatted for saving to file.
      */
     public String toFileString() {
-        return this.name + " | " + this.quantity + " | " + this.available + " | " + this.loaned;
+        return this.name + " | " + this.quantity + " | " + this.available + " | " + this.loaned + " | " + this.purchaseSem.toString() + " | " + this.lifespanYears;
     }
 }
