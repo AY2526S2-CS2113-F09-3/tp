@@ -1,14 +1,6 @@
 package seedu.equipmentmaster.parser;
 
-import seedu.equipmentmaster.commands.AddCommand;
-import seedu.equipmentmaster.commands.ByeCommand;
-import seedu.equipmentmaster.commands.Command;
-import seedu.equipmentmaster.commands.FindCommand;
-import seedu.equipmentmaster.commands.ListCommand;
-import seedu.equipmentmaster.commands.SetSemCommand;
-import seedu.equipmentmaster.commands.SetStatusCommand;
-import seedu.equipmentmaster.commands.GetSemCommand;
-import seedu.equipmentmaster.commands.DeleteCommand;
+import seedu.equipmentmaster.commands.*;
 import seedu.equipmentmaster.exception.EquipmentMasterException;
 
 
@@ -29,6 +21,11 @@ public class Parser {
         commandSpecs.add(new CommandSpec("setsem", "setsem SEMESTER", SetSemCommand::parse));
         commandSpecs.add(new CommandSpec("getsem", "getsem", fullCommand -> new GetSemCommand()));
         commandSpecs.add(new CommandSpec("delete", "delete n/NAME", DeleteCommand::parse));
+        commandSpecs.add(new CommandSpec("help","help", fullCommand -> new HelpCommand()));
+    }
+
+    public static ArrayList<CommandSpec> getCommandSpecs() {
+        return commandSpecs;
     }
 
     /**
@@ -50,19 +47,31 @@ public class Parser {
         throw new EquipmentMasterException(MESSAGE_INVALID_INPUT);
     }
 
-    private interface CommandFactory {
+    public interface CommandFactory {
         Command parse(String fullCommand) throws EquipmentMasterException;
     }
 
-    private static class CommandSpec{
-        String keyword;
-        String format;
-        CommandFactory creator;
+    public static class CommandSpec{
+        private String keyword;
+        private String format;
+        private CommandFactory creator;
 
         public CommandSpec(String keyword, String format, CommandFactory creator) {
             this.keyword = keyword;
             this.format = format;
             this.creator = creator;
+        }
+
+        public String getKeyword() {
+            return keyword;
+        }
+
+        public String getFormat() {
+            return format;
+        }
+
+        public CommandFactory getCreator() {
+            return creator;
         }
     }
 }
