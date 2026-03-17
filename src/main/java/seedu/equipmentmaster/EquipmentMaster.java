@@ -45,6 +45,10 @@ public class EquipmentMaster {
         // Load equipment data
         this.equipments = new EquipmentList(storage.load());
         logger.log(Level.INFO, "System time loaded successfully.");
+
+        // Check loaded commands
+        logger.log(Level.INFO, "Loaded "+Parser.getCommandSpecs().size()+" commands.");
+        assert !Parser.getCommandSpecs().isEmpty() : "No commands loaded! Check Parser initialization.";
     }
 
     /**

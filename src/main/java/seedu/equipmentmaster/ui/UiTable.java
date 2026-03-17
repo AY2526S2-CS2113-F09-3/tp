@@ -10,12 +10,24 @@ import java.util.stream.IntStream;
  */
 public class UiTable {
     private ArrayList<UiTableRow> rows;
+    private boolean hasHeader;
 
     /**
      * Constructs a new UiTable instance with an empty list of rows.
+     *
+     * @param hasHeader Indicates whether the first row of the table should be treated as a header (not indexed).
+     */
+    public UiTable(boolean hasHeader) {
+        rows = new ArrayList<>();
+        this.hasHeader = hasHeader;
+    }
+
+    /**
+     * Constructs a new UiTable instance with an empty list of rows and no header by default.
+     *
      */
     public UiTable() {
-        rows = new ArrayList<>();
+        this(false);
     }
 
     /**
@@ -86,7 +98,7 @@ public class UiTable {
     @Override
     public String toString() {
 
-        if(rows.isEmpty()){
+        if (rows.isEmpty()) {
             return "<empty table>";
         }
 
@@ -97,12 +109,20 @@ public class UiTable {
         StringBuilder tableString = new StringBuilder();
 
         int i = 1;
+        boolean isFirstRow = true;
         for (UiTableRow row : rows) {
-            //plus 1 for the dot and 1 for the space after the dot
-            String indexString = String.format("%-" + (indexLength + 2) + "s", i + ".");
-            tableString.append(indexString).append(row.toString(widths)).append("\n");
+            if (hasHeader && isFirstRow) {
+                //header doesn't require index
+                String indexString = String.format("%-" + (indexLength + 2) + "s", "#");
+                tableString.append(indexString).append(row.toString(widths)).append("\n");
+                isFirstRow = false;
+            } else {
+                //plus 1 for the dot and 1 for the space after the dot
+                String indexString = String.format("%-" + (indexLength + 2) + "s", i + ".");
+                tableString.append(indexString).append(row.toString(widths)).append("\n");
 
-            i++;
+                i++;
+            }
         }
 
         return tableString.toString();

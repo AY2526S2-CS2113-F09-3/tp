@@ -2,10 +2,13 @@ package seedu.equipmentmaster.commands;
 
 import seedu.equipmentmaster.equipment.Equipment;
 import seedu.equipmentmaster.equipmentlist.EquipmentList;
+import seedu.equipmentmaster.exception.EquipmentMasterException;
 import seedu.equipmentmaster.storage.Storage;
 import seedu.equipmentmaster.ui.Ui;
 
 import java.util.ArrayList;
+
+import static seedu.equipmentmaster.common.Messages.MESSAGE_INVALID_FIND_FORMAT;
 
 /**
  * Represents a command to find equipment that contains a specific keyword.
@@ -20,6 +23,25 @@ public class FindCommand extends Command {
      */
     public FindCommand(String keyword) {
         this.keyword = keyword;
+    }
+
+    /**
+     * Parses the arguments for the 'find' command and creates a FindCommand object.
+     *
+     * @param fullCommand The complete input string containing the 'find' command and its keywords.
+     * @return A FindCommand object containing the search keyword.
+     * @throws EquipmentMasterException If the user does not provide a keyword after the 'find' command.
+     */
+    public static Command parse(String fullCommand) throws EquipmentMasterException {
+        String[] words = fullCommand.split(" ", 2);
+
+        // Check if the user only typed "find" without any keywords
+        if (words.length < 2 || words[1].trim().isEmpty()) {
+            throw new EquipmentMasterException(MESSAGE_INVALID_FIND_FORMAT);
+        }
+
+        String keyword = words[1].trim();
+        return new FindCommand(keyword);
     }
 
     /**
