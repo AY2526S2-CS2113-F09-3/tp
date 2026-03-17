@@ -1,6 +1,7 @@
 package seedu.equipmentmaster.storage;
 
 import seedu.equipmentmaster.equipment.Equipment;
+import seedu.equipmentmaster.exception.EquipmentMasterException;
 import seedu.equipmentmaster.semester.AcademicSemester;
 import seedu.equipmentmaster.ui.Ui;
 
@@ -96,7 +97,18 @@ public class Storage {
         if (lastSep == -1) {
             return null;
         }
-        int secondSep = line.lastIndexOf(delimiter, lastSep - 1);
+
+        int forthSep = line.lastIndexOf(delimiter, lastSep - 1);
+        if (forthSep == -1) {
+            return null;
+        }
+
+        int thirdSep = line.lastIndexOf(delimiter, forthSep - 1);
+        if (thirdSep == -1) {
+            return null;
+        }
+
+        int secondSep = line.lastIndexOf(delimiter, thirdSep - 1);
         if (secondSep == -1) {
             return null;
         }
@@ -108,17 +120,24 @@ public class Storage {
 
         String name = line.substring(0, firstSep);
         String totalStr = line.substring(firstSep + delimiter.length(), secondSep);
-        String availableStr = line.substring(secondSep + delimiter.length(), lastSep);
-        String loanedStr = line.substring(lastSep + delimiter.length());
+        String availableStr = line.substring(secondSep + delimiter.length(), thirdSep);
+        String loanedStr = line.substring(thirdSep + delimiter.length(), forthSep);
+        String purchaseSemStr = line.substring(forthSep + delimiter.length(), lastSep);
+        String lifespanYearsStr = line.substring(lastSep + delimiter.length());
         try {
             int totalQuantity = Integer.parseInt(totalStr.trim());
             int availableQuantity = Integer.parseInt(availableStr.trim());
             int loanedQuantity = Integer.parseInt(loanedStr.trim());
-            return new Equipment(name, totalQuantity, availableQuantity, loanedQuantity);
+            AcademicSemester purchaseSem = new AcademicSemester(purchaseSemStr);
+            double lifespanYears = Double.parseDouble(lifespanYearsStr.trim());
+
+            return new Equipment(name, totalQuantity, availableQuantity, loanedQuantity, purchaseSem, lifespanYears);
 
         } catch (NumberFormatException e) {
             // Ignore corrupted lines
             return null;
+        } catch (EquipmentMasterException e) {
+            throw new RuntimeException(e);
         }
     }
 
