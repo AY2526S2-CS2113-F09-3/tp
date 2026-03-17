@@ -14,12 +14,18 @@ public class UiTable {
 
     /**
      * Constructs a new UiTable instance with an empty list of rows.
+     *
+     * @param hasHeader Indicates whether the first row of the table should be treated as a header (not indexed).
      */
     public UiTable(boolean hasHeader) {
         rows = new ArrayList<>();
         this.hasHeader = hasHeader;
     }
 
+    /**
+     * Constructs a new UiTable instance with an empty list of rows and no header by default.
+     *
+     */
     public UiTable() {
         this(false);
     }
