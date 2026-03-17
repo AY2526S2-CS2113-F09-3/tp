@@ -8,8 +8,6 @@ import seedu.equipmentmaster.ui.Ui;
 import seedu.equipmentmaster.semester.AcademicSemester;
 import seedu.equipmentmaster.EquipmentMaster;
 
-import static javax.swing.JSplitPane.DIVIDER;
-
 /**
  * Generates specific reports for the equipment inventory.
  */
@@ -65,7 +63,6 @@ public class ReportCommand extends Command {
         }
 
         ui.showMessage("Aging Equipment Report (Calculated for: " + targetSem + "):");
-        ui.showMessage(DIVIDER);
 
         boolean foundAging = false;
 
@@ -80,7 +77,7 @@ public class ReportCommand extends Command {
             double age = purchaseSem.calculateAgeInYears(targetSem);
             if (age >= lifespan) {
                 foundAging = true;
-                String msg = String.format("%d. %s (Qty: %d, Bought: %s) | Age: %.1f Years | Status: [REPLACE SOON]", (i + 1), eq.getName(), eq.getQuantity(), purchaseSem.toString(), age);
+                String msg = String.format("%d. %s (Qty: %d, Bought: %s) | Age: %.1f Years | Status: [REPLACE SOON]", (i + 1), eq.getName(), eq.getQuantity(), purchaseSem, age);
                 ui.showMessage(msg);
             }
 

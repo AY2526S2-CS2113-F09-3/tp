@@ -30,10 +30,10 @@ public class ReportCommandTest {
 
     @BeforeEach
     public void setUp() {
+        System.setOut(new PrintStream(outContent));
         equipments = new EquipmentList();
         ui = new Ui();
         storage = null;
-        System.setOut(new PrintStream(outContent)); // Redirect System.out to capture prints
     }
 
     @AfterEach
@@ -48,7 +48,7 @@ public class ReportCommandTest {
         assertNotNull(cmd1);
 
         // With target semester
-        ReportCommand cmd2 = ReportCommand.parse("report aging AY28/29 Sem1");
+        ReportCommand cmd2 = ReportCommand.parse("report aging AY2028/29 Sem1");
         assertNotNull(cmd2);
     }
 
@@ -67,7 +67,7 @@ public class ReportCommandTest {
 
     @Test
     public void execute_agingReport_identifiesExpiredAndSkipsLegacy() throws EquipmentMasterException {
-        AcademicSemester purchaseSem = new AcademicSemester("AY24/25 Sem1");
+        AcademicSemester purchaseSem = new AcademicSemester("AY2024/25 Sem1");
 
         // 1. Expired Equipment (Lifespan: 2 years. Age in AY28/29 Sem1 will be 4 years) -> SHOULD BE REPORTED
         Equipment expiredEq = new Equipment("STM32", 10, purchaseSem, 2.0);
@@ -82,14 +82,14 @@ public class ReportCommandTest {
         equipments.addEquipment(legacyEq);
 
         // Execute report using a future semester to simulate time passing
-        ReportCommand command = new ReportCommand("aging", "AY28/29 Sem1");
+        ReportCommand command = new ReportCommand("aging", "AY2028/29 Sem1");
         command.execute(equipments, ui, storage);
 
         String output = outContent.toString();
 
         // Verify the report header is printed
         assertTrue(output.contains("Aging Equipment Report"));
-        assertTrue(output.contains("AY28/29 Sem1"));
+        assertTrue(output.contains("AY2028/29 Sem1"));
 
         // Verify the expired equipment IS in the report
         assertTrue(output.contains("1. STM32"));
@@ -102,14 +102,14 @@ public class ReportCommandTest {
 
     @Test
     public void execute_noExpiredEquipment_showsGreatNews() throws EquipmentMasterException {
-        AcademicSemester purchaseSem = new AcademicSemester("AY25/26 Sem1");
+        AcademicSemester purchaseSem = new AcademicSemester("AY2025/26 Sem1");
 
         // Add a brand new equipment with a 5-year lifespan
         Equipment newEq = new Equipment("3D Printer", 2, purchaseSem, 5.0);
         equipments.addEquipment(newEq);
 
         // Check report in the SAME semester it was bought
-        ReportCommand command = new ReportCommand("aging", "AY25/26 Sem1");
+        ReportCommand command = new ReportCommand("aging", "AY2025/26 Sem1");
         command.execute(equipments, ui, storage);
 
         String output = outContent.toString();
