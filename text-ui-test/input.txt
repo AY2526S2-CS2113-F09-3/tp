@@ -1,1 +1,10 @@
-bye
+add n/FPGA q/40
+add n/ESP32 q/40 m/EE2026
+add n/STM32 q/40 m/EE2026 m/CG2028
+add m/EE2026 n/BASYS3 q/40
+add n/FPGA q/40 m/EE2026 m/ee2026
+find ESP32
+find FPGA
+find ee2026
+find EE2026
+find CG2028

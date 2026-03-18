@@ -96,7 +96,13 @@ public class Storage {
         if (lastSep == -1) {
             return null;
         }
-        int secondSep = line.lastIndexOf(delimiter, lastSep - 1);
+
+        int thirdSep = line.lastIndexOf(delimiter, lastSep - 1);
+        if (thirdSep == -1) {
+            return null;
+        }
+
+        int secondSep = line.lastIndexOf(delimiter, thirdSep - 1);
         if (secondSep == -1) {
             return null;
         }
@@ -108,13 +114,26 @@ public class Storage {
 
         String name = line.substring(0, firstSep);
         String totalStr = line.substring(firstSep + delimiter.length(), secondSep);
-        String availableStr = line.substring(secondSep + delimiter.length(), lastSep);
-        String loanedStr = line.substring(lastSep + delimiter.length());
+        String availableStr = line.substring(secondSep + delimiter.length(), thirdSep);
+        String loanedStr = line.substring(thirdSep + delimiter.length(), lastSep);
+        String modulesStr = line.substring(lastSep + delimiter.length());
         try {
             int totalQuantity = Integer.parseInt(totalStr.trim());
             int availableQuantity = Integer.parseInt(availableStr.trim());
             int loanedQuantity = Integer.parseInt(loanedStr.trim());
-            return new Equipment(name, totalQuantity, availableQuantity, loanedQuantity);
+
+            ArrayList<String> moduleCodes = new ArrayList<>();
+            if (modulesStr != null && !modulesStr.trim().isEmpty()) {
+                String[] modules = modulesStr.split(",");
+                for (String module : modules) {
+                    String trimmed = module.trim();
+                    if (!trimmed.isEmpty()) {
+                        moduleCodes.add(trimmed);
+                    }
+                }
+            }
+            return new Equipment(name, totalQuantity, availableQuantity, loanedQuantity,
+                    null, 0, moduleCodes);
 
         } catch (NumberFormatException e) {
             // Ignore corrupted lines

@@ -1,6 +1,7 @@
 package seedu.equipmentmaster.equipment;
 
 import seedu.equipmentmaster.semester.AcademicSemester;
+import java.util.ArrayList;
 
 /**
  * Represents a piece of equipment in the EquipmentMaster system.
@@ -14,6 +15,7 @@ public class Equipment {
     private int loaned;
     private AcademicSemester purchaseSem;
     private double lifespanYears;
+    private ArrayList<String> moduleCodes;
 
     /**
      * Constructs an Equipment object with full lifecycle attributes.
@@ -25,6 +27,7 @@ public class Equipment {
         this.quantity = total;
         this.available = total;
         this.loaned = 0;
+        this.moduleCodes = new ArrayList<>();
     }
 
     /**
@@ -40,6 +43,7 @@ public class Equipment {
         this.quantity = quantity;
         this.available = available;
         this.loaned = loaned;
+        this.moduleCodes = new ArrayList<>();
     }
 
     /**
@@ -59,6 +63,7 @@ public class Equipment {
         this.loaned = 0;
         this.purchaseSem = purchaseSem;
         this.lifespanYears = lifespanYears;
+        this.moduleCodes = new ArrayList<>();
     }
 
     /**
@@ -71,15 +76,17 @@ public class Equipment {
      * @param loaned Number of loaned items.
      * @param purchaseSem The academic semester when the equipment was purchased.
      * @param lifespanYears The expected lifespan in years.
+     * @param moduleCodes List of module codes associated with this equipment.
      */
     public Equipment(String name, int quantity, int available, int loaned,
-                     AcademicSemester purchaseSem, double lifespanYears) {
+                     AcademicSemester purchaseSem, double lifespanYears,  ArrayList<String> moduleCodes) {
         this.name = name;
         this.quantity = quantity;
         this.available = available;
         this.loaned = loaned;
         this.purchaseSem = purchaseSem;
         this.lifespanYears = lifespanYears;
+        this.moduleCodes = moduleCodes != null ? moduleCodes : new ArrayList<>();
     }
 
     /**
@@ -191,13 +198,52 @@ public class Equipment {
     }
 
     /**
+     * Returns the module codes associated with this equipment.
+     *
+     * @return List of module codes.
+     */
+    public ArrayList<String> getModuleCodes() {
+        return moduleCodes;
+    }
+
+    /**
+     * Sets the module codes associated with this equipment.
+     *
+     * @param moduleCodes List of module codes.
+     */
+    public void setModuleCodes(ArrayList<String> moduleCodes) {
+        this.moduleCodes = moduleCodes != null ? moduleCodes : new ArrayList<>();
+    }
+
+    /**
+     * Adds a module code to this equipment (case-insensitive, no duplicates).
+     *
+     * @param moduleCode The module code to add.
+     */
+    public void addModuleCode(String moduleCode) {
+        if (moduleCode == null || moduleCode.trim().isEmpty()) {
+            return;
+        }
+        String upperCode = moduleCode.toUpperCase().trim();
+        if (!moduleCodes.contains(upperCode)) {
+            moduleCodes.add(upperCode);
+        }
+    }
+
+    /**
      * Returns a human-readable representation of the equipment.
      *
      * @return Formatted equipment information.
      */
     @Override
     public String toString() {
-        return name + " | Total: " + quantity + " | Available: " + available + " | loaned: " + loaned;
+        String result =  name + " | Total: " + quantity + " | Available: " + available + " | loaned: " + loaned;
+
+        if (moduleCodes != null && !moduleCodes.isEmpty()) {
+            result += " | Modules: " + moduleCodes;
+        }
+
+        return result;
     }
 
     /**
@@ -206,6 +252,16 @@ public class Equipment {
      * @return Equipment data formatted for saving to file.
      */
     public String toFileString() {
-        return this.name + " | " + this.quantity + " | " + this.available + " | " + this.loaned;
+        String result =  this.name + " | " + this.quantity + " | " + this.available + " | " + this.loaned;
+
+        result += " | ";
+        if (moduleCodes != null && !moduleCodes.isEmpty()) {
+            for (int i = 0; i < moduleCodes.size(); i++) {
+                if (i > 0) result += ",";
+                result += moduleCodes.get(i);
+            }
+        }
+
+        return result;
     }
 }
