@@ -54,8 +54,11 @@ public class AddCommand extends Command{
 
         if (!fullCommand.contains("n/") || (!fullCommand.contains("q/")) ||
                 (!fullCommand.contains("bought/") || (!fullCommand.contains("life/")))) {
-            logger.log(Level.WARNING, "Missing compulsory flags (n/ or q/) in user input.");
-            throw new EquipmentMasterException(MESSAGE_INVALID_ADD_FORMAT);
+            logger.log(Level.WARNING,
+                    "Missing compulsory flags (n/, q/, bought/, or life/) in user input.");
+            throw new EquipmentMasterException(
+                    "Invalid add command format.\n"
+                            + "Usage: add n/NAME q/QUANTITY bought/SEMESTER life/LIFESPAN_YEARS");
         }
         int nameIndex = fullCommand.indexOf("n/");
         int quantityIndex = fullCommand.indexOf("q/");
@@ -76,7 +79,9 @@ public class AddCommand extends Command{
         lifespanYearsStr = fullCommand.substring(lifespanYearsIndex + 5);
         if (name.isEmpty() || qtString.isEmpty() || purchaseSemStr.isEmpty() || lifespanYearsStr.isEmpty()) {
             logger.log(Level.WARNING, "One or more parsed fields are empty.");
-            throw new EquipmentMasterException(MESSAGE_INVALID_ADD_FORMAT);
+            throw new EquipmentMasterException(
+                    "Invalid add command format.\n"
+                            + "Usage: add n/NAME q/QUANTITY bought/SEMESTER life/LIFESPAN_YEARS");
         }
         try {
             int quantity = Integer.parseInt(qtString);
