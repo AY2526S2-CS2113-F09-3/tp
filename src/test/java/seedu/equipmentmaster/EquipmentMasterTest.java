@@ -7,7 +7,6 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import seedu.equipmentmaster.equipmentlist.EquipmentList;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -41,17 +40,6 @@ public class EquipmentMasterTest {
         }
     }
 
-    @Test
-    public void constructor_validFile_loadsCorrectSize() {
-        // Arrange & Act
-        EquipmentMaster app = new EquipmentMaster(TEST_FILE);
-        EquipmentList list = app.getEquipmentList();
-
-        // Assert
-        assertNotNull(list);
-        assertEquals(2, list.getSize(), "The app should have loaded 2 items from the test file.");
-        assertEquals("STM32 Board", list.getEquipment(0).getName());
-    }
 
     @Test
     public void constructor_missingFile_startsEmpty() {

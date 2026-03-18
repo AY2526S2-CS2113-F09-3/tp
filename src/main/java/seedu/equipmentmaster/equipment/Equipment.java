@@ -90,6 +90,23 @@ public class Equipment {
     }
 
     /**
+     * Constructs an Equipment object with semester and lifespan but no modules.
+     * This is primarily used when creating equipment with purchase information
+     * but without module associations.
+     *
+     * @param name Name of the equipment.
+     * @param quantity Total quantity of the equipment.
+     * @param available Number of available items.
+     * @param loaned Number of loaned items.
+     * @param purchaseSem The academic semester when the equipment was purchased.
+     * @param lifespanYears The expected lifespan in years.
+     */
+    public Equipment(String name, int quantity, int available, int loaned,
+                     AcademicSemester purchaseSem, double lifespanYears) {
+        this(name, quantity, available, loaned, purchaseSem, lifespanYears, new ArrayList<>());
+    }
+
+    /**
      * Returns the name of the equipment.
      *
      * @return Name of the equipment.
@@ -237,7 +254,12 @@ public class Equipment {
      */
     @Override
     public String toString() {
-        String result =  name + " | Total: " + quantity + " | Available: " + available + " | loaned: " + loaned;
+        String result =  name + " | Total: " + quantity + " | Available: " + available +
+                " | loaned: " + loaned;
+
+        if (purchaseSem != null) {
+            result += " | Purchase: " + purchaseSem + " | Lifespan: " + lifespanYears + " years";
+        }
 
         if (moduleCodes != null && !moduleCodes.isEmpty()) {
             result += " | Modules: " + moduleCodes;
@@ -252,16 +274,15 @@ public class Equipment {
      * @return Equipment data formatted for saving to file.
      */
     public String toFileString() {
-        String result =  this.name + " | " + this.quantity + " | " + this.available + " | " + this.loaned;
+        String result = name + " | " + quantity + " | " + available + " | " + loaned;
 
-        result += " | ";
-        if (moduleCodes != null && !moduleCodes.isEmpty()) {
-            for (int i = 0; i < moduleCodes.size(); i++) {
-                if (i > 0) result += ",";
-                result += moduleCodes.get(i);
-            }
+        if (purchaseSem != null) {
+            result += " | " + purchaseSem + " | " + lifespanYears;
         }
 
+        if (moduleCodes != null && !moduleCodes.isEmpty()) {
+            result += " | Modules: " + moduleCodes;
+        }
         return result;
     }
 }

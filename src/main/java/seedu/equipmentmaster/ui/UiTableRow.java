@@ -16,8 +16,7 @@ public class UiTableRow {
 
     /**
      * Constructs a UiTableRow from an Equipment object.
-     * The row will contain the equipment's name, total quantity, available quantity, loaned quantity,
-     * and module codes if present
+     * The row will contain the equipment's name, total quantity, available quantity, and loaned quantity.
      *
      * @param equipment The Equipment object to represent in the row.
      */
@@ -25,10 +24,18 @@ public class UiTableRow {
         this(equipment.getName(),
                 "Total: " + equipment.getQuantity(),
                 "Available: " + equipment.getAvailable(),
-                "Loaned: " + equipment.getLoaned() +
-                        (equipment.getModuleCodes() != null && !equipment.getModuleCodes().isEmpty()
-                        ? " | Modules: " + equipment.getModuleCodes() : "")
-                );
+                "Loaned: " + equipment.getLoaned(),
+                equipment.getPurchaseSem() == null
+                        ? "Purchase: <N/A>"
+                        : "Purchase: " + equipment.getPurchaseSem(),
+                equipment.getLifespanYears() <= 0.0
+                        ? "Life: <N/A>"
+                        : "Life: " + equipment.getLifespanYears()
+                        + (equipment.getLifespanYears() == 1.0 ? " year" : " years"),
+                equipment.getModuleCodes() != null && !equipment.getModuleCodes().isEmpty()
+                        ? "Modules: " + equipment.getModuleCodes()
+                        : ""
+        );
     }
 
     /**

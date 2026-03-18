@@ -1,6 +1,7 @@
 package seedu.equipmentmaster.storage;
 
 import seedu.equipmentmaster.equipment.Equipment;
+import seedu.equipmentmaster.exception.EquipmentMasterException;
 import seedu.equipmentmaster.semester.AcademicSemester;
 import seedu.equipmentmaster.ui.Ui;
 
@@ -85,7 +86,7 @@ public class Storage {
      * @return An Equipment object, or null if the string format is corrupted.
      */
     private Equipment parseEquipment(String line) {
-        // Expected format: Name | Total | Available | Loaned
+        // Expected format: Name | Total | Available | Loaned | PurchaseSem | LifespanYears | Modules
         if (line == null) {
             return null;
         }
@@ -97,7 +98,17 @@ public class Storage {
             return null;
         }
 
-        int thirdSep = line.lastIndexOf(delimiter, lastSep - 1);
+        int fifthSep = line.lastIndexOf(delimiter, lastSep - 1);
+        if (fifthSep == -1) {
+            return null;
+        }
+
+        int forthSep = line.lastIndexOf(delimiter, fifthSep - 1);
+        if (forthSep == -1) {
+            return null;
+        }
+
+        int thirdSep = line.lastIndexOf(delimiter, forthSep - 1);
         if (thirdSep == -1) {
             return null;
         }
@@ -115,12 +126,16 @@ public class Storage {
         String name = line.substring(0, firstSep);
         String totalStr = line.substring(firstSep + delimiter.length(), secondSep);
         String availableStr = line.substring(secondSep + delimiter.length(), thirdSep);
-        String loanedStr = line.substring(thirdSep + delimiter.length(), lastSep);
+        String loanedStr = line.substring(thirdSep + delimiter.length(), forthSep);
+        String purchaseSemStr = line.substring(forthSep + delimiter.length(), fifthSep);
+        String lifespanYearsStr = line.substring(fifthSep + delimiter.length(), lastSep);
         String modulesStr = line.substring(lastSep + delimiter.length());
         try {
             int totalQuantity = Integer.parseInt(totalStr.trim());
             int availableQuantity = Integer.parseInt(availableStr.trim());
             int loanedQuantity = Integer.parseInt(loanedStr.trim());
+            AcademicSemester purchaseSem = new AcademicSemester(purchaseSemStr);
+            double lifespanYears = Double.parseDouble(lifespanYearsStr.trim());
 
             ArrayList<String> moduleCodes = new ArrayList<>();
             if (modulesStr != null && !modulesStr.trim().isEmpty()) {
@@ -133,10 +148,13 @@ public class Storage {
                 }
             }
             return new Equipment(name, totalQuantity, availableQuantity, loanedQuantity,
-                    null, 0, moduleCodes);
+                    purchaseSem, lifespanYears, moduleCodes);
 
         } catch (NumberFormatException e) {
             // Ignore corrupted lines
+            return null;
+        } catch (EquipmentMasterException e) {
+            // Treat invalid semesters as corrupted lines as well
             return null;
         }
     }

@@ -53,29 +53,33 @@ public class StorageTest {
     }
 
     @Test
-    public void saveAndLoad_validEquipmentList_success() {
+    public void saveAndLoad_validEquipmentList_success() throws EquipmentMasterException {
         Ui ui = new Ui();
-        // Arrange: Create a Storage object and a dummy list of equipment
         Storage storage = new Storage(TEST_FILE_PATH, ui);
         ArrayList<Equipment> originalList = new ArrayList<>();
 
-        // Using your newly created 4-argument constructor!
-        originalList.add(new Equipment("STM32 Board", 50, 45, 5));
-        originalList.add(new Equipment("HDMI Cable", 100, 100, 0));
+        AcademicSemester sem1 = new AcademicSemester("AY2025/26 Sem1");
+        AcademicSemester sem2 = new AcademicSemester("AY2025/26 Sem2");
 
-        // Act: Save the list to the text file, then immediately load it back into a new list
+        // Using your newly created 6-argument constructor!
+        originalList.add(new Equipment("STM32 Board", 50, 45, 5, sem1, 5.0));
+        originalList.add(new Equipment("HDMI Cable", 100, 100, 0, sem2, 2.5));
+
+        // Act: Save the list to the text file, then immediately load it back
         storage.save(originalList);
         ArrayList<Equipment> loadedList = storage.load();
 
-        // Assert: Verify that the loaded list has the exact same data as the original list
+        // Assert: Verify that the loaded list has the exact same data
         assertEquals(2, loadedList.size());
 
-        // Check the attributes of the first equipment
+        // Check the attributes of the first equipment, including the new lifecycle fields
         Equipment firstEquipment = loadedList.get(0);
         assertEquals("STM32 Board", firstEquipment.getName());
         assertEquals(50, firstEquipment.getQuantity());
         assertEquals(45, firstEquipment.getAvailable());
         assertEquals(5, firstEquipment.getLoaned());
+        assertEquals(sem1.toString(), firstEquipment.getPurchaseSem().toString());
+        assertEquals(5.0, firstEquipment.getLifespanYears());
     }
 
     @Test
@@ -100,10 +104,9 @@ public class StorageTest {
         Storage storage = new Storage(TEST_FILE_PATH, new Ui());
 
         // Simulating a tricky line where the name itself contains " | "
-        String trickyLine = "Special | Adapter | 50 | 45 | 5";
+        // Added the two new lifecycle fields to the end of the string
+        String trickyLine = "Special | Adapter | 50 | 45 | 5 | AY2025/26 Sem1 | 3.5";
 
-        // We need to use reflection or make parseEquipment protected to test it directly,
-        // OR just test it through the load() method:
         try (FileWriter writer = new FileWriter(TEST_FILE_PATH)) {
             writer.write(trickyLine + System.lineSeparator());
         } catch (IOException e) {
@@ -113,8 +116,12 @@ public class StorageTest {
         ArrayList<Equipment> loaded = storage.load();
 
         assertEquals(1, loaded.size());
-        // The name should correctly include the first "|"
-        assertEquals("Special | Adapter", loaded.get(0).getName());
-        assertEquals(50, loaded.get(0).getQuantity());
+
+        // Assert the name correctly includes the first "|" and fields parsed properly
+        Equipment loadedEquipment = loaded.get(0);
+        assertEquals("Special | Adapter", loadedEquipment.getName());
+        assertEquals(50, loadedEquipment.getQuantity());
+        assertEquals("AY2025/26 Sem1", loadedEquipment.getPurchaseSem().toString());
+        assertEquals(3.5, loadedEquipment.getLifespanYears());
     }
 }
