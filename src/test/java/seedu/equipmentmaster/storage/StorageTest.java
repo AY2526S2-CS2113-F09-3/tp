@@ -1,6 +1,5 @@
 package seedu.equipmentmaster.storage;
 
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 
 import org.junit.jupiter.api.io.TempDir;
@@ -9,7 +8,6 @@ import seedu.equipmentmaster.exception.EquipmentMasterException;
 import seedu.equipmentmaster.semester.AcademicSemester;
 import seedu.equipmentmaster.ui.Ui;
 
-import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.Path;
@@ -27,11 +25,14 @@ public class StorageTest {
     @TempDir
     Path tempDir; // JUnit creates a temporary directory for file tests
 
+    private Storage createStorage() {
+        return new Storage(tempDir.resolve("test.txt").toString(), new Ui());
+    }
+
     @Test
     public void saveAndLoadSettings_validSemester_success() throws EquipmentMasterException {
         // Use a temporary file path to avoid messing up real data
-        String testDataPath = tempDir.resolve("equipment.txt").toString();
-        Storage storage = new Storage(testDataPath, new Ui());
+        Storage storage = createStorage();
 
         // We need to manually point settingsPath to temp for testing
         // (Assuming you added a way to set settingsPath or it uses the same data dir)
@@ -43,19 +44,9 @@ public class StorageTest {
         assertEquals("AY2025/26 Sem2", loadedSemStr);
     }
 
-    @AfterEach
-    public void tearDown() {
-        // Clean up: Delete the test file after each test to ensure a fresh environment
-        File file = new File(TEST_FILE_PATH);
-        if (file.exists()) {
-            file.delete();
-        }
-    }
-
     @Test
     public void saveAndLoad_validEquipmentList_success() throws EquipmentMasterException {
-        Ui ui = new Ui();
-        Storage storage = new Storage(TEST_FILE_PATH, ui);
+        Storage storage = createStorage();
         ArrayList<Equipment> originalList = new ArrayList<>();
 
         AcademicSemester sem1 = new AcademicSemester("AY2025/26 Sem1");
@@ -84,13 +75,8 @@ public class StorageTest {
 
     @Test
     public void load_noExistingFile_returnsEmptyList() {
-        Ui ui = new Ui();
         // Arrange: Ensure the test file definitely does not exist
-        Storage storage = new Storage(TEST_FILE_PATH, ui);
-        File file = new File(TEST_FILE_PATH);
-        if (file.exists()) {
-            file.delete();
-        }
+        Storage storage = new Storage(tempDir.resolve("nonexistent.txt").toString(), new Ui());
 
         // Act: Attempt to load from the non-existent file
         ArrayList<Equipment> loadedList = storage.load();
@@ -101,16 +87,15 @@ public class StorageTest {
 
     @Test
     public void parseEquipment_nameWithDelimiters_success() {
-        Storage storage = new Storage(TEST_FILE_PATH, new Ui());
+        Path testFile = tempDir.resolve("test.txt");
+        Storage storage = new Storage(testFile.toString(), new Ui());
 
-        // Simulating a tricky line where the name itself contains " | "
-        // Added the two new lifecycle fields to the end of the string
-        String trickyLine = "Special | Adapter | 50 | 45 | 5 | AY2025/26 Sem1 | 3.5";
+        String trickyLine = "Special | Adapter | 50 | 45 | 5 | AY2025/26 Sem1 | 3.5 | ";
 
-        try (FileWriter writer = new FileWriter(TEST_FILE_PATH)) {
+        try (FileWriter writer = new FileWriter(testFile.toFile())) {
             writer.write(trickyLine + System.lineSeparator());
         } catch (IOException e) {
-            fail("Setup failed");
+            fail("Setup failed: " + e.getMessage());
         }
 
         ArrayList<Equipment> loaded = storage.load();
@@ -123,5 +108,6 @@ public class StorageTest {
         assertEquals(50, loadedEquipment.getQuantity());
         assertEquals("AY2025/26 Sem1", loadedEquipment.getPurchaseSem().toString());
         assertEquals(3.5, loadedEquipment.getLifespanYears());
+        assertTrue(loadedEquipment.getModuleCodes().isEmpty());
     }
 }

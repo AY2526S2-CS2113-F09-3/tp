@@ -10,6 +10,16 @@ import seedu.equipmentmaster.equipmentlist.EquipmentList;
 import java.util.ArrayList;
 
 public class FindCommandTest {
+
+    // Helper method to create equipment with modules
+    private Equipment createEquipmentWithModules(String name, int quantity, String... modules) {
+        Equipment eq = new Equipment(name, quantity);
+        for (String module : modules) {
+            eq.addModuleCode(module);
+        }
+        return eq;
+    }
+
     @Test
     public void getMatchingEquipments_keywordMatches_returnsMatchedList() {
         // Arrange
@@ -65,5 +75,44 @@ public class FindCommandTest {
 
         assertTrue(hasBoard);
         assertTrue(hasCable);
+    }
+
+    @Test
+    public void getMatchingEquipments_moduleCodeCaseInsensitive_returnsMatchedList() {
+        // Arrange
+        EquipmentList equipments = new EquipmentList();
+        equipments.addEquipment(createEquipmentWithModules("FPGA", 40, "EE2026"));
+
+        FindCommand command = new FindCommand("ee2026");
+
+        // Act
+        ArrayList<Equipment> matches = command.getMatchingEquipments(equipments);
+
+        // Assert
+        assertEquals(1, matches.size());
+        assertEquals("FPGA", matches.get(0).getName());
+    }
+
+    @Test
+    public void getMatchingEquipments_searchByModuleCode_returnsMatchedList() {
+        // Arrange
+        EquipmentList equipments = new EquipmentList();
+        equipments.addEquipment(createEquipmentWithModules("FPGA", 40, "EE2026", "CG2028"));
+        equipments.addEquipment(createEquipmentWithModules("ESP32", 40, "EE2026"));
+        equipments.addEquipment(new Equipment("Oscilloscope", 10));
+
+        FindCommand command = new FindCommand("EE2026");
+
+        // Act
+        ArrayList<Equipment> matches = command.getMatchingEquipments(equipments);
+
+        // Assert
+        assertEquals(2, matches.size());
+
+        boolean hasFPGA = matches.stream().anyMatch(eq -> eq.getName().equals("FPGA"));
+        boolean hasESP32 = matches.stream().anyMatch(eq -> eq.getName().equals("ESP32"));
+
+        assertTrue(hasFPGA);
+        assertTrue(hasESP32);
     }
 }

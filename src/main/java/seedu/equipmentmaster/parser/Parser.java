@@ -28,7 +28,7 @@ public class Parser {
     private static ArrayList<CommandSpec> commandSpecs = new ArrayList<>();
 
     static {
-        commandSpecs.add(new CommandSpec("add", "add n/NAME q/QUANTITY [sem/SEMESTER] [life/LIFESPAN]",
+        commandSpecs.add(new CommandSpec("add", "add n/NAME q/QUANTITY [m/MODULE]... [sem/SEMESTER] [life/LIFESPAN]",
                 AddCommand::parse));
         commandSpecs.add(new CommandSpec("list", "list", fullCommand -> new ListCommand()));
         commandSpecs.add(new CommandSpec("bye", "bye", fullCommand -> new ByeCommand()));

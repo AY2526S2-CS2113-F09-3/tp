@@ -86,44 +86,33 @@ public class Storage {
      * @return An Equipment object, or null if the string format is corrupted.
      */
     private Equipment parseEquipment(String line) {
-        // Expected format: Name | Total | Available | Loaned
+        // Expected format: Name | Total | Available | Loaned | PurchaseSem | LifespanYears | Modules
         if (line == null) {
             return null;
         }
 
         final String delimiter = " | ";
         // Find separators from the end: Name [delim] Total [delim] Available [delim] Loaned
-        int lastSep = line.lastIndexOf(delimiter);
-        if (lastSep == -1) {
+        int sep6 = line.lastIndexOf(delimiter); // before modules
+        int sep5 = line.lastIndexOf(delimiter, sep6 - 1); // before lifespan
+        int sep4 = line.lastIndexOf(delimiter, sep5 - 1); // before purchaseSem
+        int sep3 = line.lastIndexOf(delimiter, sep4 - 1); // before loaned
+        int sep2 = line.lastIndexOf(delimiter, sep3 - 1); // before available
+        int sep1 = line.lastIndexOf(delimiter, sep2 - 1); // before total
+        // everything before sep1 is the name
+
+        if (sep6 == -1 || sep5 == -1 || sep4 == -1 || sep3 == -1 || sep2 == -1 || sep1 == -1) {
             return null;
         }
 
-        int forthSep = line.lastIndexOf(delimiter, lastSep - 1);
-        if (forthSep == -1) {
-            return null;
-        }
+        String name = line.substring(0, sep1);
+        String totalStr = line.substring(sep1 + delimiter.length(), sep2);
+        String availableStr = line.substring(sep2 + delimiter.length(), sep3);
+        String loanedStr = line.substring(sep3 + delimiter.length(), sep4);
+        String purchaseSemStr = line.substring(sep4 + delimiter.length(), sep5);
+        String lifespanYearsStr = line.substring(sep5 + delimiter.length(), sep6);
+        String modulesStr = line.substring(sep6 + delimiter.length());
 
-        int thirdSep = line.lastIndexOf(delimiter, forthSep - 1);
-        if (thirdSep == -1) {
-            return null;
-        }
-
-        int secondSep = line.lastIndexOf(delimiter, thirdSep - 1);
-        if (secondSep == -1) {
-            return null;
-        }
-
-        int firstSep = line.lastIndexOf(delimiter, secondSep - 1);
-        if (firstSep == -1) {
-            return null;
-        }
-
-        String name = line.substring(0, firstSep);
-        String totalStr = line.substring(firstSep + delimiter.length(), secondSep);
-        String availableStr = line.substring(secondSep + delimiter.length(), thirdSep);
-        String loanedStr = line.substring(thirdSep + delimiter.length(), forthSep);
-        String purchaseSemStr = line.substring(forthSep + delimiter.length(), lastSep);
-        String lifespanYearsStr = line.substring(lastSep + delimiter.length());
         try {
             int totalQuantity = Integer.parseInt(totalStr.trim());
             int availableQuantity = Integer.parseInt(availableStr.trim());
@@ -131,7 +120,18 @@ public class Storage {
             AcademicSemester purchaseSem = new AcademicSemester(purchaseSemStr);
             double lifespanYears = Double.parseDouble(lifespanYearsStr.trim());
 
-            return new Equipment(name, totalQuantity, availableQuantity, loanedQuantity, purchaseSem, lifespanYears);
+            ArrayList<String> moduleCodes = new ArrayList<>();
+            if (modulesStr != null && !modulesStr.trim().isEmpty()) {
+                String[] modules = modulesStr.split(",");
+                for (String module : modules) {
+                    String trimmed = module.trim();
+                    if (!trimmed.isEmpty()) {
+                        moduleCodes.add(trimmed);
+                    }
+                }
+            }
+            return new Equipment(name, totalQuantity, availableQuantity, loanedQuantity,
+                    purchaseSem, lifespanYears, moduleCodes);
 
         } catch (NumberFormatException e) {
             // Ignore corrupted lines

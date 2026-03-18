@@ -21,18 +21,21 @@ public class UiTableRow {
      * @param equipment The Equipment object to represent in the row.
      */
     public UiTableRow(Equipment equipment) {
-        this(equipment.getName(),
-                "Total: " + equipment.getQuantity(),
-                "Available: " + equipment.getAvailable(),
-                "Loaned: " + equipment.getLoaned(),
-                equipment.getPurchaseSem() == null
-                        ? "Purchase: <N/A>"
-                        : "Purchase: " + equipment.getPurchaseSem(),
-                equipment.getLifespanYears() <= 0.0
-                        ? "Life: <N/A>"
-                        : "Life: " + equipment.getLifespanYears()
-                        + (equipment.getLifespanYears() == 1.0 ? " year" : " years")
-        );
+        columns = new ArrayList<>();
+        columns.add(equipment.getName());
+        columns.add("Total: " + equipment.getQuantity());
+        columns.add("Available: " + equipment.getAvailable());
+        columns.add("Loaned: " + equipment.getLoaned());
+        columns.add(equipment.getPurchaseSem() == null
+                ? "Purchase: <N/A>"
+                : "Purchase: " + equipment.getPurchaseSem());
+        columns.add(equipment.getLifespanYears() <= 0.0
+                ? "Life: <N/A>"
+                : "Life: " + equipment.getLifespanYears()
+                + (equipment.getLifespanYears() == 1.0 ? " year" : " years"));
+        if (equipment.getModuleCodes() != null && !equipment.getModuleCodes().isEmpty()) {
+            columns.add("Modules: " + equipment.getModuleCodes());
+        }
     }
 
     /**

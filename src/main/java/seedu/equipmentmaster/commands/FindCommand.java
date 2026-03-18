@@ -46,6 +46,8 @@ public class FindCommand extends Command {
 
     /**
      * Extracts the core logic of finding matching equipment so it can be tested easily.
+     * Searches in both equipment name AND module codes
+     *
      * @param equipments The current list of equipment to search through.
      * @return An ArrayList containing only the equipment that matches the keyword.
      */
@@ -68,6 +70,19 @@ public class FindCommand extends Command {
                 if (!token.isEmpty() && equipmentNameLower.contains(token)) {
                     matchingEquipments.add(eq);
                     break; // Avoid adding the same equipment multiple times
+                }
+                // Check module codes
+                if (eq.getModuleCodes() != null && !eq.getModuleCodes().isEmpty()) {
+                    for (String module : eq.getModuleCodes()) {
+                        if (module.toLowerCase().contains(token)) {
+                            matchingEquipments.add(eq);
+                            break;
+                        }
+                    }
+                    // If added from module search, break out of token loop
+                    if (matchingEquipments.contains(eq)) {
+                        break;
+                    }
                 }
             }
         }
