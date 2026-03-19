@@ -3,33 +3,41 @@ Welcome to Equipment Master! How can I help you today?
    / ____/___  __  ______  ____  ___  /  |/  /___ ______/ /____  _____
   / __/ / __ `/ / / / __ \/ __ \/ _ \/ /|_/ / __ `/ ___/ __/ _ \/ ___/
  / /___/ /_/ / /_/ / /_/ / /_/ /  __/ /  / / /_/ (__  ) /_/  __/ /
-/_____/\__, /\__,_/ .___/ .___/\___/\__/  /_/  /_/\__,_/____/\__/\___/_/
+/_____/\__, /\__,_/ .___/ .___/\___/\__/  /_/  /_/\__,_/____/\__/
       /____/     /_/   /_/
+
 ===================================================
-System semester updated to AY2024/25 Sem1.
 ===================================================
-Added 100 unit(s) of Resistor. (Total Available: 100)
+System time updated. Current academic semester is now set to AY2024/25 Sem1
 ===================================================
-Added 50 unit(s) of STM32. (Total Available: 50)
-Lifecycle tracking enabled: Bought in AY2024/25 Sem1, Lifespan: 2.5 years.
 ===================================================
-Added 5 unit(s) of Oscilloscope. (Total Available: 5)
-Lifecycle tracking enabled: Bought in AY2020/21 Sem1, Lifespan: 3.0 years.
+Added 100 of Resistor. (Total Available: 100)
 ===================================================
-Equipment quantity must be greater than 0.
+===================================================
+Added 50 of STM32. (Total Available: 50)
+===================================================
+===================================================
+Added 5 of Oscilloscope. (Total Available: 5)
+===================================================
+===================================================
+Equipment quantity must be positive.
+===================================================
 ===================================================
 Here is the equipment log:
-1. Resistor | Total: 100 | Available: 100 | Loaned: 0
-2. STM32 | Total: 50 | Available: 50 | Loaned: 0 | Bought: AY2024/25 Sem1 | Lifespan: 2.5
-3. Oscilloscope | Total: 5 | Available: 5 | Loaned: 0 | Bought: AY2020/21 Sem1 | Lifespan: 3.0
+1. Resistor     | Total: 100 | Available: 100 | Loaned: 0 | Purchase: <N/A> | Life: <N/A>
+2. STM32        | Total: 50  | Available: 50  | Loaned: 0 | Purchase: <N/A> | Life: <N/A>
+3. Oscilloscope | Total: 5   | Available: 5   | Loaned: 0 | Purchase: <N/A> | Life: <N/A>
 ===================================================
-Successfully deleted 20 unit(s) of Resistor from available.
 ===================================================
-Insufficient available quantity to delete.
+Deleted 20 available unit(s) of Resistor.
 ===================================================
-Aging Equipment Report (Current Sem: AY2024/25 Sem1)
----------------------------------------------------
-1. Oscilloscope (Qty: 5, Bought: AY2020/21 Sem1) | Age: 4.0/3.0 Years | Status: [REPLACE SOON]
 ===================================================
-Bye. Hope to see you again soon!
+Only 50 available unit(s). Cannot delete 100.
+===================================================
+===================================================
+Aging Equipment Report (Calculated for: AY2024/25 Sem1):
+Great news! No equipment needs replacement for this semester.
+===================================================
+===================================================
+Goodbye! See you back in the lab soon.
 ===================================================

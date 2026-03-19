@@ -121,7 +121,7 @@ public class AddCommand extends Command {
             }
         } catch (NumberFormatException e) {
             logger.log(Level.WARNING, "Failed to parse quantity: " + qtString, e);
-            throw new EquipmentMasterException("Please enter a valid whole number for quantity");
+            throw new EquipmentMasterException("Please enter a valid whole number for quantity.");
         }
         AcademicSemester purchaseSem = null;
         double lifespanYear = 0.0;
@@ -148,53 +148,70 @@ public class AddCommand extends Command {
                 throw new EquipmentMasterException("Please enter a valid whole number for minimum threshold");
             }
         }
-        String[] parts = fullCommand.split(" ");
-        for (String part : parts) {
-            if (part.startsWith("m/")) {
-                String moduleCode = part.substring(2).toUpperCase().trim();
-                if (!moduleCode.isEmpty() && !moduleCodes.contains(moduleCode)) {
-                    moduleCodes.add(moduleCode);
-                }
-            }
-        }
-
+        moduleCodes = extractMultipleArguments(fullCommand, "m/");
 
         logger.log(Level.INFO, "Successfully parsed AddCommand for equipment: " + name);
         return new AddCommand(name, quantity, purchaseSem, lifespanYear, minQuantity, moduleCodes);
     }
 
     /**
-     * Extracts the argument value following the given prefix, up to the next known prefix or end of string.
+     * Extracts a single argument value for a given prefix.
+     * Uses space-padding to prevent substring collisions and stops at the next valid flag.
      *
-     * @param fullCommand The full user input string.
-     * @param prefix      The prefix whose value should be extracted (e.g., "n/", "q/").
-     * @return The trimmed value associated with the prefix, or an empty string if none.
-     * @throws EquipmentMasterException If the prefix cannot be found.
+     * @param fullCommand The raw input string from the user.
+     * @param prefix      The parameter flag to search for (e.g., "q/", "b/").
+     * @return The extracted string value, or an empty string if not found.
      */
-    private static String extractArgument(String fullCommand, String prefix) throws EquipmentMasterException {
-        int prefixIndex = fullCommand.indexOf(prefix);
-        if (prefixIndex < 0) {
-            if (prefix.equals("min/") || prefix.equals("bought/") || prefix.equals("life/")) {
-                return "";
-            }
-            throw new EquipmentMasterException(MESSAGE_INVALID_ADD_FORMAT);
-        }
-        int valueStart = prefixIndex + prefix.length();
-        int valueEnd = fullCommand.length();
-        String[] allPrefixes = {"n/", "q/", "bought/", "life/", "m/", "min/"};
-        for (String otherPrefix : allPrefixes) {
-            if (otherPrefix.equals(prefix)) {
-                continue;
-            }
-            int idx = fullCommand.indexOf(otherPrefix, valueStart);
-            if (idx != -1 && idx < valueEnd) {
-                valueEnd = idx;
-            }
-        }
-        if (valueStart >= valueEnd) {
+    private static String extractArgument(String fullCommand, String prefix) {
+        String paddedCommand = " " + fullCommand.trim() + " ";
+        String searchPrefix = " " + prefix;
+        int startIdx = paddedCommand.indexOf(searchPrefix);
+        if (startIdx == -1) {
             return "";
         }
-        return fullCommand.substring(valueStart, valueEnd).trim();
+        startIdx += searchPrefix.length();
+        int endIdx = paddedCommand.length();
+        String[] allPrefixes = {" n/", " q/", " sem/", " bought/", " life/", " m/", " min/"};
+        for (String p : allPrefixes) {
+            int pIdx = paddedCommand.indexOf(p, startIdx);
+            if (pIdx != -1 && pIdx < endIdx) {
+                endIdx = pIdx;
+            }
+        }
+        return paddedCommand.substring(startIdx, endIdx).trim();
+    }
+
+    /**
+     * Extracts multiple unique argument values for a repeating prefix.
+     * It is case-insensitive and automatically filters out duplicate entries.
+     *
+     * @param fullCommand The raw input string from the user.
+     * @param prefix      The repeating parameter flag to search for (e.g., "m/").
+     * @return A list of extracted uppercase values, or an empty list if none found.
+     */
+    private static ArrayList<String> extractMultipleArguments(String fullCommand, String prefix) {
+        ArrayList<String> results = new ArrayList<>();
+        String paddedCommand = " " + fullCommand.trim() + " ";
+        paddedCommand = paddedCommand.replaceAll(" (?i)" + prefix, " " + prefix.toLowerCase());
+        String searchPrefix = " " + prefix.toLowerCase();
+        String[] allPrefixes = {" n/", " q/", " sem/", " bought/", " life/", " m/", " min/"};
+        int currentIndex = paddedCommand.indexOf(searchPrefix);
+        while (currentIndex != -1) {
+            int startIdx = currentIndex + searchPrefix.length();
+            int endIdx = paddedCommand.length();
+            for (String p : allPrefixes) {
+                int pIdx = paddedCommand.indexOf(p, startIdx);
+                if (pIdx != -1 && pIdx < endIdx) {
+                    endIdx = pIdx;
+                }
+            }
+            String value = paddedCommand.substring(startIdx, endIdx).trim().toUpperCase();
+            if (!value.isEmpty() && !results.contains(value)) {
+                results.add(value);
+            }
+            currentIndex = paddedCommand.indexOf(searchPrefix, endIdx);
+        }
+        return results;
     }
 
     /**
