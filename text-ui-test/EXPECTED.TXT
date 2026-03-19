@@ -1,49 +1,42 @@
 Welcome to Equipment Master! How can I help you today?
-    ______                                     __   __  ___                __
-   / ____/____ _ __  __ ____   ____   ____ _  / /_   /  |/  /____ _ _____ / /_ ___   _____
-  / __/  / __ `// / / // __ \ / __ \ / __ `/ / __/  / /|_/ // __ `// ___// __// _ \ / ___/
- / /___ / /_/ // /_/ // /_/ // /_/ // /_/ / / /_   / /  / // /_/ /(__  )/ /_ /  __// /
-/_____/ \__, / \__,_// .___// .___/ \__,_/  \__/  /_/  /_/ \__,_//____/ \__/ \___//_/
-          /_/       /_/    /_/
+    ______                             __  ___           __
+   / ____/___  __  ______  ____  ___  /  |/  /___ ______/ /____  _____
+  / __/ / __ `/ / / / __ \/ __ \/ _ \/ /|_/ / __ `/ ___/ __/ _ \/ ___/
+ / /___/ /_/ / /_/ / /_/ / /_/ /  __/ /  / / /_/ (__  ) /_/  __/ /
+/_____/\__, /\__,_/ .___/ .___/\___/\__/  /_/  /_/\__,_/____/\__/
+      /____/     /_/   /_/
+
 ===================================================
 ===================================================
-Added 40 of FPGA. (Total Available: 40)
+System time updated. Current academic semester is now set to AY2024/25 Sem1
 ===================================================
 ===================================================
-Added 40 of ESP32 with modules [EE2026]. (Total Available: 40)
+Added 100 of Resistor. (Total Available: 100)
 ===================================================
 ===================================================
-Added 40 of STM32 with modules [EE2026, CG2028]. (Total Available: 40)
+Added 50 of STM32. (Total Available: 50)
 ===================================================
 ===================================================
-Added 40 of BASYS3 with modules [EE2026]. (Total Available: 40)
+Added 5 of Oscilloscope. (Total Available: 5)
 ===================================================
 ===================================================
-Added 40 of FPGA with modules [EE2026]. (Total Available: 40)
+Equipment quantity must be positive.
 ===================================================
 ===================================================
-1 equipment listed!
-ESP32 | Total: 40 | Available: 40 | loaned: 0 | Modules: [EE2026]
+Here is the equipment log:
+1. Resistor     | Total: 100 | Available: 100 | Loaned: 0 | Purchase: <N/A> | Life: <N/A>
+2. STM32        | Total: 50  | Available: 50  | Loaned: 0 | Purchase: <N/A> | Life: <N/A>
+3. Oscilloscope | Total: 5   | Available: 5   | Loaned: 0 | Purchase: <N/A> | Life: <N/A>
 ===================================================
 ===================================================
-1 equipment listed!
-FPGA | Total: 80 | Available: 80 | loaned: 0
+Deleted 20 available unit(s) of Resistor.
 ===================================================
 ===================================================
-3 equipments listed!
-1. ESP32 | Total: 40 | Available: 40 | loaned: 0 | Modules: [EE2026]
-2. STM32 | Total: 40 | Available: 40 | loaned: 0 | Modules: [EE2026, CG2028]
-3. BASYS3 | Total: 40 | Available: 40 | loaned: 0 | Modules: [EE2026]
+Only 50 available unit(s). Cannot delete 100.
 ===================================================
 ===================================================
-3 equipments listed!
-1. ESP32 | Total: 40 | Available: 40 | loaned: 0 | Modules: [EE2026]
-2. STM32 | Total: 40 | Available: 40 | loaned: 0 | Modules: [EE2026, CG2028]
-3. BASYS3 | Total: 40 | Available: 40 | loaned: 0 | Modules: [EE2026]
-===================================================
-===================================================
-1 equipment listed!
-STM32 | Total: 40 | Available: 40 | loaned: 0 | Modules: [EE2026, CG2028]
+Aging Equipment Report (Calculated for: AY2024/25 Sem1):
+Great news! No equipment needs replacement for this semester.
 ===================================================
 ===================================================
 Goodbye! See you back in the lab soon.

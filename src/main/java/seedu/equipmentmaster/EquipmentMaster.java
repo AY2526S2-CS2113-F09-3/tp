@@ -1,6 +1,6 @@
 package seedu.equipmentmaster;
 
-
+import java.util.logging.LogManager;
 import seedu.equipmentmaster.commands.Command;
 import seedu.equipmentmaster.equipmentlist.EquipmentList;
 import seedu.equipmentmaster.exception.EquipmentMasterException;
@@ -88,6 +88,7 @@ public class EquipmentMaster {
     }
 
     public static void main(String[] args) throws EquipmentMasterException{
+        LogManager.getLogManager().reset();
         new EquipmentMaster("data/equipment.txt").run();
     }
 

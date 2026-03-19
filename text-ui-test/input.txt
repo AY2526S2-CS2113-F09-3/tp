@@ -1,11 +1,10 @@
-add n/FPGA q/40
-add n/ESP32 q/40 m/EE2026
-add n/STM32 q/40 m/EE2026 m/CG2028
-add m/EE2026 n/BASYS3 q/40
-add n/FPGA q/40 m/EE2026 m/ee2026
-find ESP32
-find FPGA
-find ee2026
-find EE2026
-find CG2028
+setsem AY2024/25 Sem1
+add n/Resistor q/100
+add n/STM32 q/50 sem/AY2024/25 Sem1 life/2.5
+add n/Oscilloscope q/5 sem/AY2020/21 Sem1 life/3.0
+add n/Raspberry Pi q/0
+list
+delete 1 q/20 s/available
+delete n/STM32 q/100 s/available
+report aging AY2024/25 Sem1
 bye
