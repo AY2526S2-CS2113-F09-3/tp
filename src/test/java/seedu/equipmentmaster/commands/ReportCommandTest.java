@@ -119,4 +119,39 @@ public class ReportCommandTest {
         String output = outContent.toString();
         assertTrue(output.contains("Great news! No equipment needs replacement"));
     }
+
+    @Test
+    public void execute_lowStockReport_sufficientTotalNoWarning() throws EquipmentMasterException {
+        // Arrange: Set up an equipment item where Total = 10, Min Threshold = 10.
+        // Simulate all 10 items being loaned out (Available = 0, Loaned = 10).
+        Equipment ghost = new Equipment("Ghost", 10, 0, 10, null, 0.0, 10);
+        equipments.addEquipment(ghost);
+
+        // Act: Execute the 'report lowstock' command
+        ReportCommand command = new ReportCommand("lowstock", "");
+        command.execute(equipments, ui, storage);
+
+        // Assert: Verify that the "RESTOCK NEEDED" alert is NOT triggered
+        String output = outContent.toString();
+        assertFalse(output.contains("RESTOCK NEEDED"),
+                "LOANED items should not trigger a restock alert if total quantity >= min threshold.");
+    }
+
+    @Test
+    public void execute_lowStockReport_totalBelowMinShowsWarning() throws EquipmentMasterException {
+        // Arrange: Set up an equipment item where Total = 10, but Min Threshold = 20.
+        Equipment iron = new Equipment("Soldering Iron", 10, 10, 0, null, 0.0, 20);
+        equipments.addEquipment(iron);
+
+        // Act: Execute the 'report lowstock' command
+        ReportCommand command = new ReportCommand("lowstock", "");
+        command.execute(equipments, ui, storage);
+
+        // Assert: Verify the exact output format matches expectations
+        String output = outContent.toString();
+        String expectedString = "Soldering Iron | Quantity: 10 | Min: 20 -> RESTOCK NEEDED";
+
+        assertTrue(output.contains(expectedString),
+                "The output formatting for low stock items does not match the expected string.");
+    }
 }
