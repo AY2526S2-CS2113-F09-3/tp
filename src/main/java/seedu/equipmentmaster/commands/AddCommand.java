@@ -221,6 +221,9 @@ public class AddCommand extends Command {
      */
     @Override
     public void execute(EquipmentList equipments, Ui ui, Storage storage) {
+        assert equipments != null : "EquipmentList dependency cannot be null";
+        assert ui != null : "Ui dependency cannot be null";
+        assert storage != null : "Storage dependency cannot be null";
         Equipment equipment = new Equipment(name, quantity, quantity, 0, purchaseSem, lifespanYears,
                 moduleCodes, minQuantity);
         equipments.addEquipment(equipment);
