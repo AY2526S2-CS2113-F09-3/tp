@@ -26,6 +26,7 @@ public class UiTableRow {
         columns.add("Total: " + equipment.getQuantity());
         columns.add("Available: " + equipment.getAvailable());
         columns.add("Loaned: " + equipment.getLoaned());
+        columns.add("Min: " + equipment.getMinQuantity());
         columns.add(equipment.getPurchaseSem() == null
                 ? "Purchase: <N/A>"
                 : "Purchase: " + equipment.getPurchaseSem());
@@ -33,9 +34,9 @@ public class UiTableRow {
                 ? "Life: <N/A>"
                 : "Life: " + equipment.getLifespanYears()
                 + (equipment.getLifespanYears() == 1.0 ? " year" : " years"));
-        if (equipment.getModuleCodes() != null && !equipment.getModuleCodes().isEmpty()) {
-            columns.add("Modules: " + equipment.getModuleCodes());
-        }
+        columns.add(equipment.getModuleCodes() != null && !equipment.getModuleCodes().isEmpty()
+                ? "Modules: " + equipment.getModuleCodes()
+                : "");
     }
 
     /**
@@ -77,10 +78,16 @@ public class UiTableRow {
      */
     public String toString(int[] widths) {
         StringBuilder rowString = new StringBuilder();
-        for (int i = 0; i < columns.size(); i++) {
-            String cell = String.format("%-" + widths[i] + "s", columns.get(i));
-            rowString.append(cell);
-            if (i < columns.size() - 1) {
+        int lastRendered = columns.size() - 1;
+        while (lastRendered > 0 && columns.get(lastRendered).isEmpty()) {
+            lastRendered--;
+        }
+        for (int i = 0; i <= lastRendered; i++) {
+            if (i == lastRendered) {
+                // Don't pad the last column to avoid trailing whitespace
+                rowString.append(columns.get(i));
+            } else {
+                rowString.append(String.format("%-" + widths[i] + "s", columns.get(i)));
                 rowString.append(" | ");
             }
         }

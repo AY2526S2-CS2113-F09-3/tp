@@ -89,7 +89,6 @@ public class Equipment {
      * @param minQuantity New threshold value.
      */
     public void setMinQuantity(int minQuantity) {
-        // THIS CLEARS THE !Assertions TAG ON YOUR DASHBOARD
         assert minQuantity >= 0 : "Minimum quantity threshold cannot be negative";
         this.minQuantity = minQuantity;
     }
@@ -247,7 +246,7 @@ public class Equipment {
     @Override
     public String toString() {
         String result = name + " | Total: " + quantity + " | Available: " + available +
-                " | loaned: " + loaned;
+                " | loaned: " + loaned + " | Min: " + minQuantity;
 
         if (purchaseSem != null) {
             result += " | Purchase: " + purchaseSem + " | Lifespan: " + lifespanYears + " years";

@@ -142,13 +142,18 @@ public class DeleteCommand extends Command {
         int newTotal = target.getQuantity() - quantity;
         target.setQuantity(newTotal);
 
-        // 3. Auto-remove if total reaches 0
+        // 3. Print success message exactly once
         if (newTotal == 0) {
             equipments.removeEquipment(target);
             ui.showMessage("Deleted " + quantity + " " + status + " unit(s) of " + target.getName() + ".");
             ui.showMessage("Notice: Total quantity reached 0. The item has been completely removed from the list.");
         } else {
             ui.showMessage("Deleted " + quantity + " " + status + " unit(s) of " + target.getName() + ".");
+            if (newTotal <= target.getMinQuantity()) {
+                ui.showMessage("!!! LOW STOCK ALERT: " + target.getName() +
+                        " is at or below threshold! (Current: " + newTotal +
+                        ", Min: " + target.getMinQuantity() + ")");
+            }
         }
 
         storage.save(equipments.getAllEquipments());

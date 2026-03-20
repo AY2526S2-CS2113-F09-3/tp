@@ -249,5 +249,11 @@ public class AddCommand extends Command {
         }
 
         ui.showMessage(message.toString());
+        //fix: alert if starting quantity is at or below minimum threshold
+        if (minQuantity > 0 && quantity <= minQuantity) {
+            ui.showMessage("!!! LOW STOCK ALERT: " + name +
+                    " is at or below threshold! (Current: " + quantity +
+                    ", Min: " + minQuantity + ")");
+        }
     }
 }

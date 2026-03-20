@@ -13,6 +13,8 @@ import seedu.equipmentmaster.storage.Storage;
 import seedu.equipmentmaster.ui.Ui;
 
 import java.util.ArrayList;
+import java.io.ByteArrayOutputStream;
+import java.io.PrintStream;
 
 public class AddCommandTest {
     private static final String TEST_FILE_PATH = "test_equipment.txt";
@@ -127,6 +129,36 @@ public class AddCommandTest {
         assertEquals(2, added.getModuleCodes().size());
         assertTrue(added.getModuleCodes().contains("EE2026"));
         assertTrue(added.getModuleCodes().contains("CG2028"));
+    }
+
+    @Test
+    public void execute_addAtMinThreshold_showsLowStockAlert() {
+        EquipmentList equipments = new EquipmentList();
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+        Ui ui = new Ui(System.in, new PrintStream(outputStream));
+        Storage storage = new Storage(TEST_FILE_PATH, ui);
+
+        AddCommand command = new AddCommand("Resistor", 5, null, 0.0, 5, new ArrayList<>());
+
+        command.execute(equipments, ui, storage);
+
+        String output = outputStream.toString();
+        assertTrue(output.contains("!!! LOW STOCK ALERT: Resistor"));
+    }
+
+    @Test
+    public void execute_addAboveMinThreshold_noLowStockAlert() {
+        EquipmentList equipments = new EquipmentList();
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+        Ui ui = new Ui(System.in, new PrintStream(outputStream));
+        Storage storage = new Storage(TEST_FILE_PATH, ui);
+
+        AddCommand command = new AddCommand("Resistor", 10, null, 0.0, 5, new ArrayList<>());
+
+        command.execute(equipments, ui, storage);
+
+        String output = outputStream.toString();
+        assertTrue(!output.contains("!!! LOW STOCK ALERT:"));
     }
 }
 

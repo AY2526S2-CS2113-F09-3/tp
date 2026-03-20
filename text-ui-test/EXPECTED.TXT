@@ -9,32 +9,32 @@ Welcome to Equipment Master! How can I help you today?
 ===================================================
 ===================================================
 Here are the available commands:
-#   Command   | Format                                                                               
+#   Command   | Format
 1.  add       | add n/NAME q/QUANTITY [m/MODULE] [bought/SEMESTER] [min/MINTHRESHOLD] [life/LIFESPAN]
-2.  list      | list                                                                                 
-3.  bye       | bye                                                                                  
-4.  setstatus | setstatus n/NAME q/QUANTITY s/STATUS or setstatus INDEX q/QUANTITY s/STATUS          
-5.  find      | find KEYWORD                                                                         
-6.  setsem    | setsem AY[YYYY]/[YY] Sem[1/2]                                                        
-7.  getsem    | getsem                                                                               
-8.  delete    | delete n/NAME q/QUANTITY s/STATUS or delete INDEX q/QUANTITY s/STATUS                
-9.  help      | help                                                                                 
-10. setmin    | setmin n/NAME min/QUANTITY                                                           
+2.  list      | list
+3.  bye       | bye
+4.  setstatus | setstatus n/NAME q/QUANTITY s/STATUS or setstatus INDEX q/QUANTITY s/STATUS
+5.  find      | find KEYWORD
+6.  setsem    | setsem AY[YYYY]/[YY] Sem[1/2]
+7.  getsem    | getsem
+8.  delete    | delete n/NAME q/QUANTITY s/STATUS or delete INDEX q/QUANTITY s/STATUS
+9.  help      | help
+10. setmin    | setmin n/NAME min/QUANTITY
 11. report    | report aging [AY[YYYY]/[YY] Sem[1/2]] or report lowstock
 ===================================================
 ===================================================
 Here are the available commands:
-#   Command   | Format                                                                               
+#   Command   | Format
 1.  add       | add n/NAME q/QUANTITY [m/MODULE] [bought/SEMESTER] [min/MINTHRESHOLD] [life/LIFESPAN]
-2.  list      | list                                                                                 
-3.  bye       | bye                                                                                  
-4.  setstatus | setstatus n/NAME q/QUANTITY s/STATUS or setstatus INDEX q/QUANTITY s/STATUS          
-5.  find      | find KEYWORD                                                                         
-6.  setsem    | setsem AY[YYYY]/[YY] Sem[1/2]                                                        
-7.  getsem    | getsem                                                                               
-8.  delete    | delete n/NAME q/QUANTITY s/STATUS or delete INDEX q/QUANTITY s/STATUS                
-9.  help      | help                                                                                 
-10. setmin    | setmin n/NAME min/QUANTITY                                                           
+2.  list      | list
+3.  bye       | bye
+4.  setstatus | setstatus n/NAME q/QUANTITY s/STATUS or setstatus INDEX q/QUANTITY s/STATUS
+5.  find      | find KEYWORD
+6.  setsem    | setsem AY[YYYY]/[YY] Sem[1/2]
+7.  getsem    | getsem
+8.  delete    | delete n/NAME q/QUANTITY s/STATUS or delete INDEX q/QUANTITY s/STATUS
+9.  help      | help
+10. setmin    | setmin n/NAME min/QUANTITY
 11. report    | report aging [AY[YYYY]/[YY] Sem[1/2]] or report lowstock
 ===================================================
 ===================================================
@@ -111,7 +111,7 @@ There is no matching equipment in your list.
 ===================================================
 ===================================================
 1 equipment listed!
-STM32 | Total: 50 | Available: 50 | loaned: 0 | Purchase: AY2024/25 Sem1 | Lifespan: 2.5 years | Modules: [CG2111A, CG2271]
+STM32 | Total: 50 | Available: 50 | loaned: 0 | Min: 0 | Purchase: AY2024/25 Sem1 | Lifespan: 2.5 years | Modules: [CG2111A, CG2271]
 ===================================================
 ===================================================
 Missing index. Use: setstatus INDEX q/QUANTITY s/STATUS

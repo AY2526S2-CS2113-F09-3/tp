@@ -11,6 +11,8 @@ import seedu.equipmentmaster.storage.Storage;
 import seedu.equipmentmaster.ui.Ui;
 import seedu.equipmentmaster.exception.EquipmentMasterException;
 
+import java.io.ByteArrayOutputStream;
+import java.io.PrintStream;
 import java.nio.file.Path;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -171,5 +173,39 @@ public class DeleteCommandTest {
         assertThrows(EquipmentMasterException.class, () -> {
             command.execute(equipments, ui, storage);
         });
+    }
+
+    @Test
+    public void execute_deleteBelowMinThreshold_showsLowStockAlert() throws EquipmentMasterException {
+        // Arrange: Total 10, Available 10, minQuantity 8
+        // Delete 3 → newTotal 7 which is below minQuantity 8 — alert should fire
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+        Ui ui = new Ui(System.in, new PrintStream(outputStream));
+
+        Equipment eq = new Equipment("Resistor", 10, 10, 0, null, 0.0, 8);
+        equipments.addEquipment(eq);
+
+        DeleteCommand command = new DeleteCommand("Resistor", 3, "available");
+        command.execute(equipments, ui, storage);
+
+        String output = outputStream.toString();
+        assertTrue(output.contains("!!! LOW STOCK ALERT: Resistor"));
+    }
+
+    @Test
+    public void execute_deleteAboveMinThreshold_noLowStockAlert() throws EquipmentMasterException {
+        // Arrange: Total 10, Available 10, minQuantity 5
+        // Delete 2 → newTotal 8 which is above minQuantity 5 — alert should NOT fire
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+        Ui ui = new Ui(System.in, new PrintStream(outputStream));
+
+        Equipment eq = new Equipment("Resistor", 10, 10, 0, null, 0.0, 5);
+        equipments.addEquipment(eq);
+
+        DeleteCommand command = new DeleteCommand("Resistor", 2, "available");
+        command.execute(equipments, ui, storage);
+
+        String output = outputStream.toString();
+        assertTrue(!output.contains("!!! LOW STOCK ALERT:"));
     }
 }
