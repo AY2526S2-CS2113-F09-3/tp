@@ -95,7 +95,7 @@ Invalid format! Use: setmin n/NAME min/QUANTITY
 Success: Minimum threshold for Ghost set to 10
 ===================================================
 ===================================================
-Invalid format! Use: setmin n/NAME min/QUANTITY
+Minimum threshold cannot be negative.
 ===================================================
 ===================================================
 Invalid format! Use: setmin n/NAME min/QUANTITY
