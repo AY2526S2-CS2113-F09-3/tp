@@ -15,6 +15,7 @@ import seedu.equipmentmaster.ui.Ui;
 import java.util.ArrayList;
 import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
+import java.util.Arrays;
 
 public class AddCommandTest {
     private static final String TEST_FILE_PATH = "test_equipment.txt";
@@ -159,6 +160,37 @@ public class AddCommandTest {
 
         String output = outputStream.toString();
         assertTrue(!output.contains("!!! LOW STOCK ALERT:"));
+    }
+
+    @Test
+    public void addEquipment_duplicateEquipmentWithNewModules_mergesQuantitiesAndModules() throws EquipmentMasterException {
+        // Setup
+        EquipmentList equipmentList = new EquipmentList();
+        AcademicSemester sem = new AcademicSemester("AY2024/25 Sem1");
+
+        // 1. Create and add initial equipment (10 units, module: CG2211)
+        ArrayList<String> initialModules = new ArrayList<>(Arrays.asList("CG2211"));
+        Equipment firstEquipment = new Equipment("STM32", 10, 10, 0, sem, 5.0, initialModules, 0);
+        equipmentList.addEquipment(firstEquipment);
+
+        // 2. Create and add the same equipment (5 units, modules: CG2211 [duplicate], EE2211 [new])
+        ArrayList<String> newModules = new ArrayList<>(Arrays.asList("CG2211", "EE2211"));
+        Equipment secondEquipment = new Equipment("STM32", 5, 5, 0, sem, 5.0, newModules, 0);
+        equipmentList.addEquipment(secondEquipment);
+
+        // 3. Verify the list size hasn't grown (it should have merged)
+        assertEquals(1, equipmentList.getSize(), "Equipment list size should remain 1 after merging.");
+
+        // 4. Verify the quantities merged correctly
+        Equipment mergedEquipment = equipmentList.getEquipment(0);
+        assertEquals(15, mergedEquipment.getQuantity(), "Total quantity should be 10 + 5 = 15.");
+        assertEquals(15, mergedEquipment.getAvailable(), "Available quantity should be 10 + 5 = 15.");
+
+        // 5. Verify the modules merged correctly without duplicates
+        ArrayList<String> mergedModules = mergedEquipment.getModuleCodes();
+        assertEquals(2, mergedModules.size(), "Module list should contain exactly 2 distinct modules.");
+        assertTrue(mergedModules.contains("CG2211"), "Merged modules should contain CG2211.");
+        assertTrue(mergedModules.contains("EE2211"), "Merged modules should contain EE2211.");
     }
 }
 

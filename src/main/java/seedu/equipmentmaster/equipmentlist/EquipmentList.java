@@ -43,9 +43,7 @@ public class EquipmentList {
                 existingItem.setLoaned(existingItem.getLoaned() + newEquipment.getLoaned());
 
                 for (String moduleCode : newEquipment.getModuleCodes()) {
-                    if (!existingItem.getModuleCodes().contains(moduleCode)) {
-                        existingItem.addModuleCode(moduleCode);
-                    }
+                    existingItem.addModuleCode(moduleCode);
                 }
                 return;
             }
