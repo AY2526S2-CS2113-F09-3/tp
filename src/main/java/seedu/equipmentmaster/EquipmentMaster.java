@@ -48,6 +48,8 @@ public class EquipmentMaster {
         this.equipments = new EquipmentList(storage.load());
         logger.log(Level.INFO, "System time loaded successfully.");
 
+        this.moduleLists = storage.loadModules();
+
         // Check loaded commands
         logger.log(Level.INFO, "Loaded "+Parser.getCommandSpecs().size()+" commands.");
         assert !Parser.getCommandSpecs().isEmpty() : "No commands loaded! Check Parser initialization.";
@@ -79,7 +81,7 @@ public class EquipmentMaster {
                 String fullCommand = ui.readCommand();
                 ui.showLine();
                 Command c = Parser.parse(fullCommand);
-                c.execute(equipments, ui, storage);
+                c.execute(equipments, moduleLists, ui, storage);
                 isExit = c.isExit();
             } catch (EquipmentMasterException e) {
                 ui.showMessage(e.getMessage());

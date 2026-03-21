@@ -70,4 +70,14 @@ public class ModuleList {
         }
         return null;
     }
+
+    /**
+     * Retrieves the entire list of modules.
+     * This is primarily used by the Storage class to save data to the hard disk.
+     *
+     * @return An {@code ArrayList} containing all current modules.
+     */
+    public ArrayList<Module> getModules() {
+        return modules;
+    }
 }

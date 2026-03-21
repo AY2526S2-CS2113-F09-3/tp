@@ -1,8 +1,11 @@
 package seedu.equipmentmaster.storage;
 
 import seedu.equipmentmaster.equipment.Equipment;
+import seedu.equipmentmaster.exception.EquipmentMasterException;
+import seedu.equipmentmaster.modulelist.ModuleList;
 import seedu.equipmentmaster.semester.AcademicSemester;
 import seedu.equipmentmaster.ui.Ui;
+import seedu.equipmentmaster.module.Module;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -21,6 +24,7 @@ public class Storage {
     private String filePath;
     private Ui ui;
     private String settingsPath = "data/settings.txt";
+    private String moduleFilePath = "data/module.txt";
 
     /**
      * Constructor.
@@ -170,5 +174,84 @@ public class Storage {
             // Fallback to default
         }
         return "AY2024/25 Sem1";
+    }
+
+    /**
+     * Saves the current collection of modules to the designated text file.
+     * Each module is saved on a new line in the format: "ModuleName | Pax".
+     * Creates the necessary directories and file if they do not already exist.
+     *
+     * @param moduleList The {@code ModuleList} containing the modules to be saved.
+     * @throws EquipmentMasterException If an I/O error occurs while writing to the file.
+     */
+    public void saveModules(ModuleList moduleList) throws EquipmentMasterException {
+        try {
+            File file = new File(moduleFilePath);
+            file.getParentFile().mkdirs();
+            FileWriter fw = new FileWriter(file);
+
+            for (Module m : moduleList.getModules()) {
+                fw.write(m.getName() + " | " + m.getPax() + System.lineSeparator());
+            }
+            fw.close();
+        } catch (IOException e) {
+            throw new EquipmentMasterException("Error saving modules to file: " + moduleFilePath);
+        }
+    }
+
+    /**
+     * Loads module data from the storage file into a new {@code ModuleList}.
+     * If the specified file does not exist, it creates a new empty file.
+     * Errors during file creation or data parsing are printed directly to the console.
+     *
+     * @return A {@code ModuleList} populated with the saved modules, or an empty list if errors occur or a new file is created.
+     */
+    public ModuleList loadModules() {
+        ModuleList loadedList = new ModuleList();
+        File file = new File(moduleFilePath);
+
+        try {
+            // Check if the file exists. If not, create it.
+            if (!file.exists()) {
+                if (file.getParentFile() != null) {
+                    file.getParentFile().mkdirs();
+                }
+                file.createNewFile();
+
+                // Return the empty list since there is no data to read yet
+                return loadedList;
+            }
+
+            // Read and parse the data
+            Scanner scanner = new Scanner(file);
+            while (scanner.hasNext()) {
+                String line = scanner.nextLine();
+
+                if (line.trim().isEmpty()) {
+                    continue;
+                }
+
+                String[] parts = line.split(" \\| ");
+
+                if (parts.length == 2) {
+                    String name = parts[0].trim();
+                    int pax = Integer.parseInt(parts[1].trim());
+
+                    // Add the reconstructed module to the list
+                    loadedList.addModule(new Module(name, pax));
+                }
+            }
+            scanner.close();
+
+        } catch (IOException e) {
+            // Print the I/O error directly to the console instead of throwing an exception
+            System.out.println("Error creating a new module data file: " + e.getMessage());
+        } catch (NumberFormatException e) {
+            // Print the parsing error directly to the console
+            System.out.println("Data corruption detected: Module pax is not a valid integer.");
+        }
+
+        // Return whatever was successfully loaded (even if it's empty due to an error)
+        return loadedList;
     }
 }
