@@ -204,7 +204,8 @@ public class Storage {
      * If the specified file does not exist, it creates a new empty file.
      * Errors during file creation or data parsing are printed directly to the console.
      *
-     * @return A {@code ModuleList} populated with the saved modules, or an empty list if errors occur or a new file is created.
+     * @return A {@code ModuleList} populated with the saved modules or an empty list if
+     *     errors occur or a new file is created.
      */
     public ModuleList loadModules() {
         ModuleList loadedList = new ModuleList();

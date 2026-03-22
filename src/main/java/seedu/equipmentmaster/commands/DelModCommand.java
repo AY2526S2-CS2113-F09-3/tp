@@ -33,7 +33,8 @@ public class DelModCommand extends Command {
      * @throws EquipmentMasterException If the specified module is not found.
      */
     @Override
-    public void execute(EquipmentList equipmentList, ModuleList moduleList, Ui ui, Storage storage) throws EquipmentMasterException {
+    public void execute(EquipmentList equipmentList, ModuleList moduleList, Ui ui, Storage storage)
+            throws EquipmentMasterException {
         // 1. Delete the module. If it doesn't exist, this throws an EquipmentMasterException.
         moduleList.deleteModule(moduleName);
 

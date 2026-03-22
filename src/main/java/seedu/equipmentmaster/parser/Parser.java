@@ -1,8 +1,22 @@
 package seedu.equipmentmaster.parser;
 
-import seedu.equipmentmaster.commands.*;
+import seedu.equipmentmaster.commands.AddCommand;
+import seedu.equipmentmaster.commands.ByeCommand;
+import seedu.equipmentmaster.commands.Command;
+import seedu.equipmentmaster.commands.ListCommand;
+import seedu.equipmentmaster.commands.SetStatusCommand;
+import seedu.equipmentmaster.commands.FindCommand;
+import seedu.equipmentmaster.commands.SetSemCommand;
+import seedu.equipmentmaster.commands.GetSemCommand;
+import seedu.equipmentmaster.commands.DeleteCommand;
+import seedu.equipmentmaster.commands.HelpCommand;
+import seedu.equipmentmaster.commands.SetMinCommand;
+import seedu.equipmentmaster.commands.AddModCommand;
+import seedu.equipmentmaster.commands.UpdateModCommand;
+import seedu.equipmentmaster.commands.DelModCommand;
+import seedu.equipmentmaster.commands.ListModCommand;
+import seedu.equipmentmaster.commands.ReportCommand;
 import seedu.equipmentmaster.exception.EquipmentMasterException;
-
 
 import java.util.ArrayList;
 import java.util.logging.Level;
@@ -20,7 +34,8 @@ public class Parser {
     private static ArrayList<CommandSpec> commandSpecs = new ArrayList<>();
 
     static {
-        commandSpecs.add(new CommandSpec("add", "add n/NAME q/QUANTITY [m/MODULE] [bought/SEMESTER] [min/MINTHRESHOLD] [life/LIFESPAN]",
+        commandSpecs.add(new CommandSpec("add", "add n/NAME q/QUANTITY [m/MODULE] [bought/SEMESTER] " +
+                "[min/MINTHRESHOLD] [life/LIFESPAN]",
                 AddCommand::parse));
         commandSpecs.add(new CommandSpec("list", "list", fullCommand -> new ListCommand()));
         commandSpecs.add(new CommandSpec("bye", "bye", fullCommand -> new ByeCommand()));

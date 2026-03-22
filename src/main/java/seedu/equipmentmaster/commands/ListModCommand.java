@@ -33,7 +33,8 @@ public class ListModCommand extends Command {
      * @throws EquipmentMasterException If an error occurs during execution.
      */
     @Override
-    public void execute(EquipmentList equipmentList, ModuleList moduleList, Ui ui, Storage storage) throws EquipmentMasterException {
+    public void execute(EquipmentList equipmentList, ModuleList moduleList, Ui ui, Storage storage)
+            throws EquipmentMasterException {
         // 1. Check if the module list is empty
         if (moduleList.getModules().isEmpty()) {
             System.out.println("There are currently no modules tracked in the system.");

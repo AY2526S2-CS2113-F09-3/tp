@@ -8,6 +8,7 @@ import org.junit.jupiter.api.Test;
 import seedu.equipmentmaster.equipment.Equipment;
 import seedu.equipmentmaster.equipmentlist.EquipmentList;
 import seedu.equipmentmaster.exception.EquipmentMasterException;
+import seedu.equipmentmaster.modulelist.ModuleList;
 import seedu.equipmentmaster.semester.AcademicSemester;
 import seedu.equipmentmaster.storage.Storage;
 import seedu.equipmentmaster.ui.Ui;
@@ -23,12 +24,13 @@ public class AddCommandTest {
         EquipmentList equipments = new EquipmentList();
         Ui ui = new Ui();
         Storage storage = new Storage(TEST_FILE_PATH, ui);
+        ModuleList moduleList = new ModuleList();
 
         // Test basic add (no modules, no semester/lifespan)
         AddCommand command = new AddCommand("STM32", 5);
 
         // Act
-        command.execute(equipments, ui, storage);
+        command.execute(equipments, moduleList, ui, storage);
 
         // Assert
         assertEquals(1, equipments.getSize());
@@ -47,6 +49,7 @@ public class AddCommandTest {
         EquipmentList equipments = new EquipmentList();
         Ui ui = new Ui();
         Storage storage = new Storage(TEST_FILE_PATH, ui);
+        ModuleList moduleList = new ModuleList();
 
         // 1. Create dummy data for your new fields
         AcademicSemester testSem = new AcademicSemester("AY2023/24 Sem1");
@@ -56,7 +59,7 @@ public class AddCommandTest {
         AddCommand command = new AddCommand("STM32", 5, testSem, testLifespan, 0,
                 new ArrayList<>());
 
-        command.execute(equipments, ui, storage);
+        command.execute(equipments, moduleList, ui, storage);
 
         // Assert
         assertEquals(1, equipments.getSize());
@@ -75,6 +78,7 @@ public class AddCommandTest {
         EquipmentList equipments = new EquipmentList();
         Ui ui = new Ui();
         Storage storage = new Storage(TEST_FILE_PATH, ui);
+        ModuleList moduleList = new ModuleList();
 
         ArrayList<String> modules = new ArrayList<>();
         modules.add("EE2026");
@@ -83,7 +87,7 @@ public class AddCommandTest {
         AddCommand command = new AddCommand("FPGA", 40, modules);
 
         // Act
-        command.execute(equipments, ui, storage);
+        command.execute(equipments, moduleList, ui, storage);
 
         // Assert
         assertEquals(1, equipments.getSize());
@@ -104,6 +108,7 @@ public class AddCommandTest {
         EquipmentList equipments = new EquipmentList();
         Ui ui = new Ui();
         Storage storage = new Storage(TEST_FILE_PATH, ui);
+        ModuleList moduleList = new ModuleList();
 
         AcademicSemester testSem = new AcademicSemester("AY2023/24 Sem1");
         double testLifespan = 5.5;
@@ -114,7 +119,7 @@ public class AddCommandTest {
         AddCommand command = new AddCommand("FPGA", 40, testSem, testLifespan, 0, modules);
 
         // Act
-        command.execute(equipments, ui, storage);
+        command.execute(equipments, moduleList, ui, storage);
 
         // Assert
         assertEquals(1, equipments.getSize());

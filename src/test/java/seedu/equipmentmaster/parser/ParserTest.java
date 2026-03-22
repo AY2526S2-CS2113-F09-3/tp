@@ -7,7 +7,10 @@ import seedu.equipmentmaster.commands.DelModCommand;
 import seedu.equipmentmaster.commands.ListModCommand;
 import seedu.equipmentmaster.exception.EquipmentMasterException;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 
 public class ParserTest {
 

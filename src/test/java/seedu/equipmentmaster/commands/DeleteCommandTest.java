@@ -6,6 +6,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 import seedu.equipmentmaster.equipment.Equipment;
 import seedu.equipmentmaster.equipmentlist.EquipmentList;
+import seedu.equipmentmaster.modulelist.ModuleList;
 import seedu.equipmentmaster.semester.AcademicSemester;
 import seedu.equipmentmaster.storage.Storage;
 import seedu.equipmentmaster.ui.Ui;
@@ -45,10 +46,11 @@ public class DeleteCommandTest {
         AcademicSemester testSem = new AcademicSemester("AY2024/25 Sem1");
         Equipment eq = new Equipment("Oscilloscope", 10, 10, 0, testSem, 5.0, 0);
         equipments.addEquipment(eq);
+        ModuleList moduleList = new ModuleList();
 
         // Action: Delete 3 available
         DeleteCommand command = new DeleteCommand(1, 3, "available");
-        command.execute(equipments, ui, storage);
+        command.execute(equipments, moduleList, ui, storage);
 
         // Verify: Total becomes 7, Available becomes 7
         assertEquals(7, eq.getQuantity());
@@ -62,10 +64,11 @@ public class DeleteCommandTest {
         AcademicSemester testSem = new AcademicSemester("AY2024/25 Sem1");
         Equipment eq = new Equipment("Multimeter", 10, 6, 4, testSem, 3.0, 0);
         equipments.addEquipment(eq);
+        ModuleList moduleList = new ModuleList();
 
         // Action: Delete 2 loaned
         DeleteCommand command = new DeleteCommand("Multimeter", 2, "loaned");
-        command.execute(equipments, ui, storage);
+        command.execute(equipments, moduleList, ui, storage);
 
         // Verify: Total becomes 8, Loaned becomes 2, Available remains 6
         assertEquals(8, eq.getQuantity());
@@ -80,10 +83,11 @@ public class DeleteCommandTest {
         eq.setAvailable(5);
         eq.setLoaned(0);
         equipments.addEquipment(eq);
+        ModuleList moduleList = new ModuleList();
 
         // Action: Delete all 5 available
         DeleteCommand command = new DeleteCommand(1, 5, "available");
-        command.execute(equipments, ui, storage);
+        command.execute(equipments, moduleList, ui, storage);
 
         // Verify: The item should be completely removed from the list
         assertEquals(0, equipments.getSize());
@@ -97,10 +101,11 @@ public class DeleteCommandTest {
         eq.setAvailable(2);
         eq.setLoaned(3);
         equipments.addEquipment(eq);
+        ModuleList moduleList = new ModuleList();
 
         // Action & Verify: Try to delete 3 available (only 2 exist)
         DeleteCommand command = new DeleteCommand(1, 3, "available");
-        assertThrows(EquipmentMasterException.class, () -> command.execute(equipments, ui, storage));
+        assertThrows(EquipmentMasterException.class, () -> command.execute(equipments, moduleList, ui, storage));
     }
 
     @Test
@@ -110,10 +115,11 @@ public class DeleteCommandTest {
         eq.setAvailable(4);
         eq.setLoaned(1);
         equipments.addEquipment(eq);
+        ModuleList moduleList = new ModuleList();
 
         // Action & Verify: Try to delete 2 loaned (only 1 exists)
         DeleteCommand command = new DeleteCommand("Raspberry Pi", 2, "loaned");
-        assertThrows(EquipmentMasterException.class, () -> command.execute(equipments, ui, storage));
+        assertThrows(EquipmentMasterException.class, () -> command.execute(equipments, moduleList, ui, storage));
     }
 
     @Test
@@ -129,6 +135,7 @@ public class DeleteCommandTest {
 
     @Test
     public void execute_validIndex_reducesQuantity() throws EquipmentMasterException {
+        ModuleList moduleList = new ModuleList();
         // Arrange
         // (equipments, ui, and storage are safely set up in @BeforeEach)
         AcademicSemester testSem = new AcademicSemester("AY2025/26 Sem2"); // Adjust to your expected format
@@ -136,7 +143,7 @@ public class DeleteCommandTest {
 
         // Act: Delete 4 units from index 1
         DeleteCommand command = new DeleteCommand(1, 4, "available");
-        command.execute(equipments, ui, storage);
+        command.execute(equipments, moduleList, ui, storage);
 
         // Assert
         assertEquals(6, equipments.getEquipment(0).getQuantity());
@@ -145,13 +152,14 @@ public class DeleteCommandTest {
 
     @Test
     public void execute_validName_reducesQuantity() throws EquipmentMasterException {
+        ModuleList moduleList = new ModuleList();
         // Arrange
         AcademicSemester testSem = new AcademicSemester("AY2025/26 Sem2");
         equipments.addEquipment(new Equipment("STM32 Board", 20, 20, 0, testSem, 3.0, 0));
 
         // Act: Delete 5 units by name
         DeleteCommand command = new DeleteCommand("STM32 Board", 5, "available");
-        command.execute(equipments, ui, storage);
+        command.execute(equipments, moduleList, ui, storage);
 
         // Assert
         assertEquals(15, equipments.getEquipment(0).getQuantity());
@@ -165,11 +173,12 @@ public class DeleteCommandTest {
         Ui ui = new Ui();
         Storage storage = new Storage(TEST_FILE_PATH, ui);
         equipments.addEquipment(new Equipment("Basys3 FPGA", 10));
+        ModuleList moduleList = new ModuleList();
 
         // Act & Assert: Check if it throws exception for out of bounds
         DeleteCommand command = new DeleteCommand(2, 1, "available");
         assertThrows(EquipmentMasterException.class, () -> {
-            command.execute(equipments, ui, storage);
+            command.execute(equipments, moduleList, ui, storage);
         });
     }
 }

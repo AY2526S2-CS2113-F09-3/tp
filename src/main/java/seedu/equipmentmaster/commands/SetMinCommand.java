@@ -17,7 +17,8 @@ public class SetMinCommand extends Command {
     }
 
     @Override
-    public void execute(EquipmentList equipments, ModuleList moduleList, Ui ui, Storage storage) throws EquipmentMasterException {
+    public void execute(EquipmentList equipments, ModuleList moduleList, Ui ui, Storage storage)
+            throws EquipmentMasterException {
         Equipment target = equipments.findByName(name);
         if (target == null) {
             throw new EquipmentMasterException("Equipment not found: " + name);

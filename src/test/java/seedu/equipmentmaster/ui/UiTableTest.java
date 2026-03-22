@@ -37,11 +37,11 @@ public class UiTableTest {
 
         String expectedOutput = """
                 1. STM32 Development Board | Total: 50  | Available: 45  | Loaned: 5 | \
-                Purchase: AY2025/26 Sem2 | Life: 5.0 years
+                Purchase: AY2025/26 Sem2 | Lifespan: 5.0 years
                 2. Basys3 FPGA             | Total: 20  | Available: 20  | Loaned: 0 | \
-                Purchase: AY2025/26 Sem2 | Life: 5.0 years
+                Purchase: AY2025/26 Sem2 | Lifespan: 5.0 years
                 3. HDMI Cable              | Total: 100 | Available: 100 | Loaned: 0 | \
-                Purchase: AY2025/26 Sem2 | Life: 5.0 years
+                Purchase: AY2025/26 Sem2 | Lifespan: 5.0 years
                 """.trim();
 
         assertEquals(expectedOutput, uiTable.toString().trim());
@@ -54,7 +54,7 @@ public class UiTableTest {
         AcademicSemester testSem = new AcademicSemester("AY2025/26 Sem2");
 
         // Header row must match the column count (6 columns)
-        uiTable.addRow(new UiTableRow("Name", "Total", "Available", "Loaned", "Purchase", "Life"));
+        uiTable.addRow(new UiTableRow("Name", "Total", "Available", "Loaned", "Purchase", "Lifespan"));
 
         // Add rows using the Equipment objects
         uiTable.addRow(new UiTableRow(new Equipment("STM32 Development Board", 50, 45, 5, testSem, 5.0, 0)));
@@ -65,13 +65,13 @@ public class UiTableTest {
 
         String expectedOutput = """
             #  Name                    | Total      | Available      |\
-             Loaned    | Purchase                 | Life
+             Loaned    | Purchase                 | Lifespan
             1. STM32 Development Board | Total: 50  | Available: 45  |\
-             Loaned: 5 | Purchase: AY2025/26 Sem2 | Life: 5.0 years
+             Loaned: 5 | Purchase: AY2025/26 Sem2 | Lifespan: 5.0 years
             2. Basys3 FPGA             | Total: 20  | Available: 20  |\
-             Loaned: 0 | Purchase: AY2025/26 Sem2 | Life: 5.0 years
+             Loaned: 0 | Purchase: AY2025/26 Sem2 | Lifespan: 5.0 years
             3. HDMI Cable              | Total: 100 | Available: 100 |\
-             Loaned: 0 | Purchase: <N/A>          | Life: <N/A>
+             Loaned: 0 | Purchase: <N/A>          | Lifespan: <N/A>
             """.trim();
 
         // Convert both strings to a list of trimmed lines and compare those

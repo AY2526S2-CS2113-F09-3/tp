@@ -38,7 +38,8 @@ public class UpdateModCommand extends Command {
      * @throws EquipmentMasterException If the specified module is not found.
      */
     @Override
-    public void execute(EquipmentList equipmentList, ModuleList moduleList, Ui ui, Storage storage) throws EquipmentMasterException {
+    public void execute(EquipmentList equipmentList, ModuleList moduleList, Ui ui, Storage storage)
+            throws EquipmentMasterException {
         // 1. Update the module. If it doesn't exist, this will throw an EquipmentMasterException.
         moduleList.updateModule(moduleName, newPax);
 

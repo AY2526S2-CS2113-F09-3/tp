@@ -9,6 +9,7 @@ import org.junit.jupiter.api.io.TempDir;
 import seedu.equipmentmaster.equipment.Equipment;
 import seedu.equipmentmaster.equipmentlist.EquipmentList;
 import seedu.equipmentmaster.exception.EquipmentMasterException;
+import seedu.equipmentmaster.modulelist.ModuleList;
 import seedu.equipmentmaster.semester.AcademicSemester;
 import seedu.equipmentmaster.storage.Storage;
 import seedu.equipmentmaster.ui.Ui;
@@ -34,13 +35,14 @@ public class SetStatusCommandTest {
 
     @Test
     public void executeByName_loanPositive_updates() throws EquipmentMasterException {
+        ModuleList moduleList = new ModuleList();
         // Arrange
         AcademicSemester testSem = new AcademicSemester("AY2025/26 Sem2");
         equipments.addEquipment(new Equipment("BasyS3 FPGA", 40, 40, 0, testSem, 5.0, 0));
         SetStatusCommand command = new SetStatusCommand("BasyS3 FPGA", 5, "loaned");
 
         // Act
-        command.execute(equipments, ui, storage);
+        command.execute(equipments, moduleList, ui, storage);
 
         // Assert
         Equipment eq = equipments.getEquipment(0);
@@ -50,12 +52,13 @@ public class SetStatusCommandTest {
 
     @Test
     public void executeByName_loanNegative_noChange() {
+        ModuleList moduleList = new ModuleList();
         // Arrange
         equipments.addEquipment(new Equipment("BasyS3 FPGA", 40, 40, 0));
         SetStatusCommand command = new SetStatusCommand("BasyS3 FPGA", -5, "loaned");
 
         // Act
-        command.execute(equipments, ui, storage);
+        command.execute(equipments, moduleList, ui, storage);
 
         // Assert
         Equipment eq = equipments.getEquipment(0);
@@ -65,13 +68,14 @@ public class SetStatusCommandTest {
 
     @Test
     public void executeByIndex_returnPositive_updates() throws EquipmentMasterException {
+        ModuleList moduleList = new ModuleList();
         // Arrange
         AcademicSemester testSem = new AcademicSemester("AY2025/26 Sem2");
         equipments.addEquipment(new Equipment("BasyS3 FPGA", 40, 30, 10, testSem, 5.0, 0));
         SetStatusCommand command = new SetStatusCommand(1, 3, "available");
 
         // Act
-        command.execute(equipments, ui, storage);
+        command.execute(equipments, moduleList, ui, storage);
 
         // Assert
         Equipment eq = equipments.getEquipment(0);
@@ -81,12 +85,13 @@ public class SetStatusCommandTest {
 
     @Test
     public void executeByIndex_returnNegative_noChange() {
+        ModuleList moduleList = new ModuleList();
         // Arrange
         equipments.addEquipment(new Equipment("BasyS3 FPGA", 40, 30, 10));
         SetStatusCommand command = new SetStatusCommand(1, -3, "available");
 
         // Act
-        command.execute(equipments, ui, storage);
+        command.execute(equipments, moduleList, ui, storage);
 
         // Assert
         Equipment eq = equipments.getEquipment(0);

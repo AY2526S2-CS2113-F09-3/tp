@@ -6,7 +6,6 @@ import seedu.equipmentmaster.modulelist.ModuleList;
 import seedu.equipmentmaster.module.Module;
 import seedu.equipmentmaster.storage.Storage;
 import seedu.equipmentmaster.ui.Ui;
-import seedu.equipmentmaster.commands.Command;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;

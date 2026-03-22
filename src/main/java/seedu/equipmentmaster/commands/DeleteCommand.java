@@ -119,7 +119,8 @@ public class DeleteCommand extends Command {
      * @throws EquipmentMasterException If the item is not found or quantity is invalid.
      */
     @Override
-    public void execute(EquipmentList equipments, ModuleList moduleList, Ui ui, Storage storage) throws EquipmentMasterException {
+    public void execute(EquipmentList equipments, ModuleList moduleList, Ui ui, Storage storage) throws
+            EquipmentMasterException {
         Equipment target = findTarget(equipments);
 
         // 1. Check and deduct from specific status

@@ -16,7 +16,10 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.util.ArrayList;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
+
 
 public class StorageTest {
 
@@ -116,20 +119,19 @@ public class StorageTest {
     }
 
     @Test
-    public void loadModules_fileDoesNotExist_returnsEmptyList() throws EquipmentMasterException {
+    public void loadModules_fileDoesNotExist_returnsEmptyList() {
         // Path points to a non-existent file in the temporary directory
         File tempFile = tempDir.resolve("missing_modules.txt").toFile();
         Storage storage = new Storage("dummy_equipment.txt", ui);
 
-        // Should automatically create the file and return an empty list without crashing
+        // Since it handles the error internally and prints, it should return an empty list
         ModuleList loadedList = storage.loadModules();
 
-        assertTrue(loadedList.getModules().isEmpty(), "Loaded list should be empty.");
-        assertTrue(tempFile.exists(), "Storage should automatically create the missing file.");
+        assertTrue(loadedList.getModules().isEmpty(), "Loaded list should be empty when file is missing.");
     }
 
     @Test
-    public void loadModules_corruptedData_throwsException() throws IOException {
+    public void loadModules_corruptedData_returnsEmptyList() throws IOException {
         // Create a temporary file and write corrupted data into it
         File tempFile = tempDir.resolve("corrupted_modules.txt").toFile();
         FileWriter fw = new FileWriter(tempFile);
@@ -138,12 +140,10 @@ public class StorageTest {
 
         Storage storage = new Storage("dummy_equipment.txt", ui);
 
-        // Attempting to load this file should throw an exception due to NumberFormatException
-        EquipmentMasterException thrown = assertThrows(EquipmentMasterException.class, () -> {
-            storage.loadModules();
-        });
+        // Because we catch NumberFormatException and print it, it should return an empty list instead of throwing
+        ModuleList loadedList = storage.loadModules();
 
-        assertTrue(thrown.getMessage().contains("Data corruption detected"));
+        assertTrue(loadedList.getModules().isEmpty(), "Loaded list should be empty when data is corrupted.");
     }
 
     @Test
