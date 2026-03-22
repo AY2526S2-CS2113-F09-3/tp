@@ -21,6 +21,10 @@ Here are the available commands:
 9.  help      | help
 10. setmin    | setmin n/NAME min/QUANTITY
 11. report    | report aging [AY[YYYY]/[YY] Sem[1/2]] or report lowstock
+12. addmod    | addmod n/NAME pax/QTY
+13. updatemod | updatemod n/NAME pax/QTY
+14. delmod    | delmod n/NAME
+15. listmod   | listmod
 ===================================================
 ===================================================
 Here are the available commands:
@@ -36,6 +40,10 @@ Here are the available commands:
 9.  help      | help
 10. setmin    | setmin n/NAME min/QUANTITY
 11. report    | report aging [AY[YYYY]/[YY] Sem[1/2]] or report lowstock
+12. addmod    | addmod n/NAME pax/QTY
+13. updatemod | updatemod n/NAME pax/QTY
+14. delmod    | delmod n/NAME
+15. listmod   | listmod
 ===================================================
 ===================================================
 The current system time is: AY2024/25 Sem1
@@ -84,6 +92,14 @@ Added 5 of Oscilloscope. (Total Available: 5) Purchase: AY2020/21 Sem1 | Lifespa
 ===================================================
 ===================================================
 Added 10 of Soldering Iron with modules [EE2026]. (Total Available: 10) | Min Threshold: 2
+===================================================
+===================================================
+Here is the equipment log:
+1. Ghost          | Total: 10   | Available: 10   | Loaned: 0 | Min: 0  | Purchase: <N/A>          | Lifespan: <N/A>
+2. Resistor       | Total: 1000 | Available: 1000 | Loaned: 0 | Min: 50 | Purchase: <N/A>          | Lifespan: <N/A>
+3. STM32          | Total: 50   | Available: 50   | Loaned: 0 | Min: 0  | Purchase: AY2024/25 Sem1 | Lifespan: 2.5 years | Modules: [CG2111A, CG2271]
+4. Oscilloscope   | Total: 5    | Available: 5    | Loaned: 0 | Min: 0  | Purchase: AY2020/21 Sem1 | Lifespan: 3.0 years
+5. Soldering Iron | Total: 10   | Available: 10   | Loaned: 0 | Min: 2  | Purchase: <N/A>          | Lifespan: <N/A>     | Modules: [EE2026]
 ===================================================
 ===================================================
 The current system time is: AY2024/25 Sem1
@@ -170,6 +186,59 @@ Low Stock Alert (Items below minimum threshold):
 ===================================================
 Aging Equipment Report (Calculated for: AY2024/25 Sem1):
 4. Oscilloscope (Qty: 5, Bought: AY2020/21 Sem1) | Age: 4.0 Years | Status: [REPLACE SOON]
+===================================================
+===================================================
+Successfully added module: CG2111A | Enrollment: 150 students
+===================================================
+===================================================
+Successfully added module: CS2113 | Enrollment: 200 students
+===================================================
+===================================================
+Invalid command format. 
+Expected: addmod n/NAME pax/QTY
+===================================================
+===================================================
+Pax cannot be a negative number.
+===================================================
+===================================================
+Invalid pax value. Please enter a valid integer (e.g., pax/150).
+===================================================
+===================================================
+Invalid command format. 
+Expected: addmod n/NAME pax/QTY
+===================================================
+===================================================
+Here are the current course modules in your system:
+1. CG2111A | Enrollment: 150 students
+2. CS2113 | Enrollment: 200 students
+===================================================
+===================================================
+Successfully updated module:
+CG2111A | Enrollment: 180 students
+===================================================
+===================================================
+Module not found: GhostModule
+===================================================
+===================================================
+Pax cannot be a negative number.
+===================================================
+===================================================
+Here are the current course modules in your system:
+1. CG2111A | Enrollment: 180 students
+2. CS2113 | Enrollment: 200 students
+===================================================
+===================================================
+Successfully deleted module: CS2113
+===================================================
+===================================================
+Module not found: GhostModule
+===================================================
+===================================================
+Module name cannot be empty.
+===================================================
+===================================================
+Here are the current course modules in your system:
+1. CG2111A | Enrollment: 180 students
 ===================================================
 ===================================================
 Goodbye! See you back in the lab soon.

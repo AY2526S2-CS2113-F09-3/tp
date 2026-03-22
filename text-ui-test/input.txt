@@ -16,6 +16,7 @@ add n/Resistor q/1000 min/50
 add n/STM32 q/50 bought/AY2024/25 Sem1 life/2.5 m/CG2111A M/CG2271 m/cg2111a
 add n/Oscilloscope q/5 bought/AY2020/21 Sem1 life/3.0
 add n/Soldering Iron q/10 m/EE2026 min/2
+list
 getsem
 setmin
 setmin n/Ghost min/10
@@ -43,4 +44,19 @@ report invalid_type
 report lowstock
 report lowstock please
 report aging AY2024/25 Sem1
+addmod n/CG2111A pax/150
+addmod n/CS2113 pax/200
+addmod n/ pax/100
+addmod n/CG2271 pax/-5
+addmod n/CG2271 pax/abc
+addmod n/CG2271 100
+listmod
+updatemod n/CG2111A pax/180
+updatemod n/GhostModule pax/100
+updatemod n/CS2113 pax/-10
+listmod
+delmod n/CS2113
+delmod n/GhostModule
+delmod n/
+listmod
 bye
