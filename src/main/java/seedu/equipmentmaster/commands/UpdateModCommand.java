@@ -79,6 +79,9 @@ public class UpdateModCommand extends Command {
 
         try {
             int pax = Integer.parseInt(paxString);
+            if (pax < 0) {
+                throw new EquipmentMasterException("Pax cannot be a negative number.");
+            }
             return new UpdateModCommand(moduleName, pax);
         } catch (NumberFormatException e) {
             throw new EquipmentMasterException("Invalid pax value. Please enter a valid integer.");
