@@ -142,13 +142,14 @@ public class AddCommandTest {
     @Test
     public void execute_addAtMinThreshold_showsLowStockAlert() {
         EquipmentList equipments = new EquipmentList();
+        ModuleList moduleList = new ModuleList();
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
         Ui ui = new Ui(System.in, new PrintStream(outputStream));
-        Storage storage = new Storage(TEST_FILE_PATH, ui);
+        Storage storage = new Storage(TEST_FILE_PATH, ui, TEST_SETTING_FILE_PATH, TEST_MODULE_FILE_PATH);
 
         AddCommand command = new AddCommand("Resistor", 5, null, 0.0, 5, new ArrayList<>());
 
-        command.execute(equipments, ui, storage);
+        command.execute(equipments, moduleList, ui, storage);
 
         String output = outputStream.toString();
         assertTrue(output.contains("!!! LOW STOCK ALERT: Resistor"));
@@ -157,13 +158,14 @@ public class AddCommandTest {
     @Test
     public void execute_addAboveMinThreshold_noLowStockAlert() {
         EquipmentList equipments = new EquipmentList();
+        ModuleList moduleList = new ModuleList();
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
         Ui ui = new Ui(System.in, new PrintStream(outputStream));
-        Storage storage = new Storage(TEST_FILE_PATH, ui);
+        Storage storage = new Storage(TEST_FILE_PATH, ui, TEST_SETTING_FILE_PATH, TEST_MODULE_FILE_PATH);
 
         AddCommand command = new AddCommand("Resistor", 10, null, 0.0, 5, new ArrayList<>());
 
-        command.execute(equipments, ui, storage);
+        command.execute(equipments, moduleList, ui, storage);
 
         String output = outputStream.toString();
         assertTrue(!output.contains("!!! LOW STOCK ALERT:"));

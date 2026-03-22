@@ -130,10 +130,11 @@ public class ReportCommandTest {
         // Simulate all 10 items being loaned out (Available = 0, Loaned = 10).
         Equipment ghost = new Equipment("Ghost", 10, 0, 10, null, 0.0, 10);
         equipments.addEquipment(ghost);
+        ModuleList moduleList = new ModuleList();
 
         // Act: Execute the 'report lowstock' command
         ReportCommand command = new ReportCommand("lowstock", "");
-        command.execute(equipments, ui, storage);
+        command.execute(equipments, moduleList, ui, storage);
 
         // Assert: Verify that the "RESTOCK NEEDED" alert is NOT triggered
         String output = outContent.toString();
@@ -146,10 +147,11 @@ public class ReportCommandTest {
         // Arrange: Set up an equipment item where Total = 10, but Min Threshold = 20.
         Equipment iron = new Equipment("Soldering Iron", 10, 10, 0, null, 0.0, 20);
         equipments.addEquipment(iron);
+        ModuleList moduleList = new ModuleList();
 
         // Act: Execute the 'report lowstock' command
         ReportCommand command = new ReportCommand("lowstock", "");
-        command.execute(equipments, ui, storage);
+        command.execute(equipments, moduleList, ui, storage);
 
         // Assert: Verify the exact output format matches expectations
         String output = outContent.toString();

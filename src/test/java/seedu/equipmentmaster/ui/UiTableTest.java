@@ -35,14 +35,12 @@ public class UiTableTest {
         uiTable.addRow(new UiTableRow(new Equipment("Basys3 FPGA", 20, 20, 0, testSem, 5.0, 0)));
         uiTable.addRow(new UiTableRow(new Equipment("HDMI Cable", 100, 100, 0, testSem, 5.0, 0)));
 
-        String expectedOutput = """
-                1. STM32 Development Board | Total: 50  | Available: 45  | Loaned: 5 | \
-                Purchase: AY2025/26 Sem2 | Lifespan: 5.0 years
-                2. Basys3 FPGA             | Total: 20  | Available: 20  | Loaned: 0 | \
-                Purchase: AY2025/26 Sem2 | Lifespan: 5.0 years
-                3. HDMI Cable              | Total: 100 | Available: 100 | Loaned: 0 | \
-                Purchase: AY2025/26 Sem2 | Lifespan: 5.0 years
-                """.trim();
+        String expectedOutput = "1. STM32 Development Board | Total: 50  | Available: 45  | Loaned: 5 " +
+                "| Min: 0 | Purchase: AY2025/26 Sem2 | Lifespan: 5.0 years\n"
+                + "2. Basys3 FPGA             | Total: 20  | Available: 20  | Loaned: 0 " +
+                "| Min: 0 | Purchase: AY2025/26 Sem2 | Lifespan: 5.0 years\n"
+                + "3. HDMI Cable              | Total: 100 | Available: 100 | Loaned: 0 " +
+                "| Min: 0 | Purchase: AY2025/26 Sem2 | Lifespan: 5.0 years";
 
         assertEquals(expectedOutput, uiTable.toString().trim());
     }
@@ -50,31 +48,23 @@ public class UiTableTest {
     @Test
     public void toString_withHeader_printsFormattedTable() throws EquipmentMasterException {
         UiTable uiTable = new UiTable(true);
-        // Assuming your AcademicSemester toString returns "AY2025/26 Sem2"
         AcademicSemester testSem = new AcademicSemester("AY2025/26 Sem2");
 
-        // Header row must match the column count
-        uiTable.addRow(new UiTableRow("Name", "Total", "Available", "Loaned", "Min", "Purchase", "Lifespan",
-                "Modules"));
+        uiTable.addRow(new UiTableRow("Name", "Total", "Available", "Loaned", "Min",
+                "Purchase", "Lifespan", "Modules"));
 
-
-        // Add rows using the Equipment objects
         uiTable.addRow(new UiTableRow(new Equipment("STM32 Development Board", 50, 45, 5, testSem, 5.0, 0)));
         uiTable.addRow(new UiTableRow(new Equipment("Basys3 FPGA", 20, 20, 0, testSem, 5.0, 0)));
-
-        // Test a "Legacy" case to ensure your <N/A> logic works!
         uiTable.addRow(new UiTableRow(new Equipment("HDMI Cable", 100, 100, 0, null, 0.0, 0)));
 
-        String expectedOutput = """
-            #  Name                    | Total      | Available      |\
-             Loaned    | Purchase                 | Lifespan
-            1. STM32 Development Board | Total: 50  | Available: 45  |\
-             Loaned: 5 | Purchase: AY2025/26 Sem2 | Lifespan: 5.0 years
-            2. Basys3 FPGA             | Total: 20  | Available: 20  |\
-             Loaned: 0 | Purchase: AY2025/26 Sem2 | Lifespan: 5.0 years
-            3. HDMI Cable              | Total: 100 | Available: 100 |\
-             Loaned: 0 | Purchase: <N/A>          | Lifespan: <N/A>
-            """.trim();
+        String expectedOutput = "#  Name                    | Total      | Available      | Loaned    " +
+                "| Min    | Purchase                 | Lifespan            | Modules\n"
+                + "1. STM32 Development Board | Total: 50  | Available: 45  | Loaned: 5 " +
+                "| Min: 0 | Purchase: AY2025/26 Sem2 | Lifespan: 5.0 years\n"
+                + "2. Basys3 FPGA             | Total: 20  | Available: 20  | Loaned: 0 " +
+                "| Min: 0 | Purchase: AY2025/26 Sem2 | Lifespan: 5.0 years\n"
+                + "3. HDMI Cable              | Total: 100 | Available: 100 | Loaned: 0 " +
+                "| Min: 0 | Purchase: <N/A>          | Lifespan: <N/A>";
 
         // Convert both strings to a list of trimmed lines and compare those
         List<String> expectedLines = expectedOutput.lines().map(String::stripTrailing).toList();

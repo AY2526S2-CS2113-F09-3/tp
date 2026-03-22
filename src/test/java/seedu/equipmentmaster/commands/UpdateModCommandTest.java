@@ -5,6 +5,7 @@ import org.junit.jupiter.api.Test;
 import seedu.equipmentmaster.exception.EquipmentMasterException;
 import seedu.equipmentmaster.modulelist.ModuleList;
 import seedu.equipmentmaster.module.Module;
+import seedu.equipmentmaster.ui.Ui;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -18,9 +19,14 @@ public class UpdateModCommandTest {
 
     @BeforeEach
     public void setUp() {
+        Ui ui = new Ui();
         moduleList = new ModuleList();
-        // Add a dummy module for execution tests
-        moduleList.addModule(new Module("CG2271", 100));
+        try {
+            // Add a dummy module for execution tests
+            moduleList.addModule(new Module("CG2271", 100));
+        } catch (EquipmentMasterException e) {
+            ui.showMessage(e.getMessage());
+        }
     }
 
     @Test

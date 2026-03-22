@@ -193,12 +193,13 @@ public class DeleteCommandTest {
         // Delete 3 → newTotal 7 which is below minQuantity 8 — alert should fire
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
         Ui ui = new Ui(System.in, new PrintStream(outputStream));
+        ModuleList moduleList = new ModuleList();
 
         Equipment eq = new Equipment("Resistor", 10, 10, 0, null, 0.0, 8);
         equipments.addEquipment(eq);
 
         DeleteCommand command = new DeleteCommand("Resistor", 3, "available");
-        command.execute(equipments, ui, storage);
+        command.execute(equipments, moduleList, ui, storage);
 
         String output = outputStream.toString();
         assertTrue(output.contains("!!! LOW STOCK ALERT: Resistor"));
@@ -213,9 +214,10 @@ public class DeleteCommandTest {
 
         Equipment eq = new Equipment("Resistor", 10, 10, 0, null, 0.0, 5);
         equipments.addEquipment(eq);
+        ModuleList moduleList = new ModuleList();
 
         DeleteCommand command = new DeleteCommand("Resistor", 2, "available");
-        command.execute(equipments, ui, storage);
+        command.execute(equipments, moduleList, ui, storage);
 
         String output = outputStream.toString();
         assertTrue(!output.contains("!!! LOW STOCK ALERT:"));

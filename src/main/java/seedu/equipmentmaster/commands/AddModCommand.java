@@ -41,19 +41,19 @@ public class AddModCommand extends Command {
      */
     @Override
     public void execute(EquipmentList equipments, ModuleList moduleList, Ui ui, Storage storage) {
-       try {
-           Module newModule = new Module(moduleName, pax);
-           moduleList.addModule(newModule);
-           ui.showMessage("Successfully added module: " + newModule);
+        try {
+            Module newModule = new Module(moduleName, pax);
+            moduleList.addModule(newModule);
+            ui.showMessage("Successfully added module: " + newModule);
 
-           try {
-               storage.saveModules(moduleList);
-           } catch (EquipmentMasterException e) {
-               ui.showMessage("Warning: Failed to save the new module to the data file. " + e.getMessage());
-           }
+            try {
+                storage.saveModules(moduleList);
+            } catch (EquipmentMasterException e) {
+                ui.showMessage("Warning: Failed to save the new module to the data file. " + e.getMessage());
+            }
 
-       } catch (EquipmentMasterException e){
-           ui.showMessage(e.getMessage());
+        } catch (EquipmentMasterException e){
+            ui.showMessage(e.getMessage());
         }
     }
 
@@ -72,12 +72,17 @@ public class AddModCommand extends Command {
         Pattern pattern = Pattern.compile("n/(.+?)\\s+pax/(.+)");
         Matcher matcher = pattern.matcher(args);
 
+        if (!matcher.matches()) {
+            throw new EquipmentMasterException("Invalid command format. \nExpected: addmod n/NAME pax/QTY");
+        }
+
         String moduleName = matcher.group(1).trim();
         String paxString = matcher.group(2).trim();
 
         // Add this explicit check to prevent empty module names
         if (moduleName.isEmpty()) {
-            throw new EquipmentMasterException("Module name cannot be empty. Please provide a valid name (e.g., n/CG2111A).");
+            throw new EquipmentMasterException("Module name cannot be empty. " +
+                    "Please provide a valid name (e.g., n/CG2111A).");
         }
 
         try {
