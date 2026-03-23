@@ -17,6 +17,7 @@ public class Equipment {
     private AcademicSemester purchaseSem;
     private double lifespanYears;
     private int minQuantity = 0;
+    private double bufferPercentage = 0.0;
     private ArrayList<String> moduleCodes;
 
     /**
@@ -26,7 +27,7 @@ public class Equipment {
      * @param total Initial total quantity.
      */
     public Equipment(String name, int total) {
-        this(name, total, total, 0, null, 0.0, new ArrayList<>(), 0);
+        this(name, total, total, 0, null, 0.0, new ArrayList<>(), 0, 0.0);
     }
 
     /**
@@ -38,7 +39,7 @@ public class Equipment {
      * @param loaned    Number of loaned items.
      */
     public Equipment(String name, int quantity, int available, int loaned) {
-        this(name, quantity, available, loaned, null, 0.0, new ArrayList<>(), 0);
+        this(name, quantity, available, loaned, null, 0.0, new ArrayList<>(), 0, 0.0);
     }
 
     /**
@@ -52,10 +53,12 @@ public class Equipment {
      * @param purchaseSem   The academic semester when the equipment was purchased.
      * @param lifespanYears The expected lifespan in years.
      * @param moduleCodes   List of module codes associated with this equipment.
+     * @param minQuantity   Minimum stock threshold.
+     * @param bufferPercentage Safety buffer percentage for procurement.
      */
     public Equipment(String name, int quantity, int available, int loaned,
                      AcademicSemester purchaseSem, double lifespanYears,
-                     ArrayList<String> moduleCodes, int minQuantity) {
+                     ArrayList<String> moduleCodes, int minQuantity, double bufferPercentage) {
         this.name = name;
         this.quantity = quantity;
         this.available = available;
@@ -64,6 +67,7 @@ public class Equipment {
         this.lifespanYears = lifespanYears;
         this.moduleCodes = moduleCodes != null ? moduleCodes : new ArrayList<>();
         setMinQuantity(minQuantity); //trigger assertion
+        setBufferPercentage(bufferPercentage);
     }
 
     /**
@@ -80,7 +84,32 @@ public class Equipment {
      */
     public Equipment(String name, int quantity, int available, int loaned,
                      AcademicSemester purchaseSem, double lifespanYears, int minQuantity) {
-        this(name, quantity, available, loaned, purchaseSem, lifespanYears, new ArrayList<>(), minQuantity);
+        this(name, quantity, available, loaned, purchaseSem, lifespanYears, new ArrayList<>(), minQuantity, 0.0);
+    }
+
+    /**
+     * Sets the safety buffer percentage for this equipment.
+     * Buffer percentage cannot be negative.
+     *
+     * @param bufferPercentage The buffer percentage to set (0-100 recommended)
+     * @throws IllegalArgumentException if bufferPercentage is negative
+     */
+    public void setBufferPercentage(double bufferPercentage) {
+        if (bufferPercentage < 0) {
+            throw new IllegalArgumentException("Buffer percentage cannot be negative");
+        }
+        this.bufferPercentage = bufferPercentage;
+    }
+
+    /**
+     * Returns the safety buffer percentage for procurement calculations.
+     * Buffer percentage acts as a safety net for future procurement,
+     * accounting for broken, faulty, or lost items.
+     *
+     * @return Buffer percentage (e.g., 10.0 for 10%)
+     */
+    public double getBufferPercentage() {
+        return bufferPercentage;
     }
 
     /**
@@ -256,6 +285,10 @@ public class Equipment {
             result += " | Modules: " + moduleCodes;
         }
 
+        if (bufferPercentage > 0) {
+            result += " | Buffer: " + bufferPercentage + "%";
+        }
+
         return result;
     }
 
@@ -272,6 +305,7 @@ public class Equipment {
                 : "";
 
         return name + " | " + quantity + " | " + available + " | " + loaned
-                + " | " + minQuantity + " | " + purchaseSemStr + " | " + lifespanStr + " | " + modulesStr;
+                + " | " + minQuantity + " | " + purchaseSemStr + " | " + lifespanStr
+                + " | " + modulesStr + " | " + bufferPercentage;
     }
 }

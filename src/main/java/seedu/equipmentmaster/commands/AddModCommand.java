@@ -76,7 +76,7 @@ public class AddModCommand extends Command {
         Matcher matcher = pattern.matcher(args);
 
         if (!matcher.matches()) {
-            throw new EquipmentMasterException("Invalid command format. \nExpected: addmod n/NAME pax/QTY");
+            throw new EquipmentMasterException("Invalid command format.\nExpected: addmod n/NAME pax/QTY");
         }
 
         String moduleName = matcher.group(1).trim();

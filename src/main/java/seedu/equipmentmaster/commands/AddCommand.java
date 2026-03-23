@@ -232,7 +232,7 @@ public class AddCommand extends Command {
         assert ui != null : "Ui dependency cannot be null";
         assert storage != null : "Storage dependency cannot be null";
         Equipment equipment = new Equipment(name, quantity, quantity, 0, purchaseSem, lifespanYears,
-                moduleCodes, minQuantity);
+                moduleCodes, minQuantity, 0.0);
         equipments.addEquipment(equipment);
         storage.save(equipments.getAllEquipments());
 

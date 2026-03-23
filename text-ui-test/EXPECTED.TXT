@@ -25,6 +25,7 @@ Here are the available commands:
 13. updatemod | updatemod n/NAME pax/QTY
 14. delmod    | delmod n/NAME
 15. listmod   | listmod
+16. setbuffer | setbuffer n/NAME b/PERCENTAGE
 ===================================================
 ===================================================
 Here are the available commands:
@@ -44,6 +45,7 @@ Here are the available commands:
 13. updatemod | updatemod n/NAME pax/QTY
 14. delmod    | delmod n/NAME
 15. listmod   | listmod
+16. setbuffer | setbuffer n/NAME b/PERCENTAGE
 ===================================================
 ===================================================
 The current system time is: AY2024/25 Sem1
@@ -194,7 +196,7 @@ Successfully added module: CG2111A | Enrollment: 150 students
 Successfully added module: CS2113 | Enrollment: 200 students
 ===================================================
 ===================================================
-Invalid command format. 
+Invalid command format.
 Expected: addmod n/NAME pax/QTY
 ===================================================
 ===================================================
@@ -204,7 +206,7 @@ Pax cannot be a negative number.
 Invalid pax value. Please enter a valid integer (e.g., pax/150).
 ===================================================
 ===================================================
-Invalid command format. 
+Invalid command format.
 Expected: addmod n/NAME pax/QTY
 ===================================================
 ===================================================
@@ -235,6 +237,26 @@ Module not found: GhostModule
 ===================================================
 ===================================================
 Module name cannot be empty.
+===================================================
+===================================================
+Buffer Updated:
+STM32 | Safety Buffer: 10.0%
+===================================================
+===================================================
+Equipment 'Basys3' not found.
+===================================================
+===================================================
+Buffer percentage cannot be negative.
+===================================================
+===================================================
+Invalid command format!
+Usage: setbuffer n/NAME b/PERCENTAGE
+Example: setbuffer n/STM32 b/10
+===================================================
+===================================================
+Invalid command format!
+Usage: setbuffer n/NAME b/PERCENTAGE
+Example: setbuffer n/STM32 b/10
 ===================================================
 ===================================================
 Here are the current course modules in your system:

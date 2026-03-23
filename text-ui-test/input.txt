@@ -58,5 +58,10 @@ listmod
 delmod n/CS2113
 delmod n/GhostModule
 delmod n/
+setbuffer n/STM32 b/10
+setbuffer n/Basys3 b/10
+setbuffer n/STM32 b/-10
+setbuffer n/
+setbuffer b/
 listmod
 bye

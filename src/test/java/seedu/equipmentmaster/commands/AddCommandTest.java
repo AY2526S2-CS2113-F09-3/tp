@@ -206,12 +206,12 @@ public class AddCommandTest {
 
         // 1. Create and add initial equipment (10 units, module: CG2211)
         ArrayList<String> initialModules = new ArrayList<>(Arrays.asList("CG2211"));
-        Equipment firstEquipment = new Equipment("STM32", 10, 10, 0, sem, 5.0, initialModules, 0);
+        Equipment firstEquipment = new Equipment("STM32", 10, 10, 0, sem, 5.0, initialModules, 0, 0.0);
         equipmentList.addEquipment(firstEquipment);
 
         // 2. Create and add the same equipment (5 units, modules: CG2211 [duplicate], EE2211 [new])
         ArrayList<String> newModules = new ArrayList<>(Arrays.asList("CG2211", "EE2211"));
-        Equipment secondEquipment = new Equipment("STM32", 5, 5, 0, sem, 5.0, newModules, 0);
+        Equipment secondEquipment = new Equipment("STM32", 5, 5, 0, sem, 5.0, newModules, 0, 0.0);
         equipmentList.addEquipment(secondEquipment);
 
         // 3. Verify the list size hasn't grown (it should have merged)

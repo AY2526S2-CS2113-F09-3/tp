@@ -101,22 +101,36 @@ public class Storage {
             String[] parts = line.split(" \\| ", -1);
             int totalParts = parts.length;
 
+            String lastPart = parts[totalParts - 1].trim();
+            boolean hasBuffer = false;
+            double bufferPercentage = 0.0;
+
+            try {
+                if (!lastPart.isEmpty()) {
+                    bufferPercentage = Double.parseDouble(lastPart);
+                    hasBuffer = true;
+                }
+            } catch (NumberFormatException e) {
+                hasBuffer = false;
+            }
+
+            int offset = hasBuffer ? 1 : 0;
+
             // Peel from back: Modules(1), Life(2), Sem(3), Min(4), Loan(5), Avail(6), Qty(7)
-            String modulesStr = parts[totalParts - 1].trim();
-            String lifeStr = parts[totalParts - 2].trim();
+            String modulesStr = parts[totalParts - 1 - offset].trim();
+            String lifeStr = parts[totalParts - 2 - offset].trim();
             double life = lifeStr.isEmpty() ? 0.0 : Double.parseDouble(lifeStr);
-            String semStr = parts[totalParts - 3].trim();
+            String semStr = parts[totalParts - 3 - offset].trim();
             AcademicSemester sem = semStr.isEmpty() ? null : new AcademicSemester(semStr);
 
-            // Checkstyle fix: Separate declarations
-            int min = Integer.parseInt(parts[totalParts - 4].trim());
-            int l = Integer.parseInt(parts[totalParts - 5].trim());
-            int a = Integer.parseInt(parts[totalParts - 6].trim());
-            int q = Integer.parseInt(parts[totalParts - 7].trim());
+            int min = Integer.parseInt(parts[totalParts - 4 - offset].trim());
+            int l = Integer.parseInt(parts[totalParts - 5 - offset].trim());
+            int a = Integer.parseInt(parts[totalParts - 6 - offset].trim());
+            int q = Integer.parseInt(parts[totalParts - 7 - offset].trim());
 
-            // Everything before the 7 metadata fields is the Name
             StringBuilder nameBuilder = new StringBuilder();
-            for (int i = 0; i <= (totalParts - 8); i++) {
+            int nameEndIndex = totalParts - 7 - offset;
+            for (int i = 0; i < nameEndIndex; i++) {
                 if (i > 0) {
                     nameBuilder.append(" | ");
                 }
@@ -131,7 +145,7 @@ public class Storage {
                 }
             }
 
-            return new Equipment(name, q, a, l, sem, life, modules, min);
+            return new Equipment(name, q, a, l, sem, life, modules, min, bufferPercentage);
         } catch (Exception e) {
             return null;
         }

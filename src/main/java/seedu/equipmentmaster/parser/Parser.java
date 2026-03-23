@@ -16,6 +16,7 @@ import seedu.equipmentmaster.commands.UpdateModCommand;
 import seedu.equipmentmaster.commands.DelModCommand;
 import seedu.equipmentmaster.commands.ListModCommand;
 import seedu.equipmentmaster.commands.ReportCommand;
+import seedu.equipmentmaster.commands.SetBufferCommand;
 import seedu.equipmentmaster.exception.EquipmentMasterException;
 
 import java.util.ArrayList;
@@ -55,6 +56,8 @@ public class Parser {
         commandSpecs.add(new CommandSpec("updatemod", "updatemod n/NAME pax/QTY", UpdateModCommand::parse));
         commandSpecs.add(new CommandSpec("delmod", "delmod n/NAME", DelModCommand::parse));
         commandSpecs.add(new CommandSpec("listmod", "listmod", fullCommand -> new ListModCommand()));
+        commandSpecs.add(new CommandSpec("setbuffer", "setbuffer n/NAME b/PERCENTAGE",
+                SetBufferCommand::parse));
     }
 
     /**
