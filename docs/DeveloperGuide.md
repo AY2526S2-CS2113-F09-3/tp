@@ -6,8 +6,47 @@
 
 ## Design & implementation
 
-{Describe the design and implementation of the product. Use UML diagrams and short code snippets where applicable.}
+### SetBufferCommand
 
+Sets a buffer percentage on a named equipment item. The buffer is persisted to storage.
+
+![SetBufferCommand Sequence Diagram](images/SetBufferCommand.png)
+
+**Format:** `setbuffer n/<name> b/<percentage>[%]`
+
+**Behaviour:**
+- The `%` symbol in the buffer value is optional and stripped during parsing
+- If the equipment name is not found, an error message is shown and no change is made
+- Buffer percentage defaults to `0.0` when equipment is first added
+
+**Example:**
+```
+setbuffer n/STM32 b/10%
+setbuffer n/STM32 b/10
+```
+ 
+---
+
+### SetStatusCommand
+
+Updates the loaned or available count of an equipment item. Can target equipment by name or by 1-based index.
+
+![SetStatusCommand Sequence Diagram](images/SetStatusCommand.png)
+
+**Format:**
+- `setstatus n/<name> <count> loaned` — loans out `<count>` units, decreasing available
+- `setstatus n/<name> <count> available` — returns `<count>` units, increasing available
+- `setstatus <index> <count> loaned/available` — same as above but targets by 1-based list index
+
+**Constraints:**
+- Negative counts are rejected silently — no change is made
+- Count must not exceed current available (when loaning) or current loaned (when returning)
+
+**Example:**
+```
+setstatus n/BasyS3 FPGA 5 loaned
+setstatus 1 3 available
+```
 
 ## Product scope
 ### Target user profile
