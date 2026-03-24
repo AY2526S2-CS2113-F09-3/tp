@@ -48,7 +48,8 @@ public class Parser {
         commandSpecs.add(new CommandSpec("delete", "delete n/NAME q/QUANTITY s/STATUS "
                 + "or delete INDEX q/QUANTITY s/STATUS", DeleteCommand::parse));
         commandSpecs.add(new CommandSpec("help", "help", fullCommand -> new HelpCommand()));
-        commandSpecs.add(new CommandSpec("setmin", "setmin n/NAME min/QUANTITY", SetMinCommand::parse));
+        commandSpecs.add(new CommandSpec("setmin", "setmin n/NAME min/QUANTITY " +
+                "or setmin INDEX min/QUANTITY", SetMinCommand::parse));
         commandSpecs.add(new CommandSpec("report", "report aging [AY[YYYY]/[YY] Sem[1/2]] or " +
                 "report lowstock or "+
                 "report procurement",
