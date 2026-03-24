@@ -6,6 +6,9 @@ import seedu.equipmentmaster.equipmentlist.EquipmentList;
 import seedu.equipmentmaster.exception.EquipmentMasterException;
 import seedu.equipmentmaster.ui.Ui;
 import seedu.equipmentmaster.semester.AcademicSemester;
+import seedu.equipmentmaster.module.Module;
+import seedu.equipmentmaster.modulelist.ModuleList;
+import java.util.ArrayList;
 
 // @@author Hongyu1231
 /**
@@ -32,7 +35,7 @@ public class ReportCommand extends Command {
 
         if (words.length < 2) {
             throw new EquipmentMasterException("Please specify the report type. Usage: report aging [Semester] OR " +
-                    "report lowstock");
+                    "report lowstock OR report procurement");
         }
 
         String reportType = words[1].trim().toLowerCase();
@@ -58,8 +61,10 @@ public class ReportCommand extends Command {
             executeLowStockReport(equipments, ui);
         } else if (reportType.equalsIgnoreCase("aging")) {
             executeAgingReport(equipments, ui, context);
+        } else if (reportType.equalsIgnoreCase("procurement")){
+            executeProcurementReport(context);
         } else {
-            ui.showMessage("Invalid report type. Currently supported: aging, lowstock.");
+            ui.showMessage("Invalid report type. Currently supported: aging, lowstock, procurement.");
         }
     }
     // @@author Hongyu1231
@@ -128,6 +133,72 @@ public class ReportCommand extends Command {
             ui.showMessage("Great news! No equipment needs replacement for this semester.");
         }
     }
-    // @@author Hongyu1231
+
+    // @@author
+
+    private void executeProcurementReport(Context context) {
+        Ui ui = context.getUi();
+        EquipmentList equipments = context.getEquipments();
+        ModuleList moduleList = context.getModuleList();
+
+        ui.showMessage("Procurement Report (Current Sem: " + context.getCurrentSemester() + ")");
+
+        int index = 1;
+        boolean foundProcurementNeeded = false;
+
+        for (int i = 0; i < equipments.getSize(); i++) {
+            Equipment eq = equipments.getEquipment(i);
+            ArrayList<String> relatedModules = eq.getModuleCodes();
+
+            int baseDemand = 0;
+
+            for (String modCode : relatedModules) {
+                Module module = getModuleByName(moduleList, modCode);
+                if (module != null) {
+                    // TODO add requirement ratio later
+                    baseDemand += module.getPax();
+                }
+            }
+
+            // Only proceed if there is actual demand
+            if (baseDemand > 0) {
+                double bufferPercentage = eq.getBufferPercentage();
+                double bufferedDemand = baseDemand * (1.0 + (bufferPercentage / 100.0));
+
+                // Indivisibility Rule: round up to nearest whole number
+                int totalRequired = (int) Math.ceil(bufferedDemand);
+
+                int available = eq.getQuantity();
+                int toBuy = totalRequired - available;
+
+                if (toBuy > 0) {
+                    foundProcurementNeeded = true;
+                    int bufferAmt = totalRequired - baseDemand;
+                    String bufferStr = String.format("%.0f%%", bufferPercentage);
+
+                    ui.showMessage(index + ". " + eq.getName());
+                    ui.showMessage("   - Base Need: " + baseDemand + " (from " +
+                            String.join(", ", relatedModules) + ")");
+                    ui.showMessage("   - Buffer: " + bufferStr + " (+" + bufferAmt + ")");
+                    ui.showMessage("   - Total Required: " + totalRequired + " | Available: " + available
+                            + " | TO BUY: " + toBuy);
+                    index++;
+                }
+            }
+        }
+
+        if (!foundProcurementNeeded) {
+            ui.showMessage("Great news! No procurement needed based on current module requirements.");
+        }
+    }
+
+    private Module getModuleByName(ModuleList moduleList, String name) {
+        for (Module m : moduleList.getModules()) {
+            if (m.getName().equalsIgnoreCase(name)) {
+                return m;
+            }
+        }
+        return null; // Orphaned tag or not found
+    }
 }
 
