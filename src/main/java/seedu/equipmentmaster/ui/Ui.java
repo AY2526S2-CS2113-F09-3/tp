@@ -11,12 +11,14 @@ public class Ui {
     private static final String DIVIDER = "===================================================";
     private final Scanner in;
     private final PrintStream out;
+    // @@author Hongyu1231
     private final String logo =  "    ______                             __  ___           __\n"
             + "   / ____/___  __  ______  ____  ___  /  |/  /___ ______/ /____  _____\n"
             + "  / __/ / __ `/ / / / __ \\/ __ \\/ _ \\/ /|_/ / __ `/ ___/ __/ _ \\/ ___/\n"
             + " / /___/ /_/ / /_/ / /_/ / /_/ /  __/ /  / / /_/ (__  ) /_/  __/ /\n"
             + "/_____/\\__, /\\__,_/ .___/ .___/\\___/\\__/  /_/  /_/\\__,_/____/\\__/\n"
             + "      /____/     /_/   /_/\n";
+    // @@author
 
     public Ui() {
         this(System.in, System.out);

@@ -7,12 +7,14 @@ import seedu.equipmentmaster.exception.EquipmentMasterException;
 import seedu.equipmentmaster.ui.Ui;
 import seedu.equipmentmaster.semester.AcademicSemester;
 
+// @@author Hongyu1231
 /**
  * Generates specific reports for the equipment inventory.
  */
 public class ReportCommand extends Command {
     private final String reportType;
     private final String targetSemStr;
+
 
     public ReportCommand(String reportType, String targetSemStr) {
         this.reportType = reportType;
@@ -40,6 +42,7 @@ public class ReportCommand extends Command {
         return new ReportCommand(reportType, targetSem);
     }
 
+
     /**
      * Executes the report command.
      * Analyzes the equipment list to generate and display either a low-stock alert report or an aging equipment report.
@@ -59,6 +62,7 @@ public class ReportCommand extends Command {
             ui.showMessage("Invalid report type. Currently supported: aging, lowstock.");
         }
     }
+    // @@author Hongyu1231
 
     private void executeLowStockReport(EquipmentList equipments, Ui ui) {
         ui.showMessage("Low Stock Alert (Items below minimum threshold):");
@@ -81,6 +85,7 @@ public class ReportCommand extends Command {
         }
     }
 
+    // @@author Hongyu1231
     private void executeAgingReport(EquipmentList equipments, Ui ui, Context context) {
         AcademicSemester targetSem;
         try {
@@ -123,4 +128,6 @@ public class ReportCommand extends Command {
             ui.showMessage("Great news! No equipment needs replacement for this semester.");
         }
     }
+    // @@author Hongyu1231
 }
+

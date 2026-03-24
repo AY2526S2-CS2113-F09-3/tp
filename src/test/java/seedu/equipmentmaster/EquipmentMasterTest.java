@@ -1,3 +1,4 @@
+// @@author Hongyu1231
 package seedu.equipmentmaster;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -39,7 +40,7 @@ public class EquipmentMasterTest {
             file.delete();
         }
     }
-
+    // @@author
 
     @Test
     public void constructor_missingFiles_startsEmpty() {

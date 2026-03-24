@@ -198,6 +198,7 @@ public class Equipment {
         this.quantity = quantity;
     }
 
+    // @@author Hongyu1231
     /**
      * Retrieves the academic semester when the equipment was purchased.
      *
@@ -233,6 +234,7 @@ public class Equipment {
     public void setLifespanYears(double lifespanYears) {
         this.lifespanYears = lifespanYears;
     }
+    // @@author
 
     /**
      * Returns the module codes associated with this equipment.

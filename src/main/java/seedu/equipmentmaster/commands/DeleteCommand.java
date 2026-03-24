@@ -43,6 +43,7 @@ public class DeleteCommand extends Command {
         this.status = status;
     }
 
+    // @@author Hongyu1231
     /**
      * Parses the arguments for the 'delete' command.
      * @param fullCommand The complete input string.
@@ -160,6 +161,7 @@ public class DeleteCommand extends Command {
                         ", Min: " + target.getMinQuantity() + ")");
             }
         }
+        // @@author
 
         storage.save(equipments.getAllEquipments());
     }

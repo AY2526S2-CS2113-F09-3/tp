@@ -155,6 +155,7 @@ public class AddCommand extends Command {
         return new AddCommand(name, quantity, purchaseSem, lifespanYear, minQuantity, moduleCodes);
     }
 
+    // @@author Hongyu1231
     /**
      * Extracts a single argument value for a given prefix.
      * Uses space-padding to prevent substring collisions and stops at the next valid flag.
@@ -214,6 +215,7 @@ public class AddCommand extends Command {
         }
         return results;
     }
+    // @@author
 
     /**
      * Executes the add equipment command.

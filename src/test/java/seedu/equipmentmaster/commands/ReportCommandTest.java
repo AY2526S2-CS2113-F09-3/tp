@@ -1,3 +1,4 @@
+// @@author Hongyu1231
 package seedu.equipmentmaster.commands;
 
 import org.junit.jupiter.api.AfterEach;
@@ -135,6 +136,7 @@ public class ReportCommandTest {
         String output = outContent.toString();
         assertTrue(output.contains("Great news! No equipment needs replacement"));
     }
+    // @@author
 
     @Test
     public void execute_lowStockReport_sufficientTotalNoWarning() throws EquipmentMasterException {

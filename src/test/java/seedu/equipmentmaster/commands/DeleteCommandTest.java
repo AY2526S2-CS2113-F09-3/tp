@@ -47,6 +47,7 @@ public class DeleteCommandTest {
                 ui, tempDir.resolve("test_setting.txt").toString(), tempDir.resolve("test_module.txt").toString());
     }
 
+    // @@author Hongyu1231
     @Test
     public void execute_deleteAvailableQuantity_success() throws EquipmentMasterException {
         // Setup: Total 10, Available 10, Loaned 0
@@ -156,7 +157,7 @@ public class DeleteCommandTest {
         Command cmd2 = DeleteCommand.parse("delete n/STM32 q/2 s/loaned");
         assertTrue(cmd2 instanceof DeleteCommand);
     }
-
+    // @@author
 
     @Test
     public void execute_validIndex_reducesQuantity() throws EquipmentMasterException {
