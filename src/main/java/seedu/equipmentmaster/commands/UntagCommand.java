@@ -71,7 +71,8 @@ public class UntagCommand extends Command {
         boolean equipmentExists = equipments.hasEquipment(equipmentName);
 
         if (!moduleExists && !equipmentExists) {
-            throw new EquipmentMasterException("Aborted: Neither the module '" + moduleName + "' nor the equipment '" + equipmentName + "' exists.");
+            throw new EquipmentMasterException("Aborted: Neither the module '" + moduleName +
+                    "' nor the equipment '" + equipmentName + "' exists.");
         } else if (!moduleExists) {
             throw new EquipmentMasterException("Aborted: Module '" + moduleName + "' does not exist.");
         } else if (!equipmentExists) {
@@ -80,7 +81,7 @@ public class UntagCommand extends Command {
 
         // 2. Retrieve the objects
         Module targetModule = modules.getModule(moduleName);
-        Equipment targetEquipment = equipments.getEquipment(Integer.parseInt(equipmentName));
+        Equipment targetEquipment = equipments.findByName(equipmentName);
 
         // Grab the official capitalized name so it matches exactly what's inside the HashMap
         String officialEquipmentName = targetEquipment.getName();

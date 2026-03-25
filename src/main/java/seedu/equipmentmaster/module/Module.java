@@ -104,6 +104,27 @@ public class Module {
      */
     @Override
     public String toString() {
-        return name + " | Enrollment: " + pax + " students";
+        String baseString = name + " | Enrollment: " + pax + " students";
+        // If there are no tags (or the map is null), just return the base string
+        if (this.equipmentRequirements == null || this.equipmentRequirements.isEmpty()) {
+            return baseString;
+        }
+
+        // If there are tags, format them nicely!
+        StringBuilder tagsBuilder = new StringBuilder(" | Required: ");
+        int count = 0;
+
+        for (String eqName : this.equipmentRequirements.keySet()) {
+            double ratio = this.equipmentRequirements.get(eqName);
+            tagsBuilder.append(eqName).append(" (").append(ratio).append(")");
+
+            // Add a comma between items, but not after the last item
+            count++;
+            if (count < this.equipmentRequirements.size()) {
+                tagsBuilder.append(", ");
+            }
+        }
+
+        return baseString + tagsBuilder.toString();
     }
 }

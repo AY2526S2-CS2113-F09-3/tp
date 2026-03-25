@@ -13,6 +13,7 @@ import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Scanner;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -211,7 +212,19 @@ public class Storage {
         }
         try (FileWriter fw = new FileWriter(file)) {
             for (Module m : moduleList.getModules()) {
-                fw.write(m.getName() + " | " + m.getPax() + System.lineSeparator());
+                StringBuilder reqsBuilder = new StringBuilder();
+                HashMap<String, Double> reqs = m.getEquipmentRequirements();
+
+                if (reqs != null && !reqs.isEmpty()) {
+                    for (String eqName : reqs.keySet()) {
+                        reqsBuilder.append(eqName).append("=").append(reqs.get(eqName)).append(",");
+                    }
+                    reqsBuilder.setLength(reqsBuilder.length() - 1);
+                    fw.write(m.getName() + " | " + m.getPax() + " | " +
+                            reqsBuilder.toString() + System.lineSeparator());
+                } else {
+                    fw.write(m.getName() + " | " + m.getPax() + System.lineSeparator());
+                }
             }
         } catch (IOException e) {
             throw new EquipmentMasterException("Error saving modules to file: " + moduleFilePath
@@ -254,13 +267,26 @@ public class Storage {
 
                     String[] parts = line.split(" \\| ");
 
-                    if (parts.length == 2) {
+                    if (parts.length >= 2) {
                         String name = parts[0].trim();
                         int pax = Integer.parseInt(parts[1].trim());
 
                         try {
+                            Module newModule = new Module(name, pax);
+                            //Check if there is a 3rd part containing equipment tags
+                            if (parts.length == 3 && !parts[2].trim().isEmpty()) {
+                                String[] requirements = parts[2].split(",");
+                                for (String req : requirements) {
+                                    String[] pair = req.split("=");
+                                    if (pair.length == 2) {
+                                        String eqName = pair[0].trim();
+                                        double ratio = Double.parseDouble(pair[1].trim());
+                                        newModule.addEquipmentRequirement(eqName, ratio);
+                                    }
+                                }
+                            }
                             // Add the reconstructed module to the list
-                            loadedList.addModule(new Module(name, pax));
+                            loadedList.addModule(newModule);
                         } catch (EquipmentMasterException e) {
                             ui.showMessage(e.getMessage());
                         }

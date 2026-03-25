@@ -128,11 +128,6 @@ public class EquipmentList {
      * @param equipmentName Name of the equipment to be checked
      */
     public boolean hasEquipment(String equipmentName) {
-        for (Equipment equipment : equipments) {
-            if (equipment.getName().equals(equipmentName)) {
-                return true;
-            }
-        }
-        return false;
+        return findByName(equipmentName) != null;
     }
 }

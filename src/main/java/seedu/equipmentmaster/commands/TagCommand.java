@@ -29,7 +29,8 @@ public class TagCommand extends Command{
         boolean equipmentExists = equipments.hasEquipment(equipmentName);
 
         if (!moduleExists && !equipmentExists) {
-            throw new EquipmentMasterException("Aborted: Neither the module '" + moduleName + "' nor the equipment '" + equipmentName + "' exists.");
+            throw new EquipmentMasterException("Aborted: Neither the module '" +
+                    moduleName + "' nor the equipment '" + equipmentName + "' exists.");
         } else if (!moduleExists) {
             throw new EquipmentMasterException("Aborted: Module '" + moduleName + "' does not exist.");
         } else if (!equipmentExists) {
@@ -37,7 +38,10 @@ public class TagCommand extends Command{
         }
 
         Module targetModule = modules.getModule(moduleName);
-        targetModule.addEquipmentRequirement(moduleName, requirementRatio);
+        String officialEquipmentName = equipments.findByName(equipmentName).getName();
+
+        // Use the officialEquipmentName, NOT the moduleName!
+        targetModule.addEquipmentRequirement(officialEquipmentName, requirementRatio);
         int studentsPerItem = (int) Math.round(1.0 / requirementRatio);
 
         ui.showMessage("Successfully linked equipment to module:\n" +
