@@ -18,6 +18,9 @@ add n/Oscilloscope q/5 bought/AY2020/21 Sem1 life/3.0
 add n/Soldering Iron q/10 m/EE2026 min/2
 list
 getsem
+setmin 1 min/15
+setmin 2 min/80
+list
 setmin
 setmin n/Ghost min/10
 setmin n/Resistor min/-5
@@ -36,6 +39,7 @@ delete 1 q/5000 s/available
 delete n/STM32 q/0 s/available
 delete n/STM32 q/-10 s/available
 delete n/STM32 q/abc s/available
+delete 1 q/1 s/available
 delete 1 q/10 s/available
 delete n/STM32 q/5 s/available
 setmin n/Soldering Iron min/20

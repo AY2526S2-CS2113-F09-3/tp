@@ -19,8 +19,8 @@ Here are the available commands:
 7.  getsem    | getsem
 8.  delete    | delete n/NAME q/QUANTITY s/STATUS or delete INDEX q/QUANTITY s/STATUS
 9.  help      | help
-10. setmin    | setmin n/NAME min/QUANTITY
-11. report    | report aging [AY[YYYY]/[YY] Sem[1/2]] or report lowstock
+10. setmin    | setmin n/NAME min/QUANTITY or setmin INDEX min/QUANTITY
+11. report    | report aging [AY[YYYY]/[YY] Sem[1/2]] or report lowstock or report procurement
 12. addmod    | addmod n/NAME pax/QTY
 13. updatemod | updatemod n/NAME pax/QTY
 14. delmod    | delmod n/NAME
@@ -39,8 +39,8 @@ Here are the available commands:
 7.  getsem    | getsem
 8.  delete    | delete n/NAME q/QUANTITY s/STATUS or delete INDEX q/QUANTITY s/STATUS
 9.  help      | help
-10. setmin    | setmin n/NAME min/QUANTITY
-11. report    | report aging [AY[YYYY]/[YY] Sem[1/2]] or report lowstock
+10. setmin    | setmin n/NAME min/QUANTITY or setmin INDEX min/QUANTITY
+11. report    | report aging [AY[YYYY]/[YY] Sem[1/2]] or report lowstock or report procurement
 12. addmod    | addmod n/NAME pax/QTY
 13. updatemod | updatemod n/NAME pax/QTY
 14. delmod    | delmod n/NAME
@@ -107,7 +107,22 @@ Here is the equipment log:
 The current system time is: AY2024/25 Sem1
 ===================================================
 ===================================================
-Invalid format! Use: setmin n/NAME min/QUANTITY
+Success: Minimum threshold for Ghost set to 15
+Warning: Item is currently below this new threshold!
+===================================================
+===================================================
+Success: Minimum threshold for Resistor set to 80
+===================================================
+===================================================
+Here is the equipment log:
+1. Ghost          | Total: 10   | Available: 10   | Loaned: 0 | Min: 15 | Purchase: <N/A>          | Lifespan: <N/A>
+2. Resistor       | Total: 1000 | Available: 1000 | Loaned: 0 | Min: 80 | Purchase: <N/A>          | Lifespan: <N/A>
+3. STM32          | Total: 50   | Available: 50   | Loaned: 0 | Min: 0  | Purchase: AY2024/25 Sem1 | Lifespan: 2.5 years | Modules: [CG2111A, CG2271]
+4. Oscilloscope   | Total: 5    | Available: 5    | Loaned: 0 | Min: 0  | Purchase: AY2020/21 Sem1 | Lifespan: 3.0 years
+5. Soldering Iron | Total: 10   | Available: 10   | Loaned: 0 | Min: 2  | Purchase: <N/A>          | Lifespan: <N/A>     | Modules: [EE2026]
+===================================================
+===================================================
+Invalid format! Use: setmin n/NAME min/QUANTITY or setmin INDEX min/QUANTITY
 ===================================================
 ===================================================
 Success: Minimum threshold for Ghost set to 10
@@ -116,7 +131,7 @@ Success: Minimum threshold for Ghost set to 10
 Minimum threshold cannot be negative.
 ===================================================
 ===================================================
-Invalid format! Use: setmin n/NAME min/QUANTITY
+Invalid format! Use: setmin n/NAME min/QUANTITY or setmin INDEX min/QUANTITY
 ===================================================
 ===================================================
 Success: Minimum threshold for Resistor set to 100
@@ -162,6 +177,9 @@ Quantity to delete must be greater than 0.
 Quantity must be a valid whole number.
 ===================================================
 ===================================================
+Only 0 available unit(s). Cannot delete 1.
+===================================================
+===================================================
 Only 0 available unit(s). Cannot delete 10.
 ===================================================
 ===================================================
@@ -172,10 +190,10 @@ Success: Minimum threshold for Soldering Iron set to 20
 Warning: Item is currently below this new threshold!
 ===================================================
 ===================================================
-Please specify the report type. Usage: report aging [Semester] OR report lowstock
+Please specify the report type. Usage: report aging [Semester] OR report lowstock OR report procurement
 ===================================================
 ===================================================
-Invalid report type. Currently supported: aging, lowstock.
+Invalid report type. Currently supported: aging, lowstock, procurement.
 ===================================================
 ===================================================
 Low Stock Alert (Items below minimum threshold):

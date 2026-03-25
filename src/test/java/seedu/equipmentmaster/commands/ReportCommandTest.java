@@ -8,6 +8,7 @@ import seedu.equipmentmaster.context.Context;
 import seedu.equipmentmaster.equipment.Equipment;
 import seedu.equipmentmaster.equipmentlist.EquipmentList;
 import seedu.equipmentmaster.exception.EquipmentMasterException;
+import seedu.equipmentmaster.module.Module;
 import seedu.equipmentmaster.modulelist.ModuleList;
 import seedu.equipmentmaster.storage.Storage;
 import seedu.equipmentmaster.ui.Ui;
@@ -15,6 +16,8 @@ import seedu.equipmentmaster.semester.AcademicSemester;
 
 import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
+import java.util.ArrayList;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -177,5 +180,35 @@ public class ReportCommandTest {
 
         assertTrue(output.contains(expectedString),
                 "The output formatting for low stock items does not match the expected string.");
+    }
+
+    @Test
+    public void execute_procurementReport_calculatesCorrectly() throws EquipmentMasterException {
+        // Arrange
+        ModuleList moduleList = new ModuleList();
+        moduleList.addModule(new Module("CG2111A", 30));
+        moduleList.addModule(new Module("EE2026", 0)); // No demand from this one
+
+        ArrayList<String> modules = new ArrayList<>(List.of("CG2111A"));
+        // Name, Qty, Avail, Loaned, Sem, Life, Modules, Min, Buffer
+        Equipment stm32 = new Equipment("STM32", 10, 10, 0, null, 0.0, modules, 0, 10.0);
+        equipments.addEquipment(stm32);
+
+        // Act
+        ReportCommand command = new ReportCommand("procurement", "");
+        AcademicSemester currentSystemSemester = new AcademicSemester("AY2024/25 Sem1");
+        Context context = new Context(equipments, moduleList, ui, storage, currentSystemSemester);
+        command.execute(context);
+
+        String output = outContent.toString();
+
+        // Assert
+        // Base Need: 30
+        // Buffer: 10% -> 33
+        // Available: 10
+        // To Buy: 23
+        assertTrue(output.contains("Base Need: 30"));
+        assertTrue(output.contains("Buffer: 10% (+3)"));
+        assertTrue(output.contains("Total Required: 33 | Available: 10 | TO BUY: 23"));
     }
 }
