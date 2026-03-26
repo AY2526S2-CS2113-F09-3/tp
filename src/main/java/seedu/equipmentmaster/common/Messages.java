@@ -9,6 +9,7 @@ public class Messages {
     public static final String MESSAGE_INVALID_SET_STATUS_FORMAT =
             "Invalid setstatus format. Use: setstatus n/NAME q/QUANTITY s/STATUS";
     public static final String MESSAGE_DIVIDER = "===================================================";
-    public static final String MESSAGE_INVALID_SETBUFFER_FORMAT =
-            "Invalid setbuffer format. Usage: setbuffer n/NAME b/PERCENTAGE or setbuffer i/INDEX b/PERCENTAGE";
+    public static final String MESSAGE_INVALID_SETBUFFER_FORMAT = "Invalid command format!\n"
+            + "Usage: setbuffer n/NAME b/PERCENTAGE\n"
+            + "Example: setbuffer n/STM32 b/10";
 }
