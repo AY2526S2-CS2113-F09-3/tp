@@ -19,6 +19,7 @@ public class SetBufferCommand extends Command {
     private static final Logger logger = Logger.getLogger(SetBufferCommand.class.getName());
 
     private final String name;
+    private final int index; // -1 if using name
     private final double percentage;
 
     /**
@@ -29,12 +30,34 @@ public class SetBufferCommand extends Command {
      */
     public SetBufferCommand(String name, double percentage) {
         this.name = name;
+        this.index = -1;
         this.percentage = percentage;
         assert percentage >= 0 : "Buffer percentage should be non-negative";
     }
 
     /**
+     * Constructs a SetBufferCommand using equipment index.
+     *
+     * @param index      Index of the equipment to update (1-based).
+     * @param percentage Buffer percentage to set.
+     */
+    public SetBufferCommand(int index, double percentage) {
+        if (index <= 0) {
+            throw new IllegalArgumentException("Index must be positive. Received: " + index);
+        }
+
+        if (percentage < 0) {
+            throw new IllegalArgumentException("Buffer percentage cannot be negative.");
+        }
+
+        this.name = null;
+        this.index = index;
+        this.percentage = percentage;
+    }
+
+    /**
      * Parses the arguments for the 'setbuffer' command and creates a SetBufferCommand object.
+     * Supports either name format (n/NAME b/VALUE) or index format (i/INDEX b/VALUE).
      *
      * @param fullCommand The complete input string containing the 'setbuffer' command and its arguments.
      * @return A SetBufferCommand object.
@@ -43,23 +66,34 @@ public class SetBufferCommand extends Command {
     public static SetBufferCommand parse(String fullCommand) throws EquipmentMasterException {
         logger.log(Level.INFO, "Starting to parse setbuffer command input.");
 
-        if (!fullCommand.contains("n/") || !fullCommand.contains("b/")) {
-            logger.log(Level.WARNING, "Missing compulsory flags (n/ or b/) in user input.");
+        // Check for required flags
+        if (!fullCommand.contains("b/")) {
+            logger.log(Level.WARNING, "Missing compulsory flag (b/) in user input.");
             throw new EquipmentMasterException(MESSAGE_INVALID_SETBUFFER_FORMAT);
         }
 
-        // Extract name and buffer percentage
-        String name = extractArgument(fullCommand, "n/");
+        // Check if using name or index
+        boolean hasName = fullCommand.contains("n/");
+        boolean hasIndex = fullCommand.contains("i/");
+
+        if (!hasName && !hasIndex) {
+            logger.log(Level.WARNING, "Missing compulsory flag (n/ or i/) in user input.");
+            throw new EquipmentMasterException(MESSAGE_INVALID_SETBUFFER_FORMAT);
+        }
+
+        if (hasName && hasIndex) {
+            throw new EquipmentMasterException("Please specify either name (n/) OR index (i/), not both.");
+        }
+
+        // Extract buffer percentage
         String percentageStr = extractArgument(fullCommand, "b/");
-
-        if (name.isEmpty() || percentageStr.isEmpty()) {
+        if (percentageStr.isEmpty()) {
             throw new EquipmentMasterException(MESSAGE_INVALID_SETBUFFER_FORMAT);
         }
 
-        // Strip % symbol if present (e.g., "10%" -> "10")
+        // Strip % symbol if present
         percentageStr = percentageStr.replace("%", "").trim();
 
-        // Parse percentage
         double percentage;
         try {
             percentage = Double.parseDouble(percentageStr);
@@ -72,9 +106,36 @@ public class SetBufferCommand extends Command {
             throw new EquipmentMasterException("Please enter a valid number for buffer percentage.");
         }
 
-        logger.log(Level.INFO, "Successfully parsed SetBufferCommand for equipment: " + name
+        // Handle name-based identification
+        if (hasName) {
+            String name = extractArgument(fullCommand, "n/");
+            if (name.isEmpty()) {
+                throw new EquipmentMasterException("Equipment name cannot be empty.");
+            }
+            logger.log(Level.INFO, "Successfully parsed SetBufferCommand for equipment: " + name
+                    + " with buffer: " + percentage + "%");
+            return new SetBufferCommand(name, percentage);
+        }
+
+        // Handle index-based identification
+        String indexStr = extractArgument(fullCommand, "i/");
+        if (indexStr.isEmpty()) {
+            throw new EquipmentMasterException("Equipment index cannot be empty.");
+        }
+
+        int index;
+        try {
+            index = Integer.parseInt(indexStr);
+            if (index <= 0) {
+                throw new EquipmentMasterException("Index must be a positive number.");
+            }
+        } catch (NumberFormatException e) {
+            throw new EquipmentMasterException("Please enter a valid positive integer for index.");
+        }
+
+        logger.log(Level.INFO, "Successfully parsed SetBufferCommand for index: " + index
                 + " with buffer: " + percentage + "%");
-        return new SetBufferCommand(name, percentage);
+        return new SetBufferCommand(index, percentage);
     }
 
     /**
@@ -93,7 +154,7 @@ public class SetBufferCommand extends Command {
         }
         startIdx += searchPrefix.length();
         int endIdx = paddedCommand.length();
-        String[] allPrefixes = {" n/", " b/", " q/", " sem/", " bought/", " life/", " m/", " min/"};
+        String[] allPrefixes = {" n/", " i/", " b/", " q/", " sem/", " bought/", " life/", " m/", " min/"};
         for (String p : allPrefixes) {
             int pIdx = paddedCommand.indexOf(p, startIdx);
             if (pIdx != -1 && pIdx < endIdx) {
@@ -119,17 +180,30 @@ public class SetBufferCommand extends Command {
         assert storage != null : "Storage dependency cannot be null";
         assert percentage >= 0 : "Buffer percentage should be non-negative";
 
-        Equipment target = equipments.findByName(name);
+        Equipment target;
 
-        if (target == null) {
-            ui.showMessage("Equipment '" + name + "' not found.");
-            return;
+        // Find by index or name
+        if (index > 0) {
+            // Check if index is within bounds
+            if (index < 1 || index > equipments.getSize()) {
+                ui.showMessage("Equipment at index " + index + " not found. (Total: "
+                        + equipments.getSize() + " equipment(s))");
+                return;
+            }
+            // Convert from 1-based user index to 0-based internal index
+            target = equipments.getEquipment(index - 1);
+        } else {
+            target = equipments.findByName(name);
+            if (target == null) {
+                ui.showMessage("Equipment '" + name + "' not found.");
+                return;
+            }
         }
 
         target.setBufferPercentage(percentage);
         storage.save(equipments.getAllEquipments());
 
-        ui.showMessage("Buffer Updated:\n" + name + " | Safety Buffer: " + percentage + "%");
-        logger.log(Level.INFO, "Updated buffer for " + name + " to " + percentage + "%");
+        ui.showMessage("Buffer Updated:\n" + target.getName() + " | Safety Buffer: " + percentage + "%");
+        logger.log(Level.INFO, "Updated buffer for " + target.getName() + " to " + percentage + "%");
     }
 }

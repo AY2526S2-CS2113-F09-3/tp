@@ -66,6 +66,10 @@ setbuffer n/STM32 b/10
 setbuffer n/Basys3 b/10
 setbuffer n/STM32 b/-10
 setbuffer n/
+setbuffer i/
 setbuffer b/
+setbuffer i/1 b/15
+setbuffer i/2 b/25.5
+setbuffer i/0 b/-10
 listmod
 bye

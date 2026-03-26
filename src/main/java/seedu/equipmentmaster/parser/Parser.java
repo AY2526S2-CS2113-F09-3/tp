@@ -60,7 +60,8 @@ public class Parser {
         commandSpecs.add(new CommandSpec("updatemod", "updatemod n/NAME pax/QTY", UpdateModCommand::parse));
         commandSpecs.add(new CommandSpec("delmod", "delmod n/NAME", DelModCommand::parse));
         commandSpecs.add(new CommandSpec("listmod", "listmod", fullCommand -> new ListModCommand()));
-        commandSpecs.add(new CommandSpec("setbuffer", "setbuffer n/NAME b/PERCENTAGE",
+        commandSpecs.add(new CommandSpec("setbuffer", "setbuffer n/NAME b/PERCENTAGE or "
+                + "setbuffer i/INDEX b/PERCENTAGE",
                 SetBufferCommand::parse));
         commandSpecs.add(new CommandSpec("tag", "tag m/MOD_NAME n/EQ_NAME req/FRACTION",
                 TagCommand::parse));
