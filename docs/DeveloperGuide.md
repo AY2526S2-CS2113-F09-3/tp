@@ -2,7 +2,8 @@
 
 ## Acknowledgements
 
-{list here sources of all reused/adapted ideas, code, documentation, and third-party libraries -- include links to the original source as well}
+* **AddressBook-Level3 (AB3):** This project was initially inspired by and adapted from the AddressBook-Level3 project created by the [SE-EDU initiative](https://se-education.org). We thank the AB3 team for providing a robust architectural template for Java-based CLI applications.
+* **Libraries Used:** * [JUnit 5](https://junit.org/junit5/) - For comprehensive unit and integration testing.
 
 ## Design & implementation
 
@@ -49,134 +50,147 @@ setstatus 1 3 available
 ```
 
 ---
-
 ### Enhanced Find Feature
 
 #### 1. Overview
-The Enhanced Find Feature allows users to search the inventory not only by the equipment's name but also by its associated course module codes. This ensures that users can quickly locate all equipment required for a specific class (e.g., searching "CG2111A" to find all related microcontrollers, sensors, and cables).
+The Enhanced Find Feature allows users to search the inventory not only by the equipment's name but also by its associated course module codes. This ensures that users can quickly locate all equipment required for a specific class (e.g., searching `find STM32 CG2111A` to retrieve all related microcontrollers and sensors).
 
 #### 2. Implementation Details
-The feature is facilitated by the `FindCommand` class. During a recent refactoring phase, the execution logic was heavily optimized to adhere to the **Single Level of Abstraction Principle (SLAP)** and to eliminate deeply nested code structures (the "Arrow Anti-Pattern").
+The feature is facilitated by the `FindCommand` class. During a recent refactoring phase, the execution logic was heavily optimized to adhere to the **Single Level of Abstraction Principle (SLAP)**, purposefully eliminating deeply nested iterations (the "Arrow Anti-Pattern").
 
-The execution follows these steps:
-1. The user inputs a command string (e.g., `find STM32 CG2111A`).
-2. The `Parser` parses the string, splits the keywords, and returns a `FindCommand` object.
-3. The main application loop calls `FindCommand#execute(Context)`.
-4. Inside `execute()`, the command extracts the `EquipmentList` and `Ui` from the `Context`.
-5. It calls a helper method `getMatchingEquipments(EquipmentList)` which handles the iteration logic.
-6. For each `Equipment`, it delegates the low-level string comparison to a private method `isMatchFound(Equipment, String[])`.
-7. `isMatchFound()` utilizes **guard clauses** and **early returns**. If a token matches either the equipment's name or its module list, it immediately returns `true`, preventing duplicate additions without needing complex collections like `Set`.
-8. The matched equipment is collected into an `ArrayList` and passed to the `Ui` for display.
+Execution flow:
+1. The `Parser` processes the input and returns a `FindCommand` object containing the search tokens.
+2. `FindCommand#execute(Context)` is invoked.
+3. It calls a high-level helper `getMatchingEquipments(EquipmentList)` to iterate through the inventory.
+4. The low-level string matching is delegated to `isMatchFound(...)`, which utilizes early returns.
 
-#### 3. Sequence Diagram
-The following sequence diagram illustrates the interactions between the Logic and Model components. It highlights the delegation of matching logic to helper methods (`getMatchingEquipments` and `isMatchFound`) to maintain a clean level of abstraction.
+**Code Snippet: SLAP and Early Returns**
+As advised by clean code practices, we avoid deep nesting. The following minimal snippet demonstrates how `isMatchFound` safely halts execution upon the first match, preventing duplicate entries in the result list without relying on a `Set`:
 
+```java
+private boolean isMatchFound(Equipment eq, String[] tokens) {
+  for (String token : tokens) {
+    if (token.isEmpty()) {
+      continue;
+    }
+    // Early return: As soon as we find one match, we return true.
+    // This eliminates the need for the clunky "contains(eq) -> break" logic!
+    if (matchesNameOrModule(eq, token)) {
+      return true;
+    }
+  }
+  return false;
+}
+```
+
+#### 3. UML Diagrams
+To illustrate this feature without cluttering a single diagram, the logic is divided into an Activity Diagram for the algorithmic flow and a Sequence Diagram using `ref` frames to abstract lower-level details.
+
+**Activity Diagram: Iteration and Early Return**
+*(This diagram omits UI rendering steps to focus purely on the search algorithm's fast-fail mechanism.)*
+![FindCommand Activity Diagram](images/find_activity.png)
+
+**Sequence Diagram: Execution Flow**
+*(Note: Minor parameter details are omitted as `...` for brevity. The low-level matching logic is abstracted into a `ref` frame.)*
 ![FindCommand Sequence Diagram](images/find.png)
 
 #### 4. Design Considerations
-**Alternative 1 (Current Implementation): Extracted Helpers & Early Returns (SLAP)**
-* **How it works:** The high-level iteration and low-level string matching are separated into different methods. Inside the matching method, as soon as one token matches the name or module code, it returns `true` and stops checking further tokens for that equipment.
-* **Why it was chosen:** Highly performant and readable. It natively solves the deduplication problem (ensuring an equipment item is added to the results list exactly once) by failing fast/succeeding fast. It removes deep nesting, making the codebase highly testable and compliant with clean code standards.
-
-**Alternative 2: Deeply Nested Iteration with `break` Statements**
-* **How it works:** A single large `getMatchingEquipments` method contains nested `for` loops (looping through equipment, then tokens, then module codes). It uses `break` to exit the loop once a match is found and checks `matchedList.contains(eq)` before adding to prevent duplicates.
-* **Why it was rejected:** This implementation suffers from the "Arrow Anti-Pattern" (excessive indentation), making the code extremely difficult to trace and maintain. Furthermore, relying on `ArrayList.contains()` for a dynamically growing list introduces unnecessary $O(N)$ overhead compared to the $O(1)$ early return mechanism used in the current design.
+* **Alternative 1 (Current Implementation): Extracted Helpers & Early Returns**
+    * **Pros:** Highly performant ($O(1)$ addition check). The separation of concerns makes unit testing significantly easier.
+    * **Cons:** Requires creating multiple private helper methods, slightly increasing class line count.
+* **Alternative 2: Nested Iteration with `break` and `List.contains()`**
+    * **Pros:** Keeps all logic inside a single method block.
+    * **Cons:** Rejected due to the "Arrow Anti-Pattern". Relying on `ArrayList.contains(eq)` introduces an unnecessary $O(N)$ overhead per matched item.
 
 ---
 
 ### Module Tracking System
 
 #### 1. Overview
-The Module Tracking System allows users to manage a registry of academic course modules (e.g., `CG2111A`) and their respective student enrollment sizes (pax). This enhancement enables better tracking of equipment allocation by linking lab inventory to specific modules.
+The Module Tracking System allows lab technicians to manage a central registry of academic course modules (e.g., `CG2111A`). It supports standard lifecycle operations (adding, deleting, and listing modules) and advanced many-to-many relationship mapping, linking modules to specific equipment requirements based on student enrollment sizes (pax).
 
 #### 2. Implementation Details
-The feature is implemented using a centralized `ModuleList` that stores `Module` objects. It interacts closely with the `Storage` component to ensure data persistence across sessions.
+The core of the system is the `ModuleList` class, which manages a collection of `Module` entities. The system utilizes the **Context Object Pattern** to manage dependencies across all module-related commands.
 
-Given the recent architectural refactoring, the system utilizes the **Context Object Pattern** to manage dependencies. When a user inputs a module-related command (e.g., `addmod`), the following execution flow occurs:
+**Standard Operations (`addmod`, `delmod`, `listmod`):**
+* **Add/Delete:** `AddModCommand` and `DelModCommand` extract the `ModuleList` and `Storage` from the unified `Context`. They modify the list (adding or removing a `Module` by its module code) and immediately invoke `Storage#saveModules()` to persist the state.
+* **List:** `ListModCommand` simply retrieves the `ModuleList` from the `Context` and formats the current registry for the `Ui` to display.
 
-1. The user enters `addmod n/CG2111A pax/150`.
-2. The `Parser` identifies the command word and delegates parsing to `AddModCommand.parse()`, which creates an `AddModCommand` object.
-3. The main execution loop calls `AddModCommand#execute(Context)`.
-4. The command extracts the `ModuleList`, `Ui`, and `Storage` objects from the unified `Context`.
-5. A new `Module` object is instantiated and added to the `ModuleList`.
-6. The `Storage#saveModules()` method is invoked to persist the updated list to `data/module.txt`.
-7. The `Ui` displays a success confirmation to the user.
+**Advanced Mapping (`updatemod` / Equipment Requirements):**
+To support complex lab setups, a recent architectural enhancement introduced a `HashMap<String, Double>` within each `Module` to map required equipment names to their usage ratios per student.
+When a requirement is added or updated:
+1. The command extracts the `ModuleList` and retrieves the target `Module`.
+2. The low-level mathematical validation and map insertion are handled by `Module#addEquipmentRequirement(equipmentName, ratio)`.
+3. `Storage` is invoked to persist the updated state.
 
-#### 3. Sequence Diagram
-The following sequence diagram illustrates the interactions between the Logic, Model, and Storage components when the `addmod` command is executed:
+**Code Snippet: Defensive Programming in Domain Objects**
+To demonstrate our adherence to defensive programming and SLAP, the mathematical validation logic for updating requirements is completely encapsulated within the `Module` entity:
 
-![Module Class Sequence Diagram](images/module.png)
+```java
+public void addEquipmentRequirement(String equipmentName, double ratio) throws EquipmentMasterException {
+    if (!Double.isFinite(ratio)) { // Guard clause: Non-finite check
+        throw new EquipmentMasterException("Requirement ratio must be a finite number.");
+    }
+    if (ratio <= 0.0) { // Guard clause: Negative/Zero check
+        throw new EquipmentMasterException("Requirement ratio must be strictly greater than 0.0.");
+    }
+    this.equipmentRequirements.put(equipmentName, ratio);
+}
+```
+
+#### 3. UML Diagrams
+To illustrate the data structure and execution flow of the complete Module Tracking System, we employ both a Class Diagram and a Sequence Diagram.
+
+**Class Diagram: System Architecture**
+*(Note: Minor exception classes and standard Java libraries are omitted. The diagram highlights the inheritance of commands and the use of HashMap for relational mapping.)*
+![Module System Class Diagram](images/module_class.png)
+
+**Sequence Diagram: Update Module Execution Flow**
+*(Note: UI rendering steps and generic self-calls have been abstracted to focus on the core Model interactions during an update operation.)*
+![UpdateMod Sequence Diagram](images/updatemod.png)
 
 #### 4. Design Considerations
-**Alternative 1 (Current Implementation): Normalized Data Structure**
-* **How it works:** Modules and their capacities are stored in a standalone `ModuleList`. Equipment objects store only the names (Strings) of the modules they are used in.
-* **Why it was chosen:** This follows the database normalization principle. If a module's enrollment size changes (via `updatemod`), we only need to update it in one place (`ModuleList`). It avoids traversing the entire `EquipmentList`.
+* **Alternative 1 (Current Implementation): Ratio-Based Relational Mapping (HashMap)**
+  * **How it works:** Each `Module` maintains a `HashMap` linking equipment names (Strings) to a fractional ratio (Double).
+  * **Why it was chosen:** It provides extreme flexibility. Not every piece of equipment has a 1:1 student ratio (e.g., one oscilloscope might be shared by 4 students, ratio = 0.25). This mathematical modeling allows the system to accurately calculate exact lab demands without data redundancy.
 
-**Alternative 2: Embedding Module Details within Equipment**
-* **How it works:** Each `Equipment` object contains a list of fully instantiated `Module` objects (including name and pax).
-* **Why it was rejected:** This creates massive data redundancy. If `CG2111A` uses 10 different types of equipment, the enrollment number `150` would be saved 10 times. Updating the enrollment would require an $O(N)$ search through all equipment, increasing the risk of inconsistent data state.
+* **Alternative 2: Storing Hardcoded Integers**
+  * **How it works:** Instead of a ratio, the module stores the absolute integer number of equipment needed (e.g., "Needs 50 STM32s").
+  * **Why it was rejected:** This creates a brittle system. If the student enrollment (pax) changes from 100 to 150, the technician would have to manually recalculate and update every single equipment requirement. The ratio-based approach automatically scales demand when pax is updated.
+
+#### 5. Future Implementations (Beyond v2.1)
+* **Automated Demand Forecasting:** Leveraging the ratio `HashMap` and the current `pax`, future versions will introduce a `forecast` command. This will cross-reference the required total (pax * ratio) against the actual available inventory in the `EquipmentList`, automatically flagging shortages before the semester begins.
 
 ---
 
 ### Aging Equipment Report
 
 #### 1. Overview
-The Aging Equipment Report feature allows lab technicians to proactively identify equipment that has exceeded its expected lifespan. Instead of using arbitrary calendar dates, the system calculates age dynamically based on the semantic university timeline (Academic Semesters).
+The Aging Equipment Report feature empowers lab technicians to proactively audit inventory that has exceeded its expected lifespan. It calculates age dynamically based on the semantic university timeline (Academic Semesters) rather than absolute calendar dates.
 
 #### 2. Implementation Details
-The feature is driven by the `ReportCommand` class. It relies on the `AcademicSemester` class to perform semantic time-difference calculations.
+Driven by the `ReportCommand`, this feature relies heavily on the `AcademicSemester` class to perform semantic time-difference calculations.
 
-The execution flow is as follows:
-1. The user enters `report aging`.
-2. The `Parser` returns a `ReportCommand` initialized with the `"aging"` report type.
-3. During `execute(Context)`, the command extracts the global `currentSemester` and the `EquipmentList` from the `Context`.
-4. It iterates through all equipment in the list. For each equipment that has a recorded `purchaseSemester`, it calculates the elapsed time by calling `AcademicSemester#calculateAgeInYears(currentSemester)`.
-5. The calculated age is compared against the equipment's defined `lifespan`.
-6. If the age is close to or exceeds the lifespan, the equipment is appended to a temporary report list.
-7. Finally, the `Ui` formats and prints the curated report.
+During execution:
+1. The command retrieves the current `AcademicSemester` from the environment.
+2. It iterates through the `EquipmentList`.
+3. For items with a `purchaseSemester`, it calculates the elapsed time.
+4. Equipments exceeding their designated `lifespan` are compiled into a report.
 
-#### 3. Sequence Diagram
-The following sequence diagram details the object interactions during the generation of an aging report. Self-calls and minor UI formatting steps have been omitted for clarity.
-
+#### 3. UML Diagrams
+**Sequence Diagram: Report Generation**
+*(Note: Pseudocode like `calculate age` is used in place of exact mathematical method calls like `calculateAgeInYears()` to keep the diagram abstracted and focused on object interactions.)*
 ![ReportAging Sequence Diagram](images/reportAging.png)
 
 #### 4. Design Considerations
-**Alternative 1 (Current Implementation): Semantic Academic Timekeeping**
-* **How it works:** Time is tracked using `AcademicSemester` objects (e.g., `AY2024/25 Sem1`). The age is calculated mathematically by assuming each semester represents 0.5 years.
-* **Why it was chosen:** Lab equipment procurement, deployment, and auditing cycles are tightly bound to university semesters. Tracking age via `AY` aligns perfectly with the user's domain reality, making data entry and reporting highly intuitive for student TAs and lab staff.
+* **Alternative 1 (Current Implementation): Semantic Academic Timekeeping (`AY2024/25 Sem1`)**
+    * **Justification:** Aligns with the domain reality of the target users. University procurement and auditing cycles operate on semesters, not strict DD/MM/YYYY formats. This greatly reduces friction during data entry.
+* **Alternative 2: Standard `java.time.LocalDate`**
+    * **Justification for rejection:** While standard, it forces users to guess exact dates (e.g., forcing a 1st Jan date if only the year is known), creating artificially precise but practically inaccurate data.
 
-**Alternative 2: Standard Date/Time Libraries**
-* **How it works:** Utilizing `java.time.LocalDate` to record exact purchase dates and calculating the precise number of days elapsed.
-* **Why it was rejected:** While `LocalDate` is standard, it requires users to input precise formats (e.g., `YYYY-MM-DD`). In practice, lab technicians often only remember the semester an item was bought (e.g., "We got this batch last Sem 1"). Enforcing exact dates adds unnecessary friction to the data entry process.
-
----
-
-### Procurement Report (Automated Restocking)
-
-#### 1. Overview
-The Procurement Report is a computed report that calculates recommended semesterly purchase quantities. It aggregates demand from enrolled student numbers across different modules, applies a configured safety buffer, and compares the result against current stock to produce a "To Buy" list.
-
-#### 2. Implementation Details
-The feature is integrated into the existing `ReportCommand` class to group all analytical logic in one place. The core logic resides in the `executeProcurementReport(Context)` method.
-
-The calculation follows this strict algorithm for each equipment item:
-1.  **Demand Aggregation**: The system iterates through the `moduleCodes` list associated with the equipment. It retrieves the latest enrollment numbers (pax) from the `ModuleList` and sums them up to determine the `Base Demand`.
-    *   *Orphaned Tag Handling*: If a module code exists in the equipment's tag list but has been deleted from the `ModuleList`, it is gracefully ignored to prevent `NullPointerException`.
-2.  **Buffer Application**: The `Base Demand` is multiplied by `(1 + bufferPercentage / 100.0)`.
-3.  **Indivisibility Rule**: The result is rounded up to the nearest whole number using `Math.ceil()`. You cannot purchase 0.5 of a board.
-4.  **Gap Analysis**: The system subtracts the *Total Quantity* (owned inventory) from the *Total Required*.
-    *   Note: It uses *Total Quantity* rather than *Available Quantity* because procurement decisions are based on total asset ownership, regardless of whether items are currently loaned out.
-5.  **Output**: If `To Buy > 0`, the item is flagged in the report.
-
-#### 3. Design Considerations
-**Alternative 1 (Current Implementation): Total Ownership vs. Demand**
-*   **How it works:** `To Buy = Required - Total_Quantity`.
-*   **Why it was chosen:** This is the correct accounting approach. If 10 items are needed, and we own 10 but 5 are loaned out, we do *not* need to buy more. We just need to wait for returns. Using `Available` would lead to massive over-purchasing during active semesters.
-
-**Alternative 2: Available Stock vs. Demand**
-*   **How it works:** `To Buy = Required - Available_Quantity`.
-*   **Why it was rejected:** As mentioned above, this leads to double-purchasing. If an item is temporarily loaned, it is still an asset we own. Procurement budgets should only be spent on actual inventory deficits, not temporary shortages.
-
+#### 5. Future Implementations (Beyond v2.1)
+To further enhance the automated lab management experience, the following feature is planned for future iterations:
+* **Automated Procurement Generation:** Building upon the Aging Equipment Report and the Module Tracking System (pax sizes), the system will hypothetically cross-reference aging items with next semester's expected student intake to automatically generate a formatted PDF "Purchase Request Form", detailing exactly how many new boards are needed to replace dead stock and meet student quotas.
 ---
 
 ### `UiTable`: Dynamic UI Table Generation Utility
@@ -205,7 +219,13 @@ Similarly, `HelpCommand` utilizes `UiTable` but enables the `hasHeader` flag, al
 ## Product scope
 ### Target user profile
 
-{Describe the target user profile}
+Our primary target user is **Senior Lab Technicians** (e.g., Mr. Ho Fook Mun at the ECE Department). Their profile is defined by the following characteristics:
+* **Environment:** Works in a fast-paced laboratory environment, frequently dealing with long queues of students borrowing equipment during peak periods (e.g., Week 4 of the semester).
+* **Technical Preferences:** Highly proficient with a keyboard and prefers typing over using a mouse. Favors a Command Line Interface (CLI) because it allows for rapid, uninterrupted data entry compared to navigating through bulky graphical menus.
+* **Core Pain Points:** 
+  * Cannot quickly calculate total available stock versus loaned stock using paper logbooks.
+  * Struggles to track which specific modules (e.g., EE2026, CG2111A) are consuming the most resources.
+  * Relies on guesswork for end-of-semester budget declarations and procurement requests due to a lack of automated aging tracking.
 
 ### Value proposition
 
@@ -221,19 +241,59 @@ Whether you are managing shared pools of STM32 boards across different modules (
 
 ## User Stories
 
-|Version| As a ... | I want to ... | So that I can ...|
-|--------|----------|---------------|------------------|
-|v1.0|new user|see usage instructions|refer to them when I forget how to use the application|
-|v2.0|user|find a to-do item by name|locate a to-do without having to go through the entire list|
+| Version | As a ... | I want to ... | So that I can ... |
+|---------|----------|---------------|-------------------|
+| **v1.0** | new technician | view a list of all available commands | quickly learn how to operate the system without memorizing the user guide. |
+| **v1.0** | lab technician | add a new equipment item to the inventory | maintain an up-to-date digital record of all lab assets. |
+| **v1.0** | lab technician | update the status of an equipment to "loaned" | hold students accountable and know exactly what is currently out of the lab. |
+| **v1.0** | lab technician | delete a broken or lost equipment from the system | ensure the inventory count reflects the actual usable stock. |
+| **v2.0** | lab manager | search for equipment by its assigned module code (e.g., `CG2111A`) | quickly retrieve all development boards and sensors required for an upcoming class session. |
+| **v2.0** | lab manager | register a new academic module and its expected student pax | establish a baseline for how much equipment will be demanded this semester. |
+| **v2.0** | lab technician | generate an aging equipment report | proactively identify devices that have exceeded their lifespan and justify budget requests for replacements. |
+| **v2.0** | power user | link a specific equipment requirement ratio to a module | automatically scale and forecast the lab's inventory needs when student enrollment sizes change. |
 
 ## Non-Functional Requirements
 
-{Give non-functional requirements}
+1. **Environment:** The system should work seamlessly on any mainstream Operating System (Windows, macOS, Linux) that has **Java 17** or above installed.
+2. **Performance:** The system should respond to standard user commands (e.g., adding, finding, or listing items) within 100 milliseconds to support rapid typing during busy lab hours.
+3. **Data Storage:** Data should be stored locally in human-editable text files (e.g., `.txt` or `.json`). The system should not rely on an external Database Management System (DBMS) or require an active internet connection, ensuring the lab can operate even during network outages.
+4. **Data Integrity:** If the local data file is manually corrupted by a user (e.g., invalid formatting), the system should gracefully detect the error on startup and load an empty inventory rather than crashing outright.
+5. **Usability:** A user with above-average typing speed should be able to accomplish standard inventory tasks noticeably faster using the CLI than they would using a traditional mouse-driven GUI.
 
 ## Glossary
 
-* *glossary item* - Definition
+* **CLI (Command Line Interface):** A text-based user interface used to interact with software and operating systems by typing commands.
+* **Equipment:** A physical asset in the laboratory (e.g., STM32 board, Basys3 FPGA, Oscilloscope) managed by the system.
+* **Module:** An academic course offered by the university (e.g., `CG2111A`, `EE2026`).
+* **Pax:** The total number of students enrolled in a specific module.
+* **Academic Semester (AY):** The semantic time format used to track equipment age (e.g., `AY24/25 Sem1`).
+* **Safe Dereferencing:** The automated process of unlinking an equipment from a module when that module is deleted, ensuring the equipment record itself is not accidentally destroyed.
 
-## Instructions for manual testing
+## Instructions for Manual Testing
 
-{Give instructions on how to do a manual product testing e.g., how to load sample data to be used for testing}
+Given below are instructions to manually test the application.
+
+### 1. Launch and Initialization
+1. **Initial launch:** Download the latest `EquipmentMaster.jar` file and copy it into an empty folder.
+2. Open a command terminal in that folder and run the command: `java -jar EquipmentMaster.jar`.
+  * **Expected:** The application launches successfully, displaying a welcome message and an empty inventory list. A new `data` folder is automatically created in the same directory.
+
+### 2. Loading Sample Data
+To test the system with pre-populated data without typing everything manually:
+1. Close the application if it is running.
+2. Navigate to the newly created `data` folder.
+3. Replace the contents of the auto-generated storage files (e.g., `equipment.txt`, `module.txt`) with valid sample data provided by the development team.
+4. Relaunch the application.
+  * **Expected:** The system loads the sample data successfully, and typing `list` or `listmod` displays the populated items.
+
+### 3. Testing the Enhanced Find Feature
+1. **Prerequisite:** Ensure the system has at least one equipment tagged to a module (e.g., "STM32" tagged to "CG2111A").
+2. **Test Case:** Type `find CG2111A` and press Enter.
+  * **Expected:** The system returns a list of all equipment associated with that module, even if the equipment name itself does not contain the string "CG2111A".
+3. **Test Case:** Type `find nonExistentItem`.
+  * **Expected:** The system displays a message indicating that 0 items were found.
+
+### 4. Testing the Aging Equipment Report
+1. **Prerequisite:** Ensure the inventory contains equipment with different `purchaseSemester` values (some older than their `lifespan`, some newer).
+2. **Test Case:** Type `report aging` and press Enter.
+  * **Expected:** The system parses the current date, compares it against the purchase semesters, and prints a formatted list of *only* the equipment that has exceeded or reached its expected lifespan.
