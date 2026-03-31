@@ -51,6 +51,38 @@ setstatus 1 3 available
 ```
 
 ---
+
+### Low Stock Alert System
+
+#### 1. Overview
+The Low Stock Alert system is a proactive inventory management feature designed to prevent laboratory equipment shortages. It allows lab managers to define a "Minimum Threshold" for any equipment item. The system automatically monitors inventory levels during transactions and issues a high-visibility warning (`!!! LOW STOCK ALERT`) if an action causes the stock to fall to or below the defined threshold.
+
+#### 2. Implementation Details
+The feature is integrated into the `Equipment` model and is triggered by the `DeleteCommand`, `SetStatusCommand`, and the `SetMinCommand`.
+
+The execution flow follows these steps:
+1. **Threshold Definition**: Each `Equipment` object maintains a `minQuantity` integer attribute.
+2. **Configuration**: The user can set this threshold using the `setmin` command (e.g., `setmin 1 min/10`). The `SetMinCommand` validates the input and updates the `Equipment` object.
+3. **Quantity Reduction**: When a user loans out an item (via `setstatus`) or removes items (via `delete`), the respective `Command` object updates the `Equipment` quantity.
+4. **Logic Check**: Immediately after the update, the `Command` invokes `target.isBelowThreshold()`.
+5. **UI Trigger**: If the check returns `true`, the `Command` calls `ui.showLowStockAlert(target)`, which displays the current stock levels and the required minimum to the user.
+
+#### 3. Sequence Diagram
+The following sequence diagram illustrates the interaction between the `DeleteCommand`, the `Equipment` model, and the `Ui` during a stock breach:
+
+![LowStockAlert Sequence Diagram](./images/LowStockAlert.png)
+
+#### 4. Design Considerations
+**Alternative 1 (Current Implementation): Logic-Driven Alerts**
+* **How it works:** The `Command` class acts as the controller, performing the threshold check after the data is modified and deciding whether to trigger the UI.
+* **Why it was chosen:** It follows the **Separation of Concerns** principle. The `Equipment` class remains a pure data model, while the `Ui` handles presentation. This prevents the Model from being "tightly coupled" to the UI, making the system easier to maintain and test.
+
+**Alternative 2: Model-Driven Auto-Alerts**
+* **How it works:** The `Equipment#setQuantity()` method would automatically print a warning to the console if the new value is too low.
+* **Why it was rejected:** This would force the `Equipment` class to depend on a UI component, which is poor architectural practice. It would also trigger unwanted alerts during "silent" operations, such as loading data from a save file on startup.
+
+---
+
 ### Enhanced Find Feature
 
 #### 1. Overview

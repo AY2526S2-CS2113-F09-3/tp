@@ -34,7 +34,7 @@ public class EquipmentMaster {
         this.ui = new Ui();
         this.storage = new Storage(equipmentFilePath, ui, settingFilePath, moduleFilePath);
 
-        //@@author Hongyu1231
+        // @@author Hongyu1231
         // Load the system time from settings.txt during startup
         try {
             String savedSemStr = storage.loadSettings();
@@ -57,7 +57,7 @@ public class EquipmentMaster {
         // Check loaded commands
         logger.log(Level.INFO, "Loaded "+Parser.getCommandSpecs().size()+" commands.");
         assert !Parser.getCommandSpecs().isEmpty() : "No commands loaded! Check Parser initialization.";
-        //@@author
+        // @@author
     }
 
     public void run() {
