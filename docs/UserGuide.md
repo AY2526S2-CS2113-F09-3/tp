@@ -69,7 +69,7 @@ Scans the inventory and generates a report of all equipment whose age (calculate
 
 **Q: Do I need to type the exact, full name of the equipment when using the `find` command?**
 
-**A:** No, the enhanced `find` command is case-insensitive and supports partial keyword matching. For example, searching `find STM` will return "STM32". Additionally, it cross-references modules, so searching `find CG2111A` will return all equipment associated with that specific course.
+**A:** No, the enhanced `find` command is case-insensitive and supports partial keyword matching. For example, searching `find STM` will return "STM32". Additionally, it matches against the module codes stored on each equipment record, so searching `find CG2111A` will return all equipment associated with that specific course.
 
 
 **Q: The student enrollment size for a module just increased. Do I need to delete and recreate the module to update the numbers?**
@@ -84,7 +84,7 @@ Scans the inventory and generates a report of all equipment whose age (calculate
 
 **Q: Why isn't the `report aging` command finding my older equipment accurately?**
 
-**A:** The aging report calculates equipment age based on the system's *academic semester context*, not your computer's real-world calendar date. Ensure you have correctly set the current semester using the `setsem` command (e.g., `setsem AY25/26 Sem1`) before generating the report. Alternatively, you can specify the target semester directly in your command (e.g., `report aging AY26/27 Sem1`).
+**A:** The aging report calculates equipment age based on the system's *academic semester context*, not your computer's real-world calendar date. Ensure you have correctly set the current semester using the `setsem` command (e.g., `setsem AY2025/26 Sem1`) before generating the report. Alternatively, you can specify the target semester directly in your command (e.g., `report aging AY2026/27 Sem1`).
 
 
 **Q: What happens if I accidentally enter a negative number for the student enrollment (pax) when adding or updating a module?**

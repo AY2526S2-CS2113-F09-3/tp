@@ -153,8 +153,8 @@ The core of the system is the `ModuleList` class, which manages a collection of 
 The `UpdateModCommand` is responsible for modifying the semantic metadata of a module, specifically updating the student enrollment size (`pax`).
 When `updatemod n/CG2111A pax/180` is executed:
 1. The command extracts the `ModuleList` from the `Context`.
-2. It locates the target `Module` via `ModuleList#findModule(moduleName)`.
-3. The new enrollment size is updated via `Module#setPax(newPax)`.
+2. It delegates the update to `ModuleList#updateModule(moduleName, newPax)`, which performs the lookup and applies the change internally.
+3. Internally, the target `Module`'s enrollment size is updated via `Module#setPax(newPax)`.
 4. `Storage#saveModules()` is invoked to persist the updated state.
 
 **Code Snippet: Defensive Programming and Validation**
@@ -190,7 +190,7 @@ To illustrate the data structure and execution flow of the Module Tracking Syste
 #### 4. Design Considerations
 * **Alternative 1 (Current Implementation): Normalized Entity Structure**
   * **Design:** `Module` and `Equipment` are separate entities. `ModuleList` operates completely independently to track course enrollment details.
-  * **Why it was chosen:** Adheres to database normalization principles. Updating a module's pax size via `UpdateModCommand` only requires a single $O(1)$ update in `ModuleList`. It lays the architectural groundwork for future features to cross-reference equipment with modules without data redundancy.
+  * **Why it was chosen:** Adheres to database normalization principles. Updating a module's pax size via `UpdateModCommand` is handled centrally by `ModuleList` (an $O(M)$ lookup over modules followed by an $O(1)$ pax update), rather than requiring updates to be propagated across all equipment items. It lays the architectural groundwork for future features to cross-reference equipment with modules without data redundancy.
 * **Alternative 2: Deeply Embedded Objects**
   * **Design:** Storing fully instantiated `Module` objects (including their `pax` values) inside every `Equipment` item.
   * **Why it was rejected:** Creates massive data redundancy. If a module's enrollment changes from 100 to 150, the system would have to perform an $O(N)$ traversal through the entire inventory to update every single piece of equipment associated with that module, risking severe state inconsistencies.
@@ -229,6 +229,7 @@ During execution:
 To further enhance the automated lab management experience, the following feature is planned for future iterations:
 * **Automated Procurement Generation:** Building upon the Aging Equipment Report and the Module Tracking System (pax sizes), the system will hypothetically cross-reference aging items with next semester's expected student intake to automatically generate a formatted PDF "Purchase Request Form", detailing exactly how many new boards are needed to replace dead stock and meet student quotas.
 <!-- @@author XiaoGeNekidora -->
+
 ---
 
 ### Procurement Report (Automated Restocking)
@@ -280,7 +281,9 @@ Similarly, `HelpCommand` utilizes `UiTable` but enables the `hasHeader` flag, al
 
 #### 3. Class Diagram
 ![UiTable Class Diagram](images/uiTable.png)
+
 ---
+
 <!-- @@author -->
 ## Product scope
 ### Target user profile
