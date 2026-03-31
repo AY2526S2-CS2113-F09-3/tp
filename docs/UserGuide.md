@@ -67,9 +67,29 @@ Scans the inventory and generates a report of all equipment whose age (calculate
 
 ## FAQ
 
-**Q**: How do I transfer my data to another computer?
+**Q: Do I need to type the exact, full name of the equipment when using the `find` command?**
 
-**A**: {your answer here}
+**A:** No, the enhanced `find` command is case-insensitive and supports partial keyword matching. For example, searching `find STM` will return "STM32". Additionally, it cross-references modules, so searching `find CG2111A` will return all equipment associated with that specific course.
+
+
+**Q: The student enrollment size for a module just increased. Do I need to delete and recreate the module to update the numbers?**
+
+**A:** Not at all. You can easily update the existing student enrollment size (pax) without affecting anything else by using the `updatemod` command (e.g., `updatemod n/CG2111A pax/200`).
+
+
+**Q: If a course is no longer offered and I delete it using `delmod`, will the system accidentally delete the physical equipment associated with it?**
+
+**A:** Your equipment is perfectly safe! The system uses a "Safe Dereferencing" mechanism. Deleting a module only removes the course from the academic registry. The actual equipment records and their quantities will remain securely in your inventory.
+
+
+**Q: Why isn't the `report aging` command finding my older equipment accurately?**
+
+**A:** The aging report calculates equipment age based on the system's *academic semester context*, not your computer's real-world calendar date. Ensure you have correctly set the current semester using the `setsem` command (e.g., `setsem AY25/26 Sem1`) before generating the report. Alternatively, you can specify the target semester directly in your command (e.g., `report aging AY26/27 Sem1`).
+
+
+**Q: What happens if I accidentally enter a negative number for the student enrollment (pax) when adding or updating a module?**
+
+**A:** The system has built-in defensive validation. It will immediately reject negative numbers or invalid text inputs for the pax, displaying an informative error message to help you correct the format, ensuring your lab data remains strictly accurate.
 
 ---
 
