@@ -24,20 +24,22 @@ I architected and implemented the core analytical and structural features of the
     * **Justification & Depth:** Heavily refactored the iteration logic to adhere to the **Single Level of Abstraction Principle (SLAP)**. I successfully eliminated deeply nested loops (the "Arrow Anti-Pattern") by extracting helper methods and utilizing $O(1)$ early returns, significantly improving codebase testability and search performance.
 
 ### Contributions to the User Guide (UG)
-* **Authored the "Module Tracking System" section:** Detailed the usage formats and provided practical examples for the `addmod`, `updatemod`, `delmod`, and `listmod` commands, establishing the baseline for automated equipment mapping.
-* **Authored the "Enhanced Find Feature" section:** Explained how users can perform cross-relational searches by finding equipment via module names.
-* **Authored the "Aging Equipment Report" section:** Documented the `report aging` and `setsem` commands, explaining how technicians can simulate future academic semesters to proactively audit inventory lifespans.
-* **Authored "Product Scope & User Stories" sections:** Defined the target user profile (e.g., Senior Lab Technicians) and realistic operational scenarios (e.g., the Week 4 rush) to firmly establish the application's domain context and Value Proposition.
+* **Authored the "Introduction" and "Quick Start" sections:** Established the application's core value proposition for University Laboratory Technicians and provided clear, step-by-step onboarding instructions to ensure a frictionless setup process for new users.
+* **Authored the "Module Tracking System" section:** Detailed the usage formats, parameter constraints, and provided practical examples for the `addmod`, `updatemod`, `delmod`, and `listmod` commands, guiding users on how to establish a baseline for automated equipment mapping.
+* **Authored the "Enhanced Find Feature" section:** Documented the upgraded search capabilities, explaining how users can perform cross-relational searches to locate equipment via their associated module codes (e.g., finding all items needed for `CG2111A`).
+* **Authored the "Aging Equipment Report" section:** Documented the `report aging` and `setsem` commands, providing clear examples of how technicians can set semantic academic timelines to simulate future semesters and proactively audit inventory lifespans.
 
 ### Contributions to the Developer Guide (DG)
-* **Authored the "Module Tracking System" Implementation section:** Detailed the architecture of the normalized entity structure (`ModuleList`) and explicitly documented the implementation of the Context Object Pattern used for dependency injection across all module-related command classes.
-* **Authored the "Enhanced Find Feature" Implementation section:** Explained the refactoring logic behind the search algorithm, specifically detailing the adherence to the Single Level of Abstraction Principle (SLAP) and the use of $O(1)$ early returns to eliminate nested loops.
-* **Authored the "Aging Equipment Report" Implementation section:** Documented the semantic timekeeping approach using the custom `AcademicSemester` class instead of standard date libraries.
+* **Authored Feature Implementation Sections:** Detailed the architecture, execution flow, and design considerations (e.g., justifying the Normalized Entity Structure) for the **Module Tracking System**, **Enhanced Find Feature**, and **Aging Equipment Report**.
 * **Contributed UML Diagrams:** Authored multiple PlantUML diagrams specifically for my features, including:
     * Class Diagram for the Module System (`module_class.png`).
     * Sequence Diagrams for `UpdateModCommand` (`updatemod.png`) and `ReportCommand` (`reportAging.png`).
     * Activity Diagram illustrating the early-return algorithm in `FindCommand` (`find_activity.png`).
-* **Authored "Design Considerations" for all three features:** Wrote deep-dive analyses on why specific architectural choices were made, such as explicitly justifying a Normalized Entity Structure for modules to avoid data redundancy.
+* **Authored "Product Scope & User Stories" sections:** Defined the **Target User Profile** (e.g., Senior Lab Technicians) and drafted comprehensive **User Stories** to firmly establish the application's domain context, Value Proposition, and expected operational scenarios.
+* **Defined "Non-Functional Requirements" (NFRs):** Established the system's strict constraints regarding performance (response times), environment (Java 17 CLI), and data integrity to guide architectural decisions.
+* **Authored the "Glossary":** Standardized domain-specific terminology (e.g., *Pax*, *Academic Semester*, *Safe Dereferencing*) to ensure clear communication among current and future developers.
+* **Authored "Instructions for Manual Testing":** Designed and documented clear, step-by-step manual testing procedures for the Module Tracking, Enhanced Find, and Aging Report features, ensuring peer testers and evaluators can accurately verify system behaviors and edge cases.
+* **Authored "Acknowledgements":** Properly attributed the foundational AB3 architecture and necessary third-party libraries, adhering to strict academic and software engineering integrity standards.
 
 ### Contributions to Team-Based Tasks
 * **Project Management & Issue Tracking:** Orchestrated the project's issue tracker on GitHub. I actively created, prioritized, and distributed issues among team members to ensure a balanced workload and clear feature ownership.
@@ -46,32 +48,6 @@ I architected and implemented the core analytical and structural features of the
 * **Deliverable Maintenance:** Maintained the project's data storage formats to ensure backward compatibility during major refactoring. Managed the formatting and compilation of the final PDF deliverables for the UG and DG, ensuring proper pagination and functional PlantUML rendering.
 
 ### Review / Mentoring Contributions
-* **Technical Mentorship:** Frequently assisted teammates in diagnosing and resolving complex technical and IDE-related issues, helping to unblock their development progress and keep the team on schedule.
-* **Architecture Guidance:** Discussed and guided the team in adopting the Context Object Pattern to cleanly decouple the Logic and Model components during our mid-project architectural refactoring phase.
-* **Code Reviews:** *[Optional: Insert Link to a PR you reviewed here, e.g., Reviewed PR #42 related to storage bug fixes and ensured they met our team's Checkstyle standards.]*
-
----
-
-## Contributions to the Developer Guide (Extracts)
-*The following is a snippet of my contribution to the Developer Guide detailing the Design Considerations for the Module Tracking System:*
-
-> **Alternative 1 (Current Implementation): Normalized Entity Structure**
-> * **How it works:** Modules and their capacities are stored in a standalone `ModuleList`. Equipment objects store references to the modules they are used in, keeping the entities strictly separated.
-> * **Why it was chosen:** This follows the database normalization principle. If a module's enrollment size changes (via `updatemod`), we only need to update it in one place (`ModuleList`). It avoids traversing and updating the entire `EquipmentList`.
->
-> **Alternative 2: Embedding Module Details within Equipment**
-> * **How it works:** Each `Equipment` object contains a list of fully instantiated `Module` objects (including name and pax).
-> * **Why it was rejected:** This creates massive data redundancy. If `CG2111A` uses 10 different types of equipment, the enrollment number `150` would be saved 10 times. Updating the enrollment would require an $O(N)$ search through all equipment, increasing the risk of inconsistent data state.
-
-## Contributions to the User Guide (Extracts)
-*The following is a snippet of my contribution to the User Guide explaining the Aging Equipment Report:*
-
-> ### Aging Equipment Report
-> Proactively audit your inventory to find equipment that has exceeded its expected lifespan based on the semantic university timeline.
->
-> #### Generating the Aging Report: `report aging`
-> Scans the inventory and generates a report of all equipment whose age (calculated from their purchase semester to the current semester) meets or exceeds their defined lifespan.
-> * **Format:** `report aging [AY[YYYY]/[YY] Sem[1/2]]`
-    >   * *(Note: If the optional semester argument is omitted, it defaults to the system's current semester set via `setsem`.)*
-> * **Example:** `report aging`
-> * **Example:** `report aging AY2026/27 Sem1` (Simulates an audit for a future semester)
+* **Release Gatekeeping & Code Reviews:** As the person managing WEEKLY releases, I critically reviewed overarching PRs. I focused on ensuring new features did not break existing storage formats and rigidly enforced **SLAP** and **Checkstyle** standards across the codebase.
+* **Architectural Mentorship:** Guided the team through a major mid-project refactoring phase. I demonstrated how to implement the **Context Object Pattern** to cleanly inject dependencies (ModuleList, EquipmentList, Storage) into commands, significantly improving the testability of my teammates' code.
+* **Proactive Debugging & Unblocking:** Frequently stepped outside my assigned features to assist teammates with complex integration bugs. Mentored peers on writing robust JUnit assertions and utilizing IDE debuggers effectively to trace silent logic failures.
