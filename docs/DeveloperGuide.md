@@ -140,61 +140,63 @@ To illustrate this feature without cluttering a single diagram, the logic is div
 ### Module Tracking System
 
 #### 1. Overview
-The Module Tracking System allows lab technicians to manage a central registry of academic course modules (e.g., `CG2111A`). It supports standard lifecycle operations (adding, deleting, listing, and updating student pax) and advanced many-to-many relationship mapping using the `tag` and `untag` commands, which link modules to specific equipment requirements based on usage ratios.
+The Module Tracking System allows lab technicians to manage a central registry of academic course modules (e.g., `CG2111A`) and their respective student enrollment sizes (pax). This enhancement shifts the system from tracking isolated items to tracking items within their academic context, establishing the baseline required for accurate lab demand forecasting.
 
 #### 2. Implementation Details
-The core of the system is the `ModuleList` class, which manages a collection of `Module` entities. The system utilizes the **Context Object Pattern** to manage dependencies across all module-related commands.
+The core of the system is the `ModuleList` class, which manages a collection of `Module` entities. The system utilizes the **Context Object Pattern** to manage dependencies across all module-related commands, ensuring that the Logic component is cleanly decoupled from the Model and Storage components.
 
-**Standard Operations (`addmod`, `delmod`, `listmod`, `updatemod`):**
-* **Add/Delete/List:** `AddModCommand` and `DelModCommand` modify the `ModuleList` registry, while `ListModCommand` retrieves the summary.
-* **Update Pax:** `UpdateModCommand` is strictly responsible for modifying the semantic metadata of a module, specifically updating the student enrollment size (`pax`). It locates the `Module` via `ModuleList` and calls `Module#setPax(newPax)`.
+**Standard Operations (`addmod`, `delmod`, `listmod`):**
+* **Add/Delete:** `AddModCommand` and `DelModCommand` extract the `ModuleList` and `Storage` from the unified `Context`. They modify the list (adding or removing a `Module` by its module code) and immediately invoke `Storage#saveModules()` to persist the state.
+* **List:** `ListModCommand` retrieves the `ModuleList` from the `Context` and formats the current registry for the UI to display.
 
-**Advanced Requirement Mapping (`tag` and `untag`):**
-To support complex lab setups, the architecture utilizes a `HashMap<String, Double>` within each `Module` to map required equipment names to their usage ratios per student. This relational mapping is handled by `TagCommand` and `UntagCommand`.
-When a requirement is tagged:
-1. The user inputs `tag m/CG2111A eq/STM32 ratio/0.5`.
-2. `TagCommand` extracts the `ModuleList` and retrieves the target `Module`.
-3. The low-level mathematical validation and map insertion are delegated to `Module#addEquipmentRequirement(equipmentName, ratio)`.
-4. `Storage#saveModules()` is invoked to persist the updated relational state.
-   *(Note: `UntagCommand` follows a similar flow, calling `Module#removeEquipmentRequirement(equipmentName)` to cleanly sever the relationship).*
+**Updating Module Details (`updatemod`):**
+The `UpdateModCommand` is responsible for modifying the semantic metadata of a module, specifically updating the student enrollment size (`pax`).
+When `updatemod n/CG2111A pax/180` is executed:
+1. The command extracts the `ModuleList` from the `Context`.
+2. It locates the target `Module` via `ModuleList#findModule(moduleName)`.
+3. The new enrollment size is updated via `Module#setPax(newPax)`.
+4. `Storage#saveModules()` is invoked to persist the updated state.
 
-**Code Snippet: Defensive Programming in Domain Objects**
-To demonstrate our adherence to defensive programming and SLAP, the mathematical validation logic for `TagCommand` is completely encapsulated within the `Module` entity rather than the command itself:
+**Code Snippet: Defensive Programming and Validation**
+To demonstrate our adherence to defensive programming, the parsing and validation logic for `UpdateModCommand` ensures that critical metadata like `pax` cannot be set to invalid states (e.g., negative numbers) before the command is even instantiated:
 
 ```java
-public void addEquipmentRequirement(String equipmentName, double ratio) throws EquipmentMasterException {
-    if (!Double.isFinite(ratio)) { // Guard clause: Non-finite check
-        throw new EquipmentMasterException("Requirement ratio must be a finite number.");
+public static UpdateModCommand parse(String fullCommand) throws EquipmentMasterException {
+    // ... regex matching omitted for brevity
+    String paxString = matcher.group(2).trim();
+    try {
+        int pax = Integer.parseInt(paxString);
+        if (pax < 0) { // Guard clause: Negative pax check
+            throw new EquipmentMasterException("Pax cannot be a negative number.");
+        }
+        return new UpdateModCommand(moduleName, pax);
+    } catch (NumberFormatException e) {
+        throw new EquipmentMasterException("Invalid pax value. Please enter a valid integer.");
     }
-    if (ratio <= 0.0) { // Guard clause: Negative/Zero check
-        throw new EquipmentMasterException("Requirement ratio must be strictly greater than 0.0.");
-    }
-    this.equipmentRequirements.put(equipmentName, ratio);
 }
 ```
 
 #### 3. UML Diagrams
-To illustrate the data structure and execution flow of the complete Module Tracking System, we employ both a Class Diagram and a Sequence Diagram.
+To illustrate the data structure and execution flow of the Module Tracking System, we employ both a Class Diagram and a Sequence Diagram.
 
 **Class Diagram: System Architecture**
-*(Note: Minor exception classes and standard Java libraries are omitted. The diagram highlights the separation of concerns between standard module commands and the tagging commands used for mapping.)*
+*(Note: Minor exception classes and standard Java libraries are omitted. The diagram highlights the inheritance of commands and the normalized separation between the `ModuleList` and `Context`.)*
 ![Module System Class Diagram](images/module_class.png)
 
-**Sequence Diagram: Tag Module Execution Flow**
-*(Note: UI rendering steps and generic self-calls have been abstracted to focus on the core Model interactions during a tagging operation.)*
-![TagCommand Sequence Diagram](images/tag_module.png)
+**Sequence Diagram: Update Module Execution Flow**
+*(Note: UI rendering steps and generic self-calls have been abstracted to focus on the core Model interactions during an update operation.)*
+![UpdateMod Sequence Diagram](images/updatemod.png)
 
 #### 4. Design Considerations
-* **Alternative 1 (Current Implementation): Ratio-Based Relational Mapping via `tag`**
-  * **How it works:** Each `Module` maintains a `HashMap` linking equipment names to a fractional ratio. Relationships are dynamically built using `TagCommand`.
-  * **Why it was chosen:** It provides extreme flexibility. Not every piece of equipment has a 1:1 student ratio (e.g., one oscilloscope might be shared by 4 students, ratio = 0.25). This mathematical modeling allows the system to accurately calculate exact lab demands without data redundancy.
-
-* **Alternative 2: Storing Hardcoded Integers**
-  * **How it works:** Instead of a ratio, the module stores the absolute integer number of equipment needed (e.g., "Needs 50 STM32s").
-  * **Why it was rejected:** This creates a brittle system. If the `UpdateModCommand` changes the pax from 100 to 150, the technician would have to manually recalculate and re-tag every single equipment requirement. The ratio-based approach automatically scales demand when pax is updated.
+* **Alternative 1 (Current Implementation): Normalized Entity Structure**
+  * **Design:** `Module` and `Equipment` are separate entities. `ModuleList` operates completely independently to track course enrollment details.
+  * **Why it was chosen:** Adheres to database normalization principles. Updating a module's pax size via `UpdateModCommand` only requires a single $O(1)$ update in `ModuleList`. It lays the architectural groundwork for future features to cross-reference equipment with modules without data redundancy.
+* **Alternative 2: Deeply Embedded Objects**
+  * **Design:** Storing fully instantiated `Module` objects (including their `pax` values) inside every `Equipment` item.
+  * **Why it was rejected:** Creates massive data redundancy. If a module's enrollment changes from 100 to 150, the system would have to perform an $O(N)$ traversal through the entire inventory to update every single piece of equipment associated with that module, risking severe state inconsistencies.
 
 #### 5. Future Implementations (Beyond v2.1)
-* **Automated Demand Forecasting:** Leveraging the ratio `HashMap` established by `TagCommand` and the current `pax` managed by `UpdateModCommand`, future versions will introduce a `forecast` command. This will cross-reference the required total (pax * ratio) against the actual available inventory in the `EquipmentList`, automatically flagging shortages before the semester begins.
+* **Automated Demand Forecasting:** Building upon the robust `pax` tracking established by `UpdateModCommand`, future versions will introduce a feature to map equipment usage ratios directly to modules. The system will cross-reference these expected totals against the actual available inventory, automatically flagging shortages before the semester begins.
 
 ---
 
