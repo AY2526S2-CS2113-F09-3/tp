@@ -55,6 +55,7 @@ Proactively audit your inventory to find equipment that has exceeded its expecte
 Sets the current academic semester of the system, which is used as the baseline for calculating equipment age.
 * **Format:** `setsem AY[YYYY]/[YY] Sem[1/2]`
 * **Example:** `setsem AY2025/26 Sem1`
+* **Smart Reminder:** If the semester changes and modules exist in the system, a warning will remind you to update enrollment numbers (`pax`) using `updatemod` to maintain report accuracy.
 
 #### Generating the Aging Report: `report aging`
 Scans the inventory and generates a report of all equipment whose age (calculated from their purchase semester to the current semester) meets or exceeds their defined lifespan.
@@ -95,10 +96,25 @@ These commands form the foundation of navigating and managing your current lab i
 #### Listing all equipment: `list`
 Displays your entire equipment inventory in a cleanly aligned, responsive table format.
 * **Format:** `list`
+* **Note:** The table includes a **Min:** column so you can monitor your safety thresholds alongside current stock levels.
 
 #### Viewing the interactive manual: `help`
 Provides a comprehensive, in-application guide to all available commands, their parameters, and usage examples.
 * **Format:** `help`
+
+#### Setting low stock thresholds: `setmin`
+Configures a minimum quantity threshold for an equipment item. When available stock drops to or below this level, the system triggers a `!!! LOW STOCK ALERT`.
+* **Format:** `setmin [n/NAME | INDEX] min/QUANTITY`
+* **Example:** `setmin 1 min/15` (Sets the 1st item's threshold to 15)
+* **Example:** `setmin n/Resistor min/10`
+* **Note:** If the stock is already below the new threshold, the system will warn: `Warning: Item is currently below this new threshold!`
+
+#### Deleting specific quantities: `delete`
+Removes a specific number of units from either the available or loaned pool.
+* **Format:** `delete [n/NAME | INDEX] q/QUANTITY s/STATUS`
+  * `STATUS` must be either `available` or `loaned`.
+* **Example:** `delete 1 q/5 s/available`
+* **Logic:** If this action causes stock to hit the minimum threshold, a low stock alert will be displayed immediately.
 
 ---
 
@@ -108,6 +124,9 @@ Provides a comprehensive, in-application guide to all available commands, their 
 
 **A:** No, the enhanced `find` command is case-insensitive and supports partial keyword matching. For example, searching `find STM` will return "STM32". Additionally, it matches against the module codes stored on each equipment record, so searching `find CG2111A` will return all equipment associated with that specific course.
 
+**Q: Will the system warn me if I add new equipment that is already below the threshold?**
+
+**A:** Yes. If you use the `add` command with a `min/` flag (e.g., `add n/Resistor q/10 min/15`), the system will trigger a `!!! LOW STOCK ALERT` immediately upon addition.
 
 **Q: The student enrollment size for a module just increased. Do I need to delete and recreate the module to update the numbers?**
 
@@ -139,6 +158,8 @@ Provides a comprehensive, in-application guide to all available commands, their 
 * **Set Semester:** `setsem AY[YYYY]/[YY] Sem[1/2]`
 * **Aging Report:** `report aging [AY[YYYY]/[YY] Sem[1/2]]`
 * **Set Buffer:** `setbuffer n/NAME b/PERCENTAGE` or `setbuffer i/INDEX b/PERCENTAGE`
+* **Set Min Threshold:** `setmin [n/NAME | INDEX] min/QUANTITY`
+* **Delete Specific Quantity:** `delete [n/NAME | INDEX] q/QUANTITY s/STATUS`
 * **List Equipment:** `list`
 * **Help Manual:** `help`
 * **Procurement Report:** `report procurement`
