@@ -65,6 +65,43 @@ Scans the inventory and generates a report of all equipment whose age (calculate
 
 ---
 
+### 4. Procurement Report
+Forecast your laboratory equipment needs for the upcoming semester to justify budgeting and purchasing requests.
+
+#### Setting a Safety Buffer: `setbuffer`
+Sets a percentage safety buffer on specific equipment. This ensures you buy slightly more than the baseline module enrollments to account for potential damage, loss, or unexpected student increases.
+* **Format:** `setbuffer n/NAME b/PERCENTAGE` or `setbuffer i/INDEX b/PERCENTAGE`
+* **Example:** `setbuffer n/STM32 b/10` (Sets a 10% procurement buffer for STM32 boards)
+
+#### Generating the Procurement Report: `report procurement`
+Calculates the exact total number of items needed for the upcoming semester by cross-referencing your current stock levels against the student enrollment sizes (pax) of all associated modules, including any configured safety buffers. This allows you to proactively justify budget requests for equipment shortfalls.
+
+**How the Calculation Works:**
+1. **Determine Base Demand:** For each equipment, the system checks all the modules it is currently mapped to. It adds up the student enrollment sizes (pax) of these associated modules.
+2. **Apply Safety Buffer & Indivisibility:** The system applies your configured `bufferPercentage` to the Base Demand. Following the "Indivisibility Rule," the result is mathematically rounded *up* to the nearest whole number to ensure you don't procure a fraction of a piece of equipment. This becomes the **Total Required**.
+3. **Calculate Shortfall:** The system then subtracts your currently available inventory count for that item from the Total Required quantity.
+4. **Generate Output:** If the Total Required exceeds your current stock, the system flags a shortage. The item is added to the report, displaying the exact shortfall quantity you need to procure.
+
+*Example scenario:* 
+If `STM32` boards are needed for `CG2111A` (150 pax) and `CS2113` (50 pax), the **Base Demand** is 200. With a 10% safety buffer set via `setbuffer`, the buffered demand becomes 220. If your current inventory only has 180 units, the `report procurement` command will alert you to a shortfall (TO BUY) of 40 `STM32` boards.
+
+* **Format:** `report procurement`
+
+---
+
+### 5. Core Commands
+These commands form the foundation of navigating and managing your current lab inventory. All list and report outputs are beautifully formatted using responsive ASCII tables for maximum readability.
+
+#### Listing all equipment: `list`
+Displays your entire equipment inventory in a cleanly aligned, responsive table format.
+* **Format:** `list`
+
+#### Viewing the interactive manual: `help`
+Provides a comprehensive, in-application guide to all available commands, their parameters, and usage examples.
+* **Format:** `help`
+
+---
+
 ## FAQ
 
 **Q: Do I need to type the exact, full name of the equipment when using the `find` command?**
@@ -101,4 +138,7 @@ Scans the inventory and generates a report of all equipment whose age (calculate
 * **Find Equipment:** `find KEYWORD`
 * **Set Semester:** `setsem AY[YYYY]/[YY] Sem[1/2]`
 * **Aging Report:** `report aging [AY[YYYY]/[YY] Sem[1/2]]`
-
+* **Set Buffer:** `setbuffer n/NAME b/PERCENTAGE` or `setbuffer i/INDEX b/PERCENTAGE`
+* **List Equipment:** `list`
+* **Help Manual:** `help`
+* **Procurement Report:** `report procurement`
