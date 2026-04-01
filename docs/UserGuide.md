@@ -89,7 +89,23 @@ If `STM32` boards are needed for `CG2111A` (150 pax) and `CS2113` (50 pax), the 
 
 ---
 
-### 5. Core Commands
+### 5. Equipment Status Management
+
+#### Updating equipment loan status: `setstatus`
+Updates the loaned or available count of an equipment item to reflect real-time borrowing and return activity. You can target equipment by name or by its 1-based index in the list.
+
+* **Format:**
+    * `setstatus n/NAME q/COUNT s/loaned` — loans out COUNT units, decreasing available stock
+    * `setstatus n/NAME q/COUNT s/available` — returns COUNT units, increasing available stock
+    * `setstatus INDEX q/COUNT s/loaned/available` — same as above but targets by list index
+* **Example:** `setstatus n/BasyS3 FPGA q/5 s/loaned`
+* **Example:** `setstatus 1 q/3 s/available`
+
+> **Note:** The count must be a positive whole number (zero and negatives are rejected). When loaning, the count cannot exceed current available stock. When returning, the count cannot exceed current loaned quantity.
+
+---
+
+### 6. Core Commands
 These commands form the foundation of navigating and managing your current lab inventory. List-style outputs are beautifully formatted using responsive ASCII tables for maximum readability.
 
 #### Listing all equipment: `list`
@@ -128,6 +144,10 @@ Provides a comprehensive, in-application guide to all available commands, their 
 
 **A:** The system has built-in defensive validation. It will immediately reject negative numbers or invalid text inputs for the pax, displaying an informative error message to help you correct the format, ensuring your lab data remains strictly accurate.
 
+**Q: A student is returning equipment but I only remember the item's position in the list, not its full name. Do I need to look up the name first?**
+
+**A:** No, the `setstatus` command supports both name-based and index-based targeting. You can simply use the item's position in the list (e.g., `setstatus 1 q/3 s/available`) to log a return instantly without needing to recall the full equipment name, keeping the process fast during busy peak hours.
+
 ---
 
 ## Command Summary (Cheat Sheet)
@@ -139,6 +159,7 @@ Provides a comprehensive, in-application guide to all available commands, their 
 * **Set Semester:** `setsem AY[YYYY]/[YY] Sem[1/2]`
 * **Aging Report:** `report aging [AY[YYYY]/[YY] Sem[1/2]]`
 * **Set Buffer:** `setbuffer n/NAME b/PERCENTAGE` or `setbuffer i/INDEX b/PERCENTAGE`
+* **Update Loan Status:** `setstatus n/NAME q/COUNT s/loaned/available` or `setstatus INDEX q/COUNT s/loaned/available`
 * **List Equipment:** `list`
 * **Help Manual:** `help`
 * **Procurement Report:** `report procurement`

@@ -52,45 +52,99 @@ static {
 
 ### SetBufferCommand
 
-Sets a buffer percentage on a named equipment item. The buffer is persisted to storage.
+#### 1. Overview
+The `SetBufferCommand` allows lab managers to configure a safety buffer percentage on an equipment item. This buffer is factored into the Procurement Report to ensure that recommended purchase quantities account for expected wear, breakage, or unexpected demand spikes, rather than relying solely on raw student enrollment figures.
 
-![SetBufferCommand Sequence Diagram](images/SetBufferCommand.png)
+#### 2. Implementation Details
+The command supports targeting equipment by name (`n/`) or by 1-based list index (`i/`), and persists the updated buffer to storage immediately after execution.
 
-**Format:** `setbuffer n/<name> b/<percentage>[%]`
+**Format:**
+- `setbuffer n/<name> b/<percentage>[%]` — targets equipment by name
+- `setbuffer i/<index> b/<percentage>[%]` — targets equipment by 1-based list index
 
-**Behaviour:**
-- The `%` symbol in the buffer value is optional and stripped during parsing
-- If the equipment name is not found, an error message is shown and no change is made
-- Buffer percentage defaults to `0.0` when equipment is first added
+Execution flow:
+1. The `Parser` processes the input and instantiates a `SetBufferCommand` with either the equipment name or index, and the buffer percentage value.
+2. `SetBufferCommand#execute(Context)` is invoked.
+3. The command retrieves the `EquipmentList` from the `Context` and resolves the target equipment by name or index.
+4. If no match is found, an error message is displayed and execution halts with no state change.
+5. If a match is found, `Equipment#setBufferPercentage(percentage)` is called to update the value.
+6. `Storage#save()` is invoked to persist the change.
+7. The `Ui` displays a confirmation message to the user.
+
+**Parsing behaviour:**
+- The `%` symbol in the buffer value is optional and is stripped during parsing before the value is stored.
+- Negative buffer percentages are rejected with an error message.
+- Specifying both `n/` and `i/` simultaneously is rejected with an error message.
+- Buffer percentage defaults to `0.0` when equipment is first added.
 
 **Example:**
 ```
 setbuffer n/STM32 b/10%
 setbuffer n/STM32 b/10
+setbuffer i/1 b/10
 ```
- 
+
+#### 3. Sequence Diagram
+*(Note: Storage persistence and UI confirmation steps are shown at a high level. The name/index-lookup logic within `EquipmentList` is abstracted for brevity.)*
+
+![SetBufferCommand Sequence Diagram](images/SetBufferCommand.png)
+
+#### 4. Design Considerations
+* **Alternative 1 (Current Implementation): Dual Targeting (Name or Index)**
+    * **How it works:** The `Parser` detects whether the input contains `n/` or `i/` to choose between name-based and index-based resolution.
+    * **Why it was chosen:** Provides flexibility for both deliberate configuration (by name, which is explicit and unambiguous) and rapid access (by index, when the position is already known from a recent `list` output). This mirrors the dual-targeting approach used by `SetStatusCommand` for consistency across the command set.
+* **Alternative 2: Name-Only Targeting**
+    * **How it works:** The command would only accept `n/<name>` as the equipment identifier.
+    * **Why it was rejected:** Requiring technicians to always type the full equipment name adds unnecessary friction when the index is already known. Eliminating the index option without justification would also create an inconsistent user experience across commands.
+
 ---
 
 ### SetStatusCommand
 
-Updates the loaned or available count of an equipment item. Can target equipment by name or by 1-based index.
+#### 1. Overview
+The `SetStatusCommand` allows lab technicians to update the loaned or available count of an equipment item, reflecting real-time borrowing and return activity. It supports targeting equipment either by name or by 1-based list index, catering to both deliberate and rapid-entry workflows.
 
-![SetStatusCommand Sequence Diagram](images/SetStatusCommand.png)
+#### 2. Implementation Details
+The command modifies the internal `loaned` and `available` counts of an `Equipment` object and persists the change immediately.
 
 **Format:**
-- `setstatus n/<name> <count> loaned` — loans out `<count>` units, decreasing available
-- `setstatus n/<name> <count> available` — returns `<count>` units, increasing available
-- `setstatus <index> <count> loaned/available` — same as above but targets by 1-based list index
+- `setstatus n/<name> q/<count> s/loaned` — loans out `<count>` units, decreasing available count
+- `setstatus n/<name> q/<count> s/available` — returns `<count>` units, increasing available count
+- `setstatus <index> q/<count> s/loaned` — same as above but targets by 1-based list index
+- `setstatus <index> q/<count> s/available` — same as above but targets by 1-based list index
+
+Execution flow:
+1. The `Parser` processes the input and instantiates a `SetStatusCommand` with either a name or index, a count, and a direction (`loaned` or `available`).
+2. `SetStatusCommand#execute(Context)` is invoked.
+3. The command resolves the target `Equipment` from the `EquipmentList` using either the name or the index.
+4. Input validation is performed: zero and negative counts are rejected with an error message, and the count is checked against the current available stock (when loaning) or current loaned stock (when returning) to prevent invalid states.
+5. The appropriate counter is updated on the `Equipment` object.
+6. `Storage#save()` is invoked to persist the change.
+7. The `Ui` displays a confirmation message.
 
 **Constraints:**
-- Negative counts are rejected silently — no change is made
-- Count must not exceed current available (when loaning) or current loaned (when returning)
+- Zero and negative counts are rejected with an error message — no change is made.
+- Count must not exceed current available quantity when loaning out.
+- Count must not exceed current loaned quantity when returning.
 
 **Example:**
 ```
-setstatus n/BasyS3 FPGA 5 loaned
-setstatus 1 3 available
+setstatus n/Basys3 FPGA q/5 s/loaned
+setstatus 1 q/3 s/available
 ```
+
+#### 3. Sequence Diagram
+*(Note: The index-resolution and name-resolution paths share the same downstream logic once the target `Equipment` is identified. The diagram abstracts the branching lookup into a single `resolveTarget()` call for clarity.)*
+
+![SetStatusCommand Sequence Diagram](images/SetStatusCommand.png)
+
+#### 4. Design Considerations
+* **Alternative 1 (Current Implementation): Dual Targeting (Name or Index)**
+    * **How it works:** The `Parser` detects whether the input contains `n/` to choose between name-based and index-based resolution.
+    * **Why it was chosen:** During busy lab hours, a technician processing a queue of students can rapidly type `setstatus 1 q/3 s/loaned` without needing to recall the full equipment name. At the same time, name-based targeting remains available for unambiguous operations. Supporting both modes maximises throughput without sacrificing precision.
+* **Alternative 2: Name-Only Targeting**
+    * **How it works:** The command would only accept `n/<name>` as the equipment identifier.
+    * **Why it was rejected:** Loan and return operations are the most frequent actions in the system, performed under time pressure. Forcing technicians to type full equipment names (which may be long, e.g., `Basys3 FPGA`) for every transaction would significantly slow down the workflow, directly undermining the CLI speed advantage that the application is designed to provide.
 
 ---
 
