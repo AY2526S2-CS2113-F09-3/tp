@@ -15,7 +15,52 @@ Equipment Master is a Command Line Interface (CLI) application designed specific
 
 ## Features
 
-### 1. Module Tracking System
+### 1. Equipment Inventory Management
+To maintain an organized and efficient laboratory inventory, the system allows you to register physical equipment, track stock levels, associate items with modules, and configure lifecycle and alert settings.
+
+#### Adding new equipment: `add`
+Registers new physical equipment into your laboratory inventory. You can perform a basic addition or include optional parameters to immediately tag the equipment to modules, set its expected lifespan, and configure low-stock alerts.
+
+* **Format:** `add n/NAME q/QUANTITY [m/MODULE_CODE]... [bought/SEMESTER life/YEARS] [min/MIN_QTY]`
+
+**Examples:**
+* **Basic addition:** `add n/Soldering Iron q/25`
+* **Adding with multiple modules:** `add n/STM32 q/150 m/CG2111A m/EE2026`
+* **Adding with lifespan tracking:** `add n/Oscilloscope q/10 bought/AY2023/24 Sem1 life/5.0`
+* **Adding with a low-stock alert threshold:** `add n/Jumper Wires q/500 min/100`
+* **Adding with all parameters:** `add n/Raspberry Pi 4 q/30 m/CG2111A bought/AY2024/25 Sem1 life/4.0 min/5`
+
+#### Managing equipment loans: `setstatus`
+Updates the availability status of your equipment. When students borrow or return items, use this command to seamlessly shift quantities between your "available" pool and your "loaned" pool, ensuring you always know exactly what is sitting on your lab shelves versus what is checked out.
+
+* **Format (by Index):** `setstatus INDEX q/QUANTITY s/STATUS`
+* **Format (by Name):** `setstatus n/NAME q/QUANTITY s/STATUS`
+
+**Examples:**
+* **Loaning items (by Index):** `setstatus 1 q/5 s/loaned` (Takes 5 available units from the 1st item in your list and marks them as loaned).
+* **Returning items (by Name):** `setstatus n/Multimeter q/2 s/available` (Takes 2 loaned Multimeters and returns them to the available pool).
+
+#### Deleting equipment: `delete`
+Removes a specific quantity of equipment from your inventory. To maintain strict accountability, you must specify whether the items being removed are currently available (e.g., broken in the lab) or loaned (e.g., lost by a student). If the total quantity of an item reaches zero, the system automatically cleans up and removes the equipment record entirely.
+
+* **Format (by Index):** `delete INDEX q/QUANTITY s/STATUS`
+* **Format (by Name):** `delete n/NAME q/QUANTITY s/STATUS`
+
+**Example:**
+* **Delete by Index:** `delete 1 q/5 s/available` (Removes 5 available units from the 1st item in the list)
+* **Delete by Name:** `delete n/Soldering Iron q/2 s/loaned` (Removes 2 loaned units of Soldering Irons)
+
+#### Setting low-stock alerts: `setmin`
+Updates the minimum stock threshold for an existing piece of equipment. If your inventory drops to or below this configured number, the system will trigger a LOW STOCK ALERT to remind you to procure more.
+
+* **Format (by Index):** `setmin INDEX min/QUANTITY`
+* **Format (by Name):** `setmin n/NAME min/QUANTITY`
+
+**Example**
+* **by Index:** `setmin 1 min/20` (Sets the alert threshold of the 1st item in your list to 20 units)
+* **by Name:** `setmin n/Soldering Iron min/5` (Sets the alert threshold for Soldering Irons to 5 units)
+
+### 2. Module Tracking System
 To accurately forecast laboratory demands, the system allows you to register academic modules, track their student enrollment (pax), and dynamically map equipment requirements to them.
 
 #### Adding a new module: `addmod`
@@ -39,7 +84,7 @@ Safely removes a module from the registry. Any equipment previously tagged to th
 
 ---
 
-### 2. Enhanced Find Feature
+### 3. Enhanced Find Feature
 #### Searching the inventory: `find`
 Locates equipment quickly. You can search not only by the equipment's actual name but also by the module it is tagged to.
 * **Format:** `find KEYWORD [MORE_KEYWORDS]`
@@ -48,7 +93,7 @@ Locates equipment quickly. You can search not only by the equipment's actual nam
 
 ---
 
-### 3. Aging Equipment Report
+### 4. Aging Equipment Report
 Proactively audit your inventory to find equipment that has exceeded its expected lifespan based on the semantic university timeline.
 
 #### Setting the Academic Context: `setsem`
@@ -65,7 +110,7 @@ Scans the inventory and generates a report of all equipment whose age (calculate
 
 ---
 
-### 4. Procurement Report
+### 5. Procurement Report
 Forecast your laboratory equipment needs for the upcoming semester to justify budgeting and purchasing requests.
 
 #### Setting a Safety Buffer: `setbuffer`
@@ -89,7 +134,7 @@ If `STM32` boards are needed for `CG2111A` (150 pax) and `CS2113` (50 pax), the 
 
 ---
 
-### 5. Core Commands
+### 6. Core Commands
 These commands form the foundation of navigating and managing your current lab inventory. List-style outputs are beautifully formatted using responsive ASCII tables for maximum readability.
 
 #### Listing all equipment: `list`
@@ -103,6 +148,31 @@ Provides a comprehensive, in-application guide to all available commands, their 
 ---
 
 ## FAQ
+
+**Q: Why am I getting an "Invalid name!" error when trying to add equipment?**
+
+**A:** To protect the integrity of the application's save files, equipment names cannot contain certain reserved characters. Ensure your equipment name does not include vertical bars (|), commas (,), or equals signs (=).
+
+
+**Q: Can I add a lifespan to an item without specifying when it was bought?**
+
+**A:** To accurately calculate when an item will expire, the system requires both a starting point and a duration. You should provide both the `bought/` semester and the `life/` duration together if you want the system to track an item's age. If you supply only one of these fields, the `add` command will still succeed, but the lifespan and purchase information will be ignored and no expiry tracking will be configured.
+
+
+**Q: Can I just delete an entire equipment record without typing out the exact quantity?**
+
+**A:** No. Equipment Master requires you to explicitly state the exact quantity and the status (available or loaned) you are deleting. This strict requirement prevents accidental complete deletions and ensures your audit trails remain 100% accurate. If you want to delete the whole record, simply delete the total remaining quantity, and the system will automatically remove the record for you.
+
+
+**Q: What happens if a deletion causes my inventory to drop below the safety threshold I set when I added the equipment?**
+
+**A:** The system will immediately catch it! If a delete command drops your total quantity down to or below your configured minimum stock threshold, a LOW STOCK ALERT will be prominently displayed on your terminal.
+
+
+**Q: What happens if I use setmin to set a threshold that is actually higher than my current total stock?**
+
+**A:** The system will successfully update your threshold, but it will immediately display a warning message: "Warning: Item is currently below this new threshold!" This ensures you are instantly aware that you are already in a state of shortage based on your new safety standards.
+
 
 **Q: Do I need to type the exact, full name of the equipment when using the `find` command?**
 
@@ -131,6 +201,10 @@ Provides a comprehensive, in-application guide to all available commands, their 
 ---
 
 ## Command Summary (Cheat Sheet)
+* **Add Equipment:** `add n/NAME q/QUANTITY [m/MODULE_CODE]... [bought/SEM life/YEARS] [min/MIN_QTY]`
+* **Update Loan Status:** `setstatus [INDEX | n/NAME] q/QTY s/[loaned|available]`
+* **Delete Equipment:** `delete [INDEX | n/NAME] q/QTY s/[available|loaned]`
+* **Set Minimum Alert:** `setmin [INDEX | n/NAME] min/QTY`
 * **Add Module:** `addmod n/NAME pax/QTY`
 * **List Modules:** `listmod`
 * **Update Pax:** `updatemod n/NAME pax/QTY`

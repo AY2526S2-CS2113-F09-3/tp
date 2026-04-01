@@ -50,6 +50,37 @@ static {
 
 ---
 
+### Core Inventory Ingestion (`AddCommand`)
+
+#### 1. Overview
+
+The Core Inventory Ingestion system handles the creation and registration of physical equipment. Because `Equipment` objects can possess a wide variety of optional attributes (such as expected lifespans, specific module tags, and minimum stock alerts), the parsing mechanism must be highly flexible to accommodate complex, single-line CLI inputs without triggering flag collisions.
+
+#### 2. Implementation Details
+
+The `AddCommand` is instantiated via its static `parse` method. The execution flow relies on custom string manipulation to safely extract arguments:
+
+1.  **Space-Padding Extraction:** To prevent substring collisions (e.g., an equipment named "Quantum/Sensor" accidentally triggering an `m/` module flag), the parser uses a space-padding technique in `extractArgument()`. It pads the user input and searches strictly for `" m/"` or `" n/"`.
+
+2.  **Repeating Flag Aggregation:** For tagging multiple modules at creation, `extractMultipleArguments()` iterates through the padded string, identifies every instance of the `" m/"` flag, converts the values to uppercase for standardization, and appends them to an internal list only if they are not already present (using a `results.contains(...)` check) to filter out duplicate inputs while preserving the original order.
+ 
+3.  **Defensive Validation:** The parser strictly rejects names containing reserved storage characters (`|`, `,`, `=`) to prevent save file corruption. Lifespan (`life/`) and purchase semester (`bought/`) are optional flags whose values are only applied when both are provided together; supplying only one of them does not cause a validation error and the partial information is ignored.
+
+4.  **Execution & Save:** Once validated, the `AddCommand` is returned. When executed, it instantiates the `Equipment`, adds it to the `EquipmentList`, and triggers `Storage#save()` to persist the new inventory state.
+
+
+#### 3. Design Considerations
+
+-   **Alternative 1 (Current Implementation): Custom String Parsing with Space-Padding**
+
+  -   **Why it was chosen:** It is lightweight, highly performant, and allows for flexible flag ordering (the user can put `bought/` before or after `m/`). By manually controlling the extraction, we can elegantly handle repeating flags (like multiple modules) without relying on heavy third-party CLI parsing libraries.
+
+-   **Alternative 2: Standard Regex Matching**
+
+  -   **Why it was rejected:** Regex becomes exponentially complex and difficult to maintain when dealing with 5+ optional flags that can appear in any order. A single malformed regex string could break the entire ingestion engine.
+
+---
+
 ### SetBufferCommand
 
 Sets a buffer percentage on a named equipment item. The buffer is persisted to storage.
@@ -251,6 +282,48 @@ To illustrate the data structure and execution flow of the Module Tracking Syste
 
 #### 5. Future Implementations (Beyond v2.1)
 * **Automated Demand Forecasting:** Building upon the robust `pax` tracking established by `UpdateModCommand` and the existing mapping of equipment-usage ratios to modules (via the `tag`/`untag` commands and each `Module`’s equipment-requirement ratio map), future versions will use these mappings to automatically forecast total equipment demand per module and semester, cross-reference the expected totals against the actual available inventory, and surface forecasts and shortage warnings (e.g. via reports) before the semester begins.
+
+---
+
+### Academic Dependency Mapping (`TagCommand` & `UntagCommand`)
+
+#### 1. Overview
+
+The Academic Dependency Mapping system forms the critical bridge between the physical `EquipmentList` and the academic `ModuleList`. It allows technicians to define exact requirement ratios (e.g., 1 Soldering Iron shared per 5 students = `0.2`), which serves as the foundational data for the automated Procurement Report.
+
+#### 2. Implementation Details
+
+The `TagCommand` and `UntagCommand` heavily rely on defensive programming to maintain database integrity. The core mechanism is the **Double Ghost Reference Check**.
+
+Execution flow of `TagCommand#execute(Context)`:
+
+1.  **State Extraction:** The command retrieves both the `ModuleList` and `EquipmentList` from the `Context`.
+
+2.  **Double Ghost Reference Check:** The system queries both lists to verify existence: `modules.hasModule(moduleName)` and `equipments.hasEquipment(equipmentName)`.
+
+3.  **Target Resolution:** If either entity is missing, the operation is immediately aborted, throwing a detailed exception explaining exactly which entity (or both) is missing.
+
+4.  **Canonical Naming:** To prevent case-sensitivity bugs during future data lookups, the command retrieves the _official_ capitalized name of the equipment from the `EquipmentList` rather than trusting the user's raw text input.
+
+5.  **Mapping:** It updates the `Module`'s internal HashMap via `targetModule.addEquipmentRequirement(officialEquipmentName, requirementRatio)`.
+
+6.  **Persistence:** It triggers `Storage#saveModules(modules)` to save the new relationship.
+
+
+#### 3. UML Diagram
+
+![Tag Command Sequence Diagrams](images/TagCommand.png)
+![Untag Command Sequence Diagrams](images/UntagCommand.png)
+
+#### 4. Design Considerations
+
+-   **Alternative 1 (Current Implementation): Strict Two-Way Validation**
+
+  -   **Why it was chosen:** It strictly prevents orphaned data. By enforcing the Double Ghost Reference Check, a user cannot tag an equipment to a module that doesn't exist, nor can they mandate an equipment that the lab doesn't actually own. This guarantees that the Procurement Report's mathematical calculations will never encounter a `NullPointerException`.
+
+-   **Alternative 2: Lazy Tagging (Create on Demand)**
+
+  -   **Why it was rejected:** If a user made a typo (e.g., `tag m/CG2111A n/STM33`), a "lazy" system might automatically create a blank equipment profile for "STM33". This would pollute the lab's inventory database with ghost items and typos, completely destroying the integrity of the tracking system.
 
 ---
 
