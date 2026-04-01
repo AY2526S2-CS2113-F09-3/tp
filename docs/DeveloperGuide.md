@@ -62,9 +62,9 @@ The `AddCommand` is instantiated via its static `parse` method. The execution fl
 
 1.  **Space-Padding Extraction:** To prevent substring collisions (e.g., an equipment named "Quantum/Sensor" accidentally triggering an `m/` module flag), the parser uses a space-padding technique in `extractArgument()`. It pads the user input and searches strictly for `" m/"` or `" n/"`.
 
-2.  **Repeating Flag Aggregation:** For tagging multiple modules at creation, `extractMultipleArguments()` iterates through the padded string, identifies every instance of the `" m/"` flag, converts the values to uppercase for standardization, and adds them to a `HashSet` to automatically filter out duplicate inputs.
-
-3.  **Defensive Validation:** The parser strictly rejects names containing reserved storage characters (`|`, `,`, `=`) to prevent save file corruption. It also enforces that lifespan (`life/`) and purchase semester (`bought/`) must be provided together.
+2.  **Repeating Flag Aggregation:** For tagging multiple modules at creation, `extractMultipleArguments()` iterates through the padded string, identifies every instance of the `" m/"` flag, converts the values to uppercase for standardization, and appends them to an internal list only if they are not already present (using a `results.contains(...)` check) to filter out duplicate inputs while preserving the original order.
+ 
+3.  **Defensive Validation:** The parser strictly rejects names containing reserved storage characters (`|`, `,`, `=`) to prevent save file corruption. Lifespan (`life/`) and purchase semester (`bought/`) are optional flags whose values are only applied when both are provided together; supplying only one of them does not cause a validation error and the partial information is ignored.
 
 4.  **Execution & Save:** Once validated, the `AddCommand` is returned. When executed, it instantiates the `Equipment`, adds it to the `EquipmentList`, and triggers `Storage#save()` to persist the new inventory state.
 

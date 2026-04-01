@@ -156,7 +156,7 @@ Provides a comprehensive, in-application guide to all available commands, their 
 
 **Q: Can I add a lifespan to an item without specifying when it was bought?**
 
-**A:** No. To accurately calculate when an item will expire, the system requires both a starting point and a duration. If you want to track an item's age, you must provide both the bought/ semester and the life/ duration together.
+**A:** To accurately calculate when an item will expire, the system requires both a starting point and a duration. You should provide both the `bought/` semester and the `life/` duration together if you want the system to track an item's age. If you supply only one of these fields, the `add` command will still succeed, but the lifespan and purchase information will be ignored and no expiry tracking will be configured.
 
 
 **Q: Can I just delete an entire equipment record without typing out the exact quantity?**
@@ -201,7 +201,7 @@ Provides a comprehensive, in-application guide to all available commands, their 
 ---
 
 ## Command Summary (Cheat Sheet)
-* **Add Equipment:** `add n/NAME q/QUANTITY [m/MODULE_CODE] [bought/SEM life/YEARS] [min/QTY]`
+* **Add Equipment:** `add n/NAME q/QUANTITY [m/MODULE_CODE]... [bought/SEM life/YEARS] [min/MIN_QTY]`
 * **Update Loan Status:** `setstatus [INDEX | n/NAME] q/QTY s/[loaned|available]`
 * **Delete Equipment:** `delete [INDEX | n/NAME] q/QTY s/[available|loaned]`
 * **Set Minimum Alert:** `setmin [INDEX | n/NAME] min/QTY`

@@ -22,7 +22,7 @@
 
     -   _Justification:_ This is the core logic that enables the application's most powerful feature: the Procurement Report. By allowing variable requirement ratios, the system can accurately calculate exactly how much equipment is needed based on real-world lab sharing constraints.
 
-    -   _Highlights:_ Engineered defensive "Ghost Reference" checks. The parser strictly verifies the existence of _both_ the module and the equipment before allowing a link to be created or destroyed, preventing orphaned data and fatal errors during forecasting calculations.he module and the equipment before allowing a link to be created or destroyed, preventing orphaned data and fatal errors during forecasting calculations.
+    -   _Highlights:_ Engineered defensive "Ghost Reference" checks. During `TagCommand#execute` and `UntagCommand#execute`, the system strictly verifies the existence of _both_ the module and the equipment before allowing a link to be created or destroyed, preventing orphaned data and fatal errors during forecasting calculations.
 
 ### Contributions to the User Guide (UG)
 -   Authored the **Equipment Inventory Management** section of the User Guide (documenting `add`, `delete`, `setstatus`, and `setmin`).
