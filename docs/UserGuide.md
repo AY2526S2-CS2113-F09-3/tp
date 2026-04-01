@@ -79,11 +79,11 @@ Calculates the exact total number of items needed for the upcoming semester by c
 **How the Calculation Works:**
 1. **Determine Base Demand:** For each equipment, the system checks all the modules it is currently mapped to. It adds up the student enrollment sizes (pax) of these associated modules.
 2. **Apply Safety Buffer & Indivisibility:** The system applies your configured `bufferPercentage` to the Base Demand. Following the "Indivisibility Rule," the result is mathematically rounded *up* to the nearest whole number to ensure you don't procure a fraction of a piece of equipment. This becomes the **Total Required**.
-3. **Calculate Shortfall:** The system then subtracts your currently available inventory count for that item from the Total Required quantity.
-4. **Generate Output:** If the Total Required exceeds your current stock, the system flags a shortage. The item is added to the report, displaying the exact shortfall quantity you need to procure.
+3. **Calculate Shortfall:** The system then subtracts your current **total stock quantity** for that item (all units you own, including any that are currently on loan) from the Total Required quantity.
+4. **Generate Output:** If the Total Required exceeds your current total stock, the system flags a shortage. The item is added to the report, displaying the exact shortfall quantity you need to procure.
 
 *Example scenario:* 
-If `STM32` boards are needed for `CG2111A` (150 pax) and `CS2113` (50 pax), the **Base Demand** is 200. With a 10% safety buffer set via `setbuffer`, the buffered demand becomes 220. If your current inventory only has 180 units, the `report procurement` command will alert you to a shortfall (TO BUY) of 40 `STM32` boards.
+If `STM32` boards are needed for `CG2111A` (150 pax) and `CS2113` (50 pax), the **Base Demand** is 200. With a 10% safety buffer set via `setbuffer`, the buffered demand becomes 220. If your current total stock (regardless of how many units are currently loaned out) is 180 units, the `report procurement` command will alert you to a shortfall (TO BUY) of 40 `STM32` boards.
 
 * **Format:** `report procurement`
 
