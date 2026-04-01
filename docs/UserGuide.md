@@ -90,7 +90,7 @@ If `STM32` boards are needed for `CG2111A` (150 pax) and `CS2113` (50 pax), the 
 ---
 
 ### 5. Core Commands
-These commands form the foundation of navigating and managing your current lab inventory. All list and report outputs are beautifully formatted using responsive ASCII tables for maximum readability.
+These commands form the foundation of navigating and managing your current lab inventory. List-style outputs are beautifully formatted using responsive ASCII tables for maximum readability.
 
 #### Listing all equipment: `list`
 Displays your entire equipment inventory in a cleanly aligned, responsive table format.
