@@ -363,7 +363,7 @@ public class SetStatusCommandTest {
     }
 
     @Test
-    public void executeByName_invalidStatus_showsMessage_noChange() {
+    public void executeByName_invalidStatus_showsNoChange() {
         ModuleList moduleList = new ModuleList();
         equipments.addEquipment(new Equipment("PowerSupply", 10, 10, 0));
         SetStatusCommand command = new SetStatusCommand("PowerSupply", 2, "damaged");
@@ -382,7 +382,7 @@ public class SetStatusCommandTest {
     }
 
     @Test
-    public void executeByIndex_invalidStatus_showsMessage_noChange() {
+    public void executeByIndex_invalidStatus_showsNoChange() {
         ModuleList moduleList = new ModuleList();
         equipments.addEquipment(new Equipment("FunctionGen", 8, 8, 0));
         SetStatusCommand command = new SetStatusCommand(1, 2, "reserved");
@@ -620,7 +620,7 @@ public class SetStatusCommandTest {
     }
 
     @Test
-    public void executeByName_indexNull_nameNull_showsErrorMessage() {
+    public void executeByName_indexAndNameBothNull_showsErrorMessage() {
         ModuleList moduleList = new ModuleList();
     }
 
