@@ -55,13 +55,13 @@ Safely removes a module from the registry. Any equipment previously tagged to th
 
 #### Linking equipment to a module: `tag`
 Dynamically maps a piece of physical equipment to an academic module. You must specify a requirement ratio (`req/`) to account for equipment that is shared among groups of students during a lab session. This data is critical for generating accurate procurement forecasts.
-* **Format:** `tag m/MODULE_NAME n/EQUIPMENT_NAME req/FRACTION`
+* **Format:** `tag m/MOD_NAME n/EQ_NAME req/FRACTION`
 * **Example:** `tag m/CG2111A n/STM32 req/1.0` (Every 1 student requires 1 STM32 board)
 * **Example:** `tag m/CS2113 n/Soldering Iron req/0.2` (1 Soldering Iron is shared among a group of 5 students)
 
 #### Unlinking equipment from a module: `untag`
 Removes a specific equipment requirement from an academic module. This is useful if a course curriculum changes and a specific item is no longer needed for the classes.
-* **Format:** `untag m/MODULE_NAME n/EQUIPMENT_NAME`
+* **Format:** `untag m/MOD_NAME n/EQ_NAME`
 * **Example:** `untag m/CG2111A n/STM32`
 
 ---
@@ -237,5 +237,5 @@ Removes a specific number of units from either the available or loaned pool.
 * **List Equipment:** `list`
 * **Help Manual:** `help`
 * **Procurement Report:** `report procurement`
-* **Tag Module:** `tag m/MODULE_NAME n/EQUIPMENT_NAME req/FRACTION`
-* **Untag Module:** `untag m/MODULE_NAME n/EQUIPMENT_NAME`
+* **Tag Module:** `tag m/MOD_NAME n/EQ_NAME req/FRACTION`
+* **Untag Module:** `untag m/MOD_NAME n/EQ_NAME`
