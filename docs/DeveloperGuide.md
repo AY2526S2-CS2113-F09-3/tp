@@ -8,6 +8,12 @@
 
 ## Design & implementation
 
+**Architecture: High-Level System Components**
+The following diagram illustrates the high-level architecture of the Equipment Master application.
+The `EquipmentMaster` class acts as the main entry point. Upon initialization, it utilizes the `Storage` component to load existing data (equipment, modules, and system settings) into memory (`EquipmentList` and `ModuleList`). During execution, it bundles these instantiated components into a single `Context` object.
+The application then enters a continuous loop: the `Ui` reads user input, the `Parser` translates this string into a specific executable `Command`, and the `Command` executes its logic by interacting with the shared `Context`.
+![Equipment Master Diagram](images/EquipmentMaster.png)
+
 ### Parser Component (Command Factory Pattern)
 
 #### 1. Overview
@@ -42,6 +48,7 @@ static {
 ```
 
 #### 3. UML Class Diagram
+**Class Diagram: System Architecture**
 ![Parser Class Diagram](images/parser.png)
 
 #### 4. Design Considerations
@@ -68,8 +75,17 @@ The `AddCommand` is instantiated via its static `parse` method. The execution fl
 
 4.  **Execution & Save:** Once validated, the `AddCommand` is returned. When executed, it instantiates the `Equipment`, adds it to the `EquipmentList`, and triggers `Storage#save()` to persist the new inventory state.
 
+#### 3. UML Diagrams
+**Class Diagram: System Architecture**
+(Note: This diagram focuses strictly on the internal structure of `AddCommand` and its inheritance from `Command`. Associated domain classes like `Context`, `Equipment`, and `AcademicSemester` are shown as data types, but their full class definitions are omitted here for clarity.)
+![AddCommand Class Diagram](images/AddCommandClass.png)
 
-#### 3. Design Considerations
+**Sequence Diagram: Execution Flow**
+(Note: This diagram illustrates the `execute()` phase of the command. The initial string parsing and validation steps are handled prior to execution and are omitted for brevity. Storage file I/O operations are shown at a high level.)
+![AddCommand Sequence Diagram](images/AddCommand.png)
+
+
+#### 4. Design Considerations
 
 -   **Alternative 1 (Current Implementation): Custom String Parsing with Space-Padding**
 
@@ -363,9 +379,15 @@ Execution flow of `TagCommand#execute(Context)`:
 
 6.  **Persistence:** It triggers `Storage#saveModules(modules)` to save the new relationship.
 
-#### 3. UML Diagram
+#### 3. Sequence Diagrams: Tag and Untag Execution
+The following sequence diagrams illustrate the execution flow for the `TagCommand` and `UntagCommand`. Because these commands perform inverse operations, their execution paths are highly similar. They both locate a specific equipment item in the `EquipmentList`, modify its associated tags, and then trigger the `Storage` component to persist the updated state.
 
+*(Note: The initial parsing of user input is omitted for clarity. Standard operations, such as index bounds-checking within the `EquipmentList` and the internal file writing mechanics of the `Storage` class, are abstracted to a high level.)*
+
+**Tag Command Flow**
 ![Tag Command Sequence Diagrams](images/TagCommand.png)
+
+**Untag Command Flow**
 ![Untag Command Sequence Diagrams](images/UntagCommand.png)
 
 #### 4. Design Considerations
@@ -429,7 +451,11 @@ The calculation follows this strict algorithm for each equipment item:
   *   Note: It uses *Total Quantity* rather than *Available Quantity* because procurement decisions are based on total asset ownership, regardless of whether items are currently loaned out.
 5.  **Output**: If `To Buy > 0`, the item is flagged in the report.
 
-#### 3. Design Considerations
+### 3. Sequence Diagram: Procurement Report Execution
+_(Note: The `getModuleByName` logic is represented as a self-invocation within the `ReportCommand`, and standard math calculations for demand are abstracted to focus on object interactions.)_
+![Procurement Report Diagram](images/ProcurementReport.png)
+
+#### 4. Design Considerations
 **Alternative 1 (Current Implementation): Total Ownership vs. Demand**
 *   **How it works:** `To Buy = Required - Total_Quantity`.
 *   **Why it was chosen:** This is the correct accounting approach. If 10 items are needed, and we own 10 but 5 are loaned out, we do *not* need to buy more. We just need to wait for returns. Using `Available` would lead to massive over-purchasing during active semesters.
@@ -461,6 +487,16 @@ Similarly, `HelpCommand` utilizes `UiTable` but enables the `hasHeader` flag, al
 
 #### 3. Class Diagram
 ![UiTable Class Diagram](images/uiTable.png)
+
+
+#### 4. Design Considerations
+**Alternative 1 (Current Implementation): Dynamic Column Width Calculation**
+*   **How it works:** The `UiTable` calculates the required width for each column dynamically by iterating through all `UiTableRow` instances (via `getColumnWidth()`) to find the longest string in each column before generating the final formatted output.
+*   **Why it was chosen:** It ensures perfect vertical alignment regardless of the data size while optimizing terminal space. It prevents data truncation for unusually long entries (like multiple module codes) and avoids massive gaps of whitespace when data entries are short. It also makes the table highly reusable for different types of data configurations.
+
+**Alternative 2: Fixed Hardcoded Column Widths**
+*   **How it works:** Pre-defining strict character limits for each column (e.g., allocating exactly 20 characters for the "Name" column and 15 characters for the "Lifespan" column).
+*   **Why it was rejected:** It is rigid and prone to visual breakage. If an equipment name exceeds the fixed width, it either breaks the table alignment or requires complex text-wrapping/truncation logic. Additionally, it wastes horizontal screen real estate when dealing with consistently short data strings, making the UI feel cluttered and harder to read on smaller terminal windows.
 
 ---
 
