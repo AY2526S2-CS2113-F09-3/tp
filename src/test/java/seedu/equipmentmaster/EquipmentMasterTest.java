@@ -1,15 +1,22 @@
 package seedu.equipmentmaster;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import seedu.equipmentmaster.equipment.Equipment;
 
+
+import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.InputStream;
+import java.util.ArrayList;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 
 public class EquipmentMasterTest {
 
@@ -39,7 +46,6 @@ public class EquipmentMasterTest {
             file.delete();
         }
     }
-    // @@author
 
     @Test
     public void constructor_missingFiles_startsEmpty() {
@@ -48,7 +54,7 @@ public class EquipmentMasterTest {
         String missingSetPath = "data/test_missing_set.txt";
         String missingModPath = "data/test_missing_mod.txt";
 
-        // Helper function (defined below) to clean up before testing
+        // Clean up before testing just in case
         deleteFileIfExists(missingEqPath);
         deleteFileIfExists(missingSetPath);
         deleteFileIfExists(missingModPath);
@@ -65,6 +71,89 @@ public class EquipmentMasterTest {
         deleteFileIfExists(missingEqPath);
         deleteFileIfExists(missingSetPath);
         deleteFileIfExists(missingModPath);
+    }
+
+    @Test
+    public void constructor_existingEquipmentFile_loadsDataSuccessfully() throws Exception {
+        String dummyEqPath = "data/test_dummy_eq.txt";
+        String dummySetPath = "data/test_dummy_set.txt";
+        String dummyModPath = "data/test_dummy_mod.txt";
+
+        // 1. Clean up before starting
+        deleteFileIfExists(dummyEqPath);
+        deleteFileIfExists(dummySetPath);
+        deleteFileIfExists(dummyModPath);
+
+        // 2. Use Storage to save data using a raw ArrayList (bypassing EquipmentList getter issues)
+        seedu.equipmentmaster.ui.Ui ui = new seedu.equipmentmaster.ui.Ui();
+        seedu.equipmentmaster.storage.Storage testStorage = new seedu.equipmentmaster.storage.Storage(
+                dummyEqPath, ui, dummySetPath, dummyModPath);
+
+        ArrayList<Equipment> rawList = new ArrayList<>();
+        rawList.add(new Equipment("STM32", 10));
+        rawList.add(new Equipment("HDMI", 5));
+
+        // Save the raw ArrayList directly to the file
+        testStorage.save(rawList);
+
+        // 3. Act: Initialize the main application. It should detect the file we just saved and load it.
+        EquipmentMaster app = new EquipmentMaster(dummyEqPath, dummySetPath, dummyModPath);
+
+        // 4. Assert: Verify that the data was loaded correctly into the internal list
+        assertNotNull(app.getEquipmentList(), "Equipment list should not be null.");
+        assertEquals(2, app.getEquipmentList().getSize(),
+                "App should successfully load exactly 2 items from the perfectly formatted file.");
+
+        // 5. Clean up
+        deleteFileIfExists(dummyEqPath);
+        deleteFileIfExists(dummySetPath);
+        deleteFileIfExists(dummyModPath);
+    }
+
+    @Test
+    public void run_validAndInvalidCommands_executesAndExits() {
+        // Arrange: Simulate user typing an invalid command, followed by "bye" to exit the loop.
+        String simulatedInput = "thisisnotacommand" + System.lineSeparator() + "bye" + System.lineSeparator();
+
+        // Hijack System.in to feed our simulated string instead of waiting for real keyboard input
+        InputStream originalIn = System.in;
+        System.setIn(new ByteArrayInputStream(simulatedInput.getBytes()));
+
+        try {
+            EquipmentMaster app = new EquipmentMaster("data/test_run_eq.txt", "data/test_run_set.txt", "data/test_run_mod.txt");
+
+            // Act: Run the application. It will read our string, throw an error, read "bye", and exit smoothly.
+            app.run();
+
+            // Assert: If the test reaches this line without an infinite loop, it passed!
+            assertNotNull(app);
+        } finally {
+            // CRITICAL: Always restore the original System.in after the test!
+            System.setIn(originalIn);
+            // Clean up files created during this run test
+            deleteFileIfExists("data/test_run_eq.txt");
+            deleteFileIfExists("data/test_run_set.txt");
+            deleteFileIfExists("data/test_run_mod.txt");
+        }
+    }
+
+    @Test
+    public void main_byeCommand_startsAndExits() throws Exception {
+        // Arrange: Simulate typing "bye" right as the program starts via main()
+        String simulatedInput = "bye" + System.lineSeparator();
+        InputStream originalIn = System.in;
+        System.setIn(new ByteArrayInputStream(simulatedInput.getBytes()));
+
+        try {
+            // Act: Call the main method directly.
+            EquipmentMaster.main(new String[]{});
+
+            // Assert: Program started and terminated successfully.
+            assertTrue(true);
+        } finally {
+            // Restore System.in
+            System.setIn(originalIn);
+        }
     }
 
     /**

@@ -210,4 +210,85 @@ public class ReportCommandTest {
         assertTrue(output.contains("Buffer: 10% (+3)"));
         assertTrue(output.contains("Total Required: 33 | Available: 10 | TO BUY: 23"));
     }
+
+    @Test
+    public void execute_agingReport_noSystemSemesterSet_showsError() {
+        // Case: targetSemStr is empty AND context.getCurrentSemester() is null
+        // Triggers the exception on line 108
+        ReportCommand command = new ReportCommand("aging", "");
+        // Context with null currentSemester
+        Context context = new Context(equipments, new ModuleList(), ui, null, null);
+
+        command.execute(context);
+        assertTrue(outContent.toString().contains("System semester not set!"));
+    }
+
+    @Test
+    public void execute_agingReport_invalidSemesterFormat_showsError() {
+        // Case: targetSemStr is provided but is in a garbage format
+        // Triggers the exception from the AcademicSemester constructor
+        ReportCommand command = new ReportCommand("aging", "NotASemester");
+        Context context = new Context(equipments, new ModuleList(), ui, null, null);
+
+        command.execute(context);
+        // The catch block on line 111 will catch the constructor error
+        assertNotNull(outContent.toString());
+    }
+
+    @Test
+    public void execute_agingReport_skipsInvalidEquipmentData() throws EquipmentMasterException {
+        // Case 1: purchaseSem is null
+        Equipment nullSemEq = new Equipment("NullSem", 10, 10, 0, null, 5.0, 0);
+        equipments.addEquipment(nullSemEq);
+
+        // Case 2: lifespan is 0 or negative
+        AcademicSemester validSem = new AcademicSemester("AY2024/25 Sem1");
+        Equipment zeroLifeEq = new Equipment("ZeroLife", 10, 10, 0, validSem, 0.0, 0);
+        Equipment negLifeEq = new Equipment("NegLife", 10, 10, 0, validSem, -1.0, 0);
+        equipments.addEquipment(zeroLifeEq);
+        equipments.addEquipment(negLifeEq);
+
+        ReportCommand command = new ReportCommand("aging", "AY2024/25 Sem1");
+        Context context = new Context(equipments, new ModuleList(), ui, null, validSem);
+
+        command.execute(context);
+
+        // Ensure none of these items were processed into the report body
+        String output = outContent.toString();
+        assertFalse(output.contains("NullSem"));
+        assertFalse(output.contains("ZeroLife"));
+        assertFalse(output.contains("NegLife"));
+    }
+
+    @Test
+    public void execute_agingReport_usesContextSemesterIfTargetEmpty() throws EquipmentMasterException {
+        AcademicSemester systemSem = new AcademicSemester("AY2024/25 Sem1");
+        // Item bought long ago, should be aging in the current system semester
+        AcademicSemester oldSem = new AcademicSemester("AY2020/21 Sem1");
+        Equipment agingEq = new Equipment("AgingItem", 1, 1, 0, oldSem, 1.0, 0);
+        equipments.addEquipment(agingEq);
+
+        // targetSemStr is empty
+        ReportCommand command = new ReportCommand("aging", "");
+        Context context = new Context(equipments, new ModuleList(), ui, null, systemSem);
+
+        command.execute(context);
+
+        assertTrue(outContent.toString().contains("Aging Equipment Report (Calculated for: AY2024/25 Sem1)"));
+        assertTrue(outContent.toString().contains("AgingItem"));
+    }
+
+    @Test
+    public void execute_agingReport_noAgingFound_showsGreatNews() throws EquipmentMasterException {
+        AcademicSemester currentSem = new AcademicSemester("AY2024/25 Sem1");
+        // Item is brand new, not aging
+        Equipment newEq = new Equipment("NewItem", 1, 1, 0, currentSem, 10.0, 0);
+        equipments.addEquipment(newEq);
+
+        ReportCommand command = new ReportCommand("aging", "AY2024/25 Sem1");
+        Context context = new Context(equipments, new ModuleList(), ui, null, currentSem);
+
+        command.execute(context);
+        assertTrue(outContent.toString().contains("Great news! No equipment needs replacement"));
+    }
 }

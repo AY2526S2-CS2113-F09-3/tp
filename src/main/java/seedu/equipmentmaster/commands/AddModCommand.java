@@ -52,7 +52,9 @@ public class AddModCommand extends Command {
             ui.showMessage("Successfully added module: " + newModule);
 
             try {
-                storage.saveModules(moduleList);
+                if (storage != null) {
+                    storage.saveModules(moduleList);
+                }
             } catch (EquipmentMasterException e) {
                 ui.showMessage("Warning: Failed to save the new module to the data file. " + e.getMessage());
             }
