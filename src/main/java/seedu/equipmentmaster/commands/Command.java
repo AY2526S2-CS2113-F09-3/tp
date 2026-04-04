@@ -15,7 +15,11 @@ import java.util.logging.Logger;
 public abstract class Command {
 
     // 1. LOGGING: Base logger could be used for general command-related traces
-    protected static final Logger logger = Logger.getLogger(Command.class.getName());
+    private static final Logger logger = Logger.getLogger(Command.class.getName());
+
+    protected Logger getLogger() {
+        return logger;
+    }
 
     /**
      * Executes the command using the provided application context.
@@ -40,6 +44,6 @@ public abstract class Command {
      * This reduces code duplication across different Command subclasses.
      */
     protected void logExecution(String commandName) {
-        Logger.getLogger(getClass().getName()).log(Level.INFO, "Executing command: " + commandName);
+        logger.log(Level.INFO, "Executing " + getClass().getSimpleName());
     }
 }

@@ -75,7 +75,8 @@ public class ModuleTest {
     }
 
     @Test
-    public void removeEquipmentRequirement_existingAndNonExisting_returnsCorrectBoolean() throws EquipmentMasterException {
+    public void removeEquipmentRequirement_existingAndNonExisting_returnsCorrectBoolean()
+            throws EquipmentMasterException {
         Module module = new Module("CG2111A", 150);
         module.addEquipmentRequirement("STM32", 0.5);
 
@@ -129,13 +130,18 @@ public class ModuleTest {
         Module module = new Module("CG2111A", 150);
 
         // 1. Trigger the !Double.isFinite() branch (handles NaN and Infinity)
-        assertThrows(EquipmentMasterException.class, () -> module.addEquipmentRequirement("Eq1", Double.NaN));
-        assertThrows(EquipmentMasterException.class, () -> module.addEquipmentRequirement("Eq1", Double.POSITIVE_INFINITY));
-        assertThrows(EquipmentMasterException.class, () -> module.addEquipmentRequirement("Eq1", Double.NEGATIVE_INFINITY));
+        assertThrows(EquipmentMasterException.class, () -> module.addEquipmentRequirement("Eq1",
+                Double.NaN));
+        assertThrows(EquipmentMasterException.class, () -> module.addEquipmentRequirement("Eq1",
+                Double.POSITIVE_INFINITY));
+        assertThrows(EquipmentMasterException.class, () -> module.addEquipmentRequirement("Eq1",
+                Double.NEGATIVE_INFINITY));
 
         // 2. Trigger the ratio <= 0.0 branch
-        assertThrows(EquipmentMasterException.class, () -> module.addEquipmentRequirement("Eq1", 0.0));
-        assertThrows(EquipmentMasterException.class, () -> module.addEquipmentRequirement("Eq1", -1.5));
+        assertThrows(EquipmentMasterException.class, () -> module.addEquipmentRequirement("Eq1",
+                0.0));
+        assertThrows(EquipmentMasterException.class, () -> module.addEquipmentRequirement("Eq1",
+                -1.5));
 
         // 3. Trigger the successful branch where both guard clauses are bypassed
         module.addEquipmentRequirement("Eq1", 1.0);

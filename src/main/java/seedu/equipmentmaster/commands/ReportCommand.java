@@ -136,7 +136,7 @@ public class ReportCommand extends Command {
      * @param context The application context.
      * @return The determined AcademicSemester.
      * @throws EquipmentMasterException If the user didn't provide a semester
-     * and the system semester is not set.
+     *     and the system semester is not set.
      */
     private AcademicSemester resolveTargetSemester(Context context)
             throws EquipmentMasterException {

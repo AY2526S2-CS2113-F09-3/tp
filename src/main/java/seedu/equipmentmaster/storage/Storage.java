@@ -264,7 +264,11 @@ public class Storage {
         try (Scanner scanner = new Scanner(file)) {
             while (scanner.hasNextLine()) {
                 String line = scanner.nextLine();
-                if (line.trim().isEmpty()) continue;
+
+                if (line.trim().isEmpty()) {
+                    continue;
+                }
+
                 parseAndAddModule(line, loadedList); // SLAP: Extracted complex parsing
             }
         } catch (Exception e) {
@@ -279,7 +283,10 @@ public class Storage {
      */
     private void parseAndAddModule(String line, ModuleList loadedList) {
         String[] parts = line.split(" \\| ", 3);
-        if (parts.length < 2) return;
+
+        if (parts.length < 2) {
+            return;
+        }
 
         try {
             String name = parts[0].trim();

@@ -120,7 +120,8 @@ public class EquipmentMasterTest {
         System.setIn(new ByteArrayInputStream(simulatedInput.getBytes()));
 
         try {
-            EquipmentMaster app = new EquipmentMaster("data/test_run_eq.txt", "data/test_run_set.txt", "data/test_run_mod.txt");
+            EquipmentMaster app = new EquipmentMaster("data/test_run_eq.txt",
+                    "data/test_run_set.txt", "data/test_run_mod.txt");
 
             // Act: Run the application. It will read our string, throw an error, read "bye", and exit smoothly.
             app.run();

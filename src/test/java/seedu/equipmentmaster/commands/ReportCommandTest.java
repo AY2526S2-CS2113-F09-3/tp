@@ -212,7 +212,7 @@ public class ReportCommandTest {
     }
 
     @Test
-    public void execute_agingReport_noSystemSemesterSet_showsError() {
+    public void execute_agingReport_noSystemSemesterSet() {
         // Case: targetSemStr is empty AND context.getCurrentSemester() is null
         // Triggers the exception on line 108
         ReportCommand command = new ReportCommand("aging", "");
@@ -224,7 +224,7 @@ public class ReportCommandTest {
     }
 
     @Test
-    public void execute_agingReport_invalidSemesterFormat_showsError() {
+    public void execute_agingReport_invalidFormat() {
         // Case: targetSemStr is provided but is in a garbage format
         // Triggers the exception from the AcademicSemester constructor
         ReportCommand command = new ReportCommand("aging", "NotASemester");
@@ -279,7 +279,7 @@ public class ReportCommandTest {
     }
 
     @Test
-    public void execute_agingReport_noAgingFound_showsGreatNews() throws EquipmentMasterException {
+    public void execute_agingReport_noAgingFound() throws EquipmentMasterException {
         AcademicSemester currentSem = new AcademicSemester("AY2024/25 Sem1");
         // Item is brand new, not aging
         Equipment newEq = new Equipment("NewItem", 1, 1, 0, currentSem, 10.0, 0);

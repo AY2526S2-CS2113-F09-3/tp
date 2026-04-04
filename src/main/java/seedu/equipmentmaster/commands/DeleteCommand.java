@@ -8,12 +8,15 @@ import seedu.equipmentmaster.storage.Storage;
 import seedu.equipmentmaster.ui.Ui;
 
 import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * Represents a command to delete a specific quantity of equipment.
  * Supports targeting equipment by its index in the list or by its exact name.
  */
 public class DeleteCommand extends Command {
+    private static final Logger logger = Logger.getLogger(DeleteCommand.class.getName());
+
     private static final String STATUS_AVAILABLE = "available";
     private static final String STATUS_LOANED = "loaned";
     private static final String FLAG_NAME = "n/";
@@ -167,7 +170,11 @@ public class DeleteCommand extends Command {
     private static int parseQuantity(String qStr) throws EquipmentMasterException {
         try {
             int q = Integer.parseInt(qStr);
-            if (q <= 0) throw new EquipmentMasterException("Quantity must be > 0.");
+
+            if (q <= 0) {
+                throw new EquipmentMasterException("Quantity must be > 0.");
+            }
+
             return q;
         } catch (NumberFormatException e) {
             logger.log(Level.WARNING, "User provided invalid quantity string: " + qStr); // 新增日志
@@ -178,7 +185,11 @@ public class DeleteCommand extends Command {
     private static DeleteCommand createDeleteCommand(String id, int q, String s) throws EquipmentMasterException {
         if (id.startsWith(FLAG_NAME)) {
             String name = id.substring(FLAG_NAME.length()).trim();
-            if (name.isEmpty()) throw new EquipmentMasterException("Name cannot be empty.");
+
+            if (name.isEmpty()) {
+                throw new EquipmentMasterException("Name cannot be empty.");
+            }
+
             return new DeleteCommand(name, q, s);
         }
         try {

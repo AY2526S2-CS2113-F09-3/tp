@@ -72,9 +72,9 @@ public class AddModCommandTest {
     public void parse_reservedCharacters_throwsException() {
         // Testing '|', ',', and '=' validation
         String[] invalidInputs = {
-                "addmod n/CG|2111 pax/100",
-                "addmod n/CG,2111 pax/100",
-                "addmod n/CG=2111 pax/100"
+            "addmod n/CG|2111 pax/100",
+            "addmod n/CG,2111 pax/100",
+            "addmod n/CG=2111 pax/100"
         };
 
         for (String input : invalidInputs) {
