@@ -147,8 +147,8 @@ Please provide a keyword to find. Example: find STM32
 There is no matching equipment in your list.
 ===================================================
 ===================================================
-1 equipment listed!
-STM32 | Total: 50 | Available: 50 | loaned: 0 | Min: 0 | Purchase: AY2024/25 Sem1 | Lifespan: 2.5 years | Modules: [CG2111A, CG2271]
+1 matching equipment(s) found!
+1. STM32 | Total: 50 | Available: 50 | loaned: 0 | Min: 0 | Purchase: AY2024/25 Sem1 | Lifespan: 2.5 years | Modules: [CG2111A, CG2271]
 ===================================================
 ===================================================
 Missing index. Use: setstatus INDEX q/QUANTITY s/STATUS
@@ -169,22 +169,22 @@ Invalid index. Please check the list again.
 Equipment 'Aliens' not found.
 ===================================================
 ===================================================
-Only 0 available unit(s). Cannot delete 5000.
+Only 0 available unit(s) available. Cannot delete 5000.
 ===================================================
 ===================================================
-Quantity to delete must be greater than 0.
+Quantity must be > 0.
 ===================================================
 ===================================================
-Quantity to delete must be greater than 0.
+Quantity must be > 0.
 ===================================================
 ===================================================
 Quantity must be a valid whole number.
 ===================================================
 ===================================================
-Only 0 available unit(s). Cannot delete 1.
+Only 0 available unit(s) available. Cannot delete 1.
 ===================================================
 ===================================================
-Only 0 available unit(s). Cannot delete 10.
+Only 0 available unit(s) available. Cannot delete 10.
 ===================================================
 ===================================================
 Deleted 5 available unit(s) of STM32.
@@ -209,7 +209,7 @@ Low Stock Alert (Items below minimum threshold):
 ===================================================
 ===================================================
 Aging Equipment Report (Calculated for: AY2024/25 Sem1):
-4. Oscilloscope (Qty: 5, Bought: AY2020/21 Sem1) | Age: 4.0 Years | Status: [REPLACE SOON]
+1. Oscilloscope (Qty: 5, Bought: AY2020/21 Sem1) | Age: 4.0 Years | Status: [REPLACE SOON]
 ===================================================
 ===================================================
 Successfully added module: CG2111A | Enrollment: 150 students
@@ -225,7 +225,7 @@ Expected: addmod n/NAME pax/QTY
 Pax cannot be a negative number.
 ===================================================
 ===================================================
-Invalid pax value. Please enter a valid integer (e.g., pax/150).
+Invalid pax value. Please enter a valid integer.
 ===================================================
 ===================================================
 Invalid command format.
@@ -258,7 +258,8 @@ Successfully deleted module: CS2113
 Module not found: GhostModule
 ===================================================
 ===================================================
-Module name cannot be empty.
+Invalid command format. 
+Expected: delmod n/NAME
 ===================================================
 ===================================================
 Buffer Updated:
