@@ -181,7 +181,8 @@ class TagCommandTest {
             }
         };
 
-        Context brokenContext = new Context(equipmentList, moduleList, dummyUi, brokenStorage, new AcademicSemester("AY2024/25 Sem1"));
+        Context brokenContext = new Context(equipmentList, moduleList, dummyUi,
+                brokenStorage, new AcademicSemester("AY2024/25 Sem1"));
 
         TagCommand command = new TagCommand("CG2111", "stm32", 0.2);
 

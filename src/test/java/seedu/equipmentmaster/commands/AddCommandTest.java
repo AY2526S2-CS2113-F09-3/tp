@@ -258,7 +258,8 @@ public class AddCommandTest {
 
     @Test
     public void parse_validFullInput_success() throws EquipmentMasterException {
-        AddCommand command = AddCommand.parse("add n/Centrifuge q/2 bought/AY2024/25 Sem1 life/5.5 min/1 m/CS2113 m/CG2023");
+        AddCommand command = AddCommand.parse(
+                "add n/Centrifuge q/2 bought/AY2024/25 Sem1 life/5.5 min/1 m/CS2113 m/CG2023");
         assertNotNull(command);
     }
 }
