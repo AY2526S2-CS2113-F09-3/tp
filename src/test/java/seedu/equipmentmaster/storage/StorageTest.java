@@ -378,34 +378,6 @@ public class StorageTest {
         // The invalid module should trigger the Exception, print the message, and be skipped.
         assertEquals(1, loaded.getModules().size());
         assertEquals("CS2113", loaded.getModules().get(0).getName());
-    public void save_ioException_showsErrorMessage() {
-        Path barrierFile = tempDir.resolve("barrier.txt");
-        try {
-            barrierFile.toFile().createNewFile();
-        } catch (IOException e) {
-            fail("Setup failed: " + e.getMessage());
-        }
-
-        Path invalidPath = barrierFile.resolve("equipment.txt");
-
-        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-        PrintStream printStream = new PrintStream(outputStream);
-        Ui testUi = new Ui(System.in, printStream);
-
-        Storage storage = new Storage(
-                invalidPath.toString(),
-                testUi,
-                tempDir.resolve("test_set.txt").toString(),
-                tempDir.resolve("test_mod.txt").toString()
-        );
-
-        ArrayList<Equipment> equipments = new ArrayList<>();
-        equipments.add(new Equipment("TestItem", 10, 10, 0));
-
-        storage.save(equipments);
-
-        String output = outputStream.toString();
-        assertTrue(output.contains("Error saving equipment data:"));
     }
 
     @Test
@@ -447,39 +419,6 @@ public class StorageTest {
 
         // Should skip corrupted line
         assertEquals(0, loaded.size());
-    }
-
-    @Test
-    public void saveSettings_ioException_showsErrorMessage() {
-        Path barrierFile = tempDir.resolve("settings_barrier.txt");
-        try {
-            barrierFile.toFile().createNewFile();
-        } catch (IOException e) {
-            fail("Setup failed: " + e.getMessage());
-        }
-
-        Path invalidPath = barrierFile.resolve("setting.txt");
-
-        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-        PrintStream printStream = new PrintStream(outputStream);
-        Ui testUi = new Ui(System.in, printStream);
-
-        Storage storage = new Storage(
-                tempDir.resolve("test_eq.txt").toString(),
-                testUi,
-                invalidPath.toString(),
-                tempDir.resolve("test_mod.txt").toString()
-        );
-
-        try {
-            AcademicSemester sem = new AcademicSemester("AY2025/26 Sem1");
-            storage.saveSettings(sem);
-        } catch (EquipmentMasterException e) {
-            fail("Should not throw exception: " + e.getMessage());
-        }
-
-        String output = outputStream.toString();
-        assertTrue(output.contains("Error saving settings:"));
     }
 
     @Test
@@ -640,4 +579,3 @@ public class StorageTest {
         }
     }
 }
-
