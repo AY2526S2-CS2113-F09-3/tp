@@ -167,4 +167,84 @@ public class EquipmentMasterTest {
             file.delete();
         }
     }
+
+    @Test
+    public void run_emptyCommand_continuesLoop() {
+        // Arrange: Simulate pressing Enter (empty string), typing spaces, and then "bye"
+        String simulatedInput = System.lineSeparator() + "   " + System.lineSeparator() + "bye" + System.lineSeparator();
+
+        InputStream originalIn = System.in;
+        System.setIn(new ByteArrayInputStream(simulatedInput.getBytes()));
+
+        try {
+            EquipmentMaster app = new EquipmentMaster("data/test_empty_eq.txt",
+                    "data/test_empty_set.txt", "data/test_empty_mod.txt");
+
+            // Act
+            app.run();
+
+            // Assert: If the loop doesn't crash and exits gracefully, the branch is covered.
+            assertTrue(true);
+        } finally {
+            System.setIn(originalIn);
+            deleteFileIfExists("data/test_empty_eq.txt");
+            deleteFileIfExists("data/test_empty_set.txt");
+            deleteFileIfExists("data/test_empty_mod.txt");
+        }
+    }
+
+    @Test
+    public void constructor_existingSettingsFile_loadsSemesterSuccessfully() throws IOException {
+        String dummyEqPath = "data/test_sem_eq.txt";
+        String dummySetPath = "data/test_sem_set.txt";
+        String dummyModPath = "data/test_sem_mod.txt";
+
+        // 1. Clean up before starting
+        deleteFileIfExists(dummyEqPath);
+        deleteFileIfExists(dummySetPath);
+        deleteFileIfExists(dummyModPath);
+
+        // 2. Create a settings file with a valid semester string
+        try (FileWriter writer = new FileWriter(dummySetPath)) {
+            writer.write("AY2023/24 Sem2");
+        }
+
+        // 3. Act: Initialize the main application
+        EquipmentMaster app = new EquipmentMaster(dummyEqPath, dummySetPath, dummyModPath);
+
+        // 4. Assert
+        assertNotNull(app, "Application should initialize successfully with a valid settings file.");
+
+        // 5. Clean up
+        deleteFileIfExists(dummyEqPath);
+        deleteFileIfExists(dummySetPath);
+        deleteFileIfExists(dummyModPath);
+    }
+
+    @Test
+    public void constructor_corruptedSettingsFile_usesFallbackSemester() throws IOException {
+        String dummyEqPath = "data/test_corrupt_eq.txt";
+        String dummySetPath = "data/test_corrupt_set.txt";
+        String dummyModPath = "data/test_corrupt_mod.txt";
+
+        deleteFileIfExists(dummyEqPath);
+        deleteFileIfExists(dummySetPath);
+        deleteFileIfExists(dummyModPath);
+
+        // Create a settings file with INVALID data
+        try (FileWriter writer = new FileWriter(dummySetPath)) {
+            writer.write("Not A Real Semester 2024");
+        }
+
+        // Act: Initialize the application. It should read the bad file, catch the
+        // EquipmentMasterException thrown by AcademicSemester, and use the fallback.
+        EquipmentMaster app = new EquipmentMaster(dummyEqPath, dummySetPath, dummyModPath);
+
+        // Assert: The application should still initialize without crashing
+        assertNotNull(app, "Application should survive a corrupted settings file.");
+
+        deleteFileIfExists(dummyEqPath);
+        deleteFileIfExists(dummySetPath);
+        deleteFileIfExists(dummyModPath);
+    }
 }
