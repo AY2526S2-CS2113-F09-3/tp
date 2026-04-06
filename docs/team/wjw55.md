@@ -15,7 +15,8 @@
 
     -   _Justification:_ Establishing a solid architectural baseline early on was critical for team velocity. It cleanly separated the system components, allowing the rest of the team to immediately work in parallel on different classes and features without architectural bottlenecks or constant merge conflicts.
   
-- **Core Inventory Ingestion (`add` command):**
+-   **Core Inventory Ingestion (`add` command):**
+
     -   _What it does:_ Allows technicians to register physical equipment into the system. It supports basic additions as well as highly detailed records (including inline module tagging, expected lifespans, purchase semesters, and low-stock thresholds) in a single command.
 
     -   _Justification:_ This forms the foundational database of the entire application. Without a robust way to ingest and structure the physical stock, downstream forecasting and module mapping features would not function.

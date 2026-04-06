@@ -7,10 +7,12 @@ import seedu.equipmentmaster.equipment.Equipment;
 
 
 import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.PrintStream;
 import java.util.ArrayList;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -170,12 +172,17 @@ public class EquipmentMasterTest {
 
     @Test
     public void run_emptyCommand_continuesLoop() {
-        // Arrange: Simulate pressing Enter (empty string), typing spaces, and then "bye"
+        // Arrange: Simulate pressing Enter, typing spaces, and then "bye"
         String simulatedInput = System.lineSeparator() + "   " + System.lineSeparator()
                 + "bye" + System.lineSeparator();
 
         InputStream originalIn = System.in;
+        PrintStream originalOut = System.out;
+        ByteArrayOutputStream outContent = new ByteArrayOutputStream();
+
+        // Hijack both System.in (for typing) and System.out (for reading what the app prints)
         System.setIn(new ByteArrayInputStream(simulatedInput.getBytes()));
+        System.setOut(new PrintStream(outContent));
 
         try {
             EquipmentMaster app = new EquipmentMaster("data/test_empty_eq.txt",
@@ -184,10 +191,16 @@ public class EquipmentMasterTest {
             // Act
             app.run();
 
-            // Assert: If the loop doesn't crash and exits gracefully, the branch is covered.
-            assertTrue(true);
+            // Assert: Verify the loop didn't exit early by checking if the Bye command executed
+            String consoleOutput = outContent.toString();
+            assertTrue(consoleOutput.contains("Goodbye"),
+                    "The loop should have ignored the empty lines and eventually processed the 'bye' command.");
+
         } finally {
+            // Restore standard input and output
             System.setIn(originalIn);
+            System.setOut(originalOut);
+
             deleteFileIfExists("data/test_empty_eq.txt");
             deleteFileIfExists("data/test_empty_set.txt");
             deleteFileIfExists("data/test_empty_mod.txt");
@@ -200,26 +213,29 @@ public class EquipmentMasterTest {
         String dummySetPath = "data/test_sem_set.txt";
         String dummyModPath = "data/test_sem_mod.txt";
 
-        // 1. Clean up before starting
+        // 1. Clean up before starting (just in case a previous run was aborted midway)
         deleteFileIfExists(dummyEqPath);
         deleteFileIfExists(dummySetPath);
         deleteFileIfExists(dummyModPath);
 
-        // 2. Create a settings file with a valid semester string
-        try (FileWriter writer = new FileWriter(dummySetPath)) {
-            writer.write("AY2023/24 Sem2");
+        try {
+            // 2. Create a settings file with a valid semester string
+            try (FileWriter writer = new FileWriter(dummySetPath)) {
+                writer.write("AY2023/24 Sem2");
+            }
+
+            // 3. Act: Initialize the main application
+            EquipmentMaster app = new EquipmentMaster(dummyEqPath, dummySetPath, dummyModPath);
+
+            // 4. Assert
+            assertNotNull(app, "Application should initialize successfully with a valid settings file.");
+
+        } finally {
+            // 5. Clean up (Guaranteed to run even if the assertion fails)
+            deleteFileIfExists(dummyEqPath);
+            deleteFileIfExists(dummySetPath);
+            deleteFileIfExists(dummyModPath);
         }
-
-        // 3. Act: Initialize the main application
-        EquipmentMaster app = new EquipmentMaster(dummyEqPath, dummySetPath, dummyModPath);
-
-        // 4. Assert
-        assertNotNull(app, "Application should initialize successfully with a valid settings file.");
-
-        // 5. Clean up
-        deleteFileIfExists(dummyEqPath);
-        deleteFileIfExists(dummySetPath);
-        deleteFileIfExists(dummyModPath);
     }
 
     @Test
