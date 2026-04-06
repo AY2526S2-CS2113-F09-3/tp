@@ -9,7 +9,13 @@
 * https://nus-cs2113-ay2526-s2.github.io/tp-dashboard/?search=wjw55&breakdown=true&sort=groupTitle%20dsc&sortWithin=title&since=2026-02-20T00%3A00%3A00&timeframe=commit&mergegroup=&groupSelect=groupByRepos&checkedFileTypes=docs~functional-code~test-code~other&filteredFileName=
 
 ### Enhancements Implemented
--   **Core Inventory Ingestion (`add` command):**
+-   **Foundation Architecture (Initial OOP Setup):**
+
+    -   _What it does:_ Designed and implemented the core Object-Oriented Programming (OOP) class structures and project skeleton at the project's inception.
+
+    -   _Justification:_ Establishing a solid architectural baseline early on was critical for team velocity. It cleanly separated the system components, allowing the rest of the team to immediately work in parallel on different classes and features without architectural bottlenecks or constant merge conflicts.
+  
+- **Core Inventory Ingestion (`add` command):**
     -   _What it does:_ Allows technicians to register physical equipment into the system. It supports basic additions as well as highly detailed records (including inline module tagging, expected lifespans, purchase semesters, and low-stock thresholds) in a single command.
 
     -   _Justification:_ This forms the foundational database of the entire application. Without a robust way to ingest and structure the physical stock, downstream forecasting and module mapping features would not function.
@@ -32,6 +38,8 @@
 -   **Authored Feature Implementation Sections:** Detailed the architecture, execution flow, and design considerations for the **Core Inventory Ingestion** (`AddCommand`) and the **Academic Dependency Mapping System** (`TagCommand` & `UntagCommand`), with a strong focus on defensive programming mechanisms like the Double Ghost Reference Check.
 
 -   **Contributed UML Diagrams:** Authored PlantUML diagrams mapping out my specific architectural contributions, including:
+
+    -   Class and Sequence Diagrams detailing the parsing and execution flow of the Core Inventory Ingestion (AddCommand.png).
 
     -   Sequence Diagram illustrating the strict two-way validation and execution flow of the Academic Dependency Mapping process (`TagCommand.png`).
 
