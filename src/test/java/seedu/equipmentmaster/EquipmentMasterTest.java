@@ -171,7 +171,8 @@ public class EquipmentMasterTest {
     @Test
     public void run_emptyCommand_continuesLoop() {
         // Arrange: Simulate pressing Enter (empty string), typing spaces, and then "bye"
-        String simulatedInput = System.lineSeparator() + "   " + System.lineSeparator() + "bye" + System.lineSeparator();
+        String simulatedInput = System.lineSeparator() + "   " + System.lineSeparator()
+                + "bye" + System.lineSeparator();
 
         InputStream originalIn = System.in;
         System.setIn(new ByteArrayInputStream(simulatedInput.getBytes()));
