@@ -1,0 +1,23 @@
+@startuml
+class Equipment {
+    - name: String
+    - purchaseSemester: AcademicSemester
+    - lifespan: double
+    + isAged(current: AcademicSemester): boolean
+}
+
+class AcademicSemester {
+    - startYear: int
+    - semester: int
+    + getNormalizedOffset(): double
+    + {static} calculateDifference(s1, s2): double
+}
+
+Equipment "1" o-- "1" AcademicSemester : bought in >
+
+note bottom of AcademicSemester
+  Normalization Algorithm:
+  Offset = startYear + (Sem 2 ? 0.5 : 0.0)
+  Age = CurrentOffset - PurchaseOffset
+end note
+@enduml

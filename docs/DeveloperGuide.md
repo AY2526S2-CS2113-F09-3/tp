@@ -14,6 +14,41 @@ The `EquipmentMaster` class acts as the main entry point. Upon initialization, i
 The application then enters a continuous loop: the `Ui` reads user input, the `Parser` translates this string into a specific executable `Command`, and the `Command` executes its logic by interacting with the shared `Context`.
 ![Equipment Master Diagram](images/EquipmentMaster.png)
 
+---
+
+### Architecture Interaction: The Context Object Pattern
+To ensure a clean separation of concerns, the application utilizes a **Context Object Pattern**. Upon startup, all major components (`EquipmentList`, `ModuleList`, `Ui`, `Storage`, `UserPreferences`) are instantiated and bundled into a single `Context` object.
+
+This design choice ensures:
+* **Decoupling**: Command objects only interact with the `Context` rather than knowing how the `Ui` or `Storage` is internally structured.
+* **Testability**: It allows us to pass a "Mock Context" with temporary storage paths during unit testing.
+
+---
+
+### Defensive Programming and Error Handling
+
+To ensure system stability, the application adopts a **Defensive Programming** strategy. The goal is to catch invalid states as early as possible—either during input parsing or immediately before command execution—to prevent the application from entering an inconsistent state.
+
+#### 1. Centralized Exception Handling
+The application utilizes a single custom checked exception: **`EquipmentMasterException`**.
+* **Role**: It acts as the primary signal for any controlled failure within the application's logic (e.g., malformed user input, missing arguments, or file I/O errors).
+* **Execution Flow**: When a `Command` or `Parser` detects an error, it throws an `EquipmentMasterException`. This exception is propagated back to the `Main` execution loop, where the `Ui` catches it and displays a user-friendly error message. This prevents a single error from terminating the entire program.
+
+#### 2. Guard Clauses in Parsing
+Before a `Command` object is even instantiated, the `Parser` component utilizes **Guard Clauses** to validate the raw input string.
+* **Example**: In `UpdateModCommand#parse`, the system checks for the presence of mandatory flags (`n/`, `pax/`) and validates data types (e.g., ensuring `pax` is a positive integer). If these checks fail, an exception is thrown immediately, ensuring that no "junk" command objects are ever created.
+
+#### 3. Use of Assertions
+The application uses **Java Assertions** to document and verify internal assumptions about the program's state during development.
+* **Usage**: Assertions are used at the beginning of `execute()` methods to ensure that critical dependencies (like `EquipmentList` or `Ui`) have been correctly injected via the `Context`.
+* **Example**: `assert equipments != null : "EquipmentList dependency cannot be null";`
+* **Purpose**: Unlike exceptions, these are used to catch **programmer errors** rather than user errors, helping developers identify bugs during the integration phase.
+
+#### 4. Safe Data Persistence
+The `Storage` component is designed to be "Fail-Safe." During the loading phase, if a specific line in the save file is corrupted (e.g., contains an illegal character `|`), the system catches the error, logs a warning, and skips only that specific line. This ensures that a single corrupted record does not prevent the user from accessing the rest of their inventory.
+
+---
+
 ### Parser Component (Command Factory Pattern)
 
 #### 1. Overview
@@ -94,6 +129,32 @@ The `AddCommand` is instantiated via its static `parse` method. The execution fl
 -   **Alternative 2: Standard Regex Matching**
 
   -   **Why it was rejected:** Regex becomes exponentially complex and difficult to maintain when dealing with 5+ optional flags that can appear in any order. A single malformed regex string could break the entire ingestion engine.
+
+---
+
+### Storage Implementation
+
+The Storage component manages data persistence using human-readable text files. This ensures that lab data is preserved across sessions without requiring a database engine.
+
+#### 1. Data Format
+Each entity is stored in a dedicated `.txt` file using the **Pipe-Delimited Format**.
+* **Equipment (`equipment.txt`)**: `Name|Quantity|Loaned|MinQuantity|PurchaseSem|Lifespan|Buffer|ModuleTags`
+* **Modules (`module.txt`)**: `ModuleCode|Pax`
+
+#### 2. Loading Logic (The "Robust Loader")
+
+![Storage Loading Sequence Diagram](images/StorageLoadingSequence.png)
+
+During the initialization phase, the `Storage` class reads files line-by-line. To ensure system stability, it employs a **Silent Recovery** mechanism:
+1.  It attempts to parse a line into a data object.
+2.  If a line is malformed (e.g., missing a field or contains illegal characters), it catches the exception.
+3.  The specific corrupted line is skipped, and a warning is issued via the `Ui`, but the rest of the file continues to load.
+
+#### 3. Design Considerations
+* **Alternative 1 (Current): Plain Text with Custom Delimiters**
+  * **Justification**: It is extremely lightweight and requires zero external dependencies. Lab technicians can manually inspect or fix data using a simple text editor if necessary.
+* **Alternative 2: JSON or XML**
+  * **Rejection**: While more structured, these formats would require an external library (like Jackson or GSON) which adds complexity to the build process. For the current inventory scale, the overhead is not justified.
 
 ---
 
@@ -434,6 +495,33 @@ To further enhance the automated lab management experience, the following featur
 
 ---
 
+### Implementation: Academic Semester Normalization
+
+A core challenge in the `Aging Report` and `Procurement Report` is performing mathematical calculations on non-standard time formats like `AY2024/25 Sem1`.
+
+#### 1. The Normalization Algorithm
+
+![Academic Semester Logic Diagram](images/AcademicSemesterLogic.png)
+
+To compare two semesters or calculate the age of an item, the `AcademicSemester` class converts strings into a **Numeric Offset**.
+
+**The Formula:**
+`NormalizedValue = StartYear + (Semester == 2 ? 0.5 : 0.0)`
+
+**Examples:**
+* `AY2020/21 Sem1` -> `2020.0`
+* `AY2020/21 Sem2` -> `2020.5`
+* `AY2024/25 Sem1` -> `2024.0`
+
+#### 2. Usage in Aging Calculation
+To determine if an equipment is "Aged", the system calculates:
+`CurrentAge = CurrentSemesterOffset - PurchaseSemesterOffset`
+If `CurrentAge >= EquipmentLifespan`, the item is flagged.
+
+This design converts a complex string-parsing problem into simple floating-point subtraction, ensuring the system is both performant and logically sound.
+
+---
+
 ### Procurement Report (Automated Restocking)
 
 #### 1. Overview
@@ -569,11 +657,11 @@ Whether you are managing shared pools of STM32 boards across different modules (
 
 ## Non-Functional Requirements
 
-1. **Environment:** The system should work seamlessly on any mainstream Operating System (Windows, macOS, Linux) that has **Java 17** or above installed.
-2. **Performance:** The system should respond to standard user commands (e.g., adding, finding, or listing items) within 100 milliseconds to support rapid typing during busy lab hours.
-3. **Data Storage:** Data should be stored locally in human-editable text files (e.g., `.txt` or `.json`). The system should not rely on an external Database Management System (DBMS) or require an active internet connection, ensuring the lab can operate even during network outages.
-4. **Data Integrity:** If the local data file is manually corrupted by a user (e.g., invalid formatting), the system should gracefully detect the error on startup and load an empty inventory rather than crashing outright.
-5. **Usability:** A user with above-average typing speed should be able to accomplish standard inventory tasks noticeably faster using the CLI than they would using a traditional mouse-driven GUI.
+1.  **Platform Independence**: The application must run on Windows, macOS, and Linux with **Java 17** or higher installed.
+2.  **Performance**: The system must respond to any search or list command within **100ms**, even with an inventory size of 1,000+ items.
+3.  **No Network Reliance**: The system must be 100% functional without an internet connection to ensure data security within lab environments.
+4.  **Robustness**: The application should handle manual corruption of the data files without crashing, by either skipping the corrupted entries or resetting to a fresh state.
+5.  **Auditability**: Every save operation must overwrite the file atomically to prevent data loss in case of a power failure during the write process.
 
 ## Glossary
 

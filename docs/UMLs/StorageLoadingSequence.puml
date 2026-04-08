@@ -1,0 +1,24 @@
+@startuml
+participant ":Storage" as Storage
+participant ":Ui" as Ui
+participant ":EquipmentList" as EqList
+
+[-> Storage : load()
+activate Storage
+
+loop for each line in file
+    Storage -> Storage : parseLine(line)
+    activate Storage
+
+    alt Successful Parse
+        Storage -> EqList : add(item)
+        deactivate Storage
+    else Malformed/Corrupted Line
+        Storage -> Ui : showWarning("Skipping corrupted line...")
+        note right: This is the "Silent Recovery" logic
+    end
+end
+
+[<-- Storage : loadedList
+deactivate Storage
+@endulum
