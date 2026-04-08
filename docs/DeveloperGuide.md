@@ -642,6 +642,13 @@ When `ListCommand` is executed:
 
 Similarly, `HelpCommand` utilizes `UiTable` but enables the `hasHeader` flag, allowing it to render a title row ("Command" | "Format") without the auto-generated numeric index.
 
+
+#### Rendering Flow (Sequence Diagram)
+The following sequence diagram illustrates how `ListCommand` utilizes `UiTable` to dynamically construct and format the inventory output before passing it to the `Ui` for display.
+
+![UiTable Sequence Diagram](images/UiTableSequence.png)
+
+
 #### 3. Class Diagram
 ![UiTable Class Diagram](images/uiTable.png)
 
@@ -748,6 +755,51 @@ Whether you are managing shared pools of STM32 boards across different modules (
 | **v3.0** | expert user | toggle verbose mode off (Quiet Mode) | keep the terminal screen clean and focused during rapid, repetitive tasks. |
 | **v3.0** | expert user | auto-generate a Budget Request email text | simply copy-paste the system's procurement data directly into an email to the boss. |
 | **v3.0** | expert user | filter inventory by "Remaining Lifespan" (e.g., `list --eol-soon`) | identify exactly which batch of boards needs to be phased out by next year. |
+
+### Use Cases
+
+(For all use cases below, the **System** is `Equipment Master` and the **Actor** is the `Lab Technician`, unless specified otherwise)
+
+**Use case: UC01 - Tag equipment to an academic module**
+
+**MSS (Main Success Scenario)**
+1. User requests to tag an equipment to a module by providing the module code, equipment name, and requirement ratio.
+2. System checks the `ModuleList` and verifies the module exists.
+3. System checks the `EquipmentList` and verifies the equipment exists.
+4. System calculates and formats the official canonical names.
+5. System registers the requirement ratio inside the target module.
+6. System saves the updated module registry to storage.
+7. System displays a success confirmation message.
+   Use case ends.
+
+**Extensions**
+* 2a. The given module code does not exist in the registry.
+  * 2a1. System displays a "Module Not Found" error.
+  * Use case ends.
+* 3a. The given equipment name does not exist in the inventory.
+  * 3a1. System displays an "Equipment Not Found" error.
+  * Use case ends.
+
+**Use case: UC02 - Generate Procurement Report**
+
+**MSS**
+1. User requests to generate the procurement report.
+2. System iterates through all equipment in the inventory.
+3. For each equipment, System cross-references tagged modules and fetches their student enrollment (pax).
+4. System calculates the base demand and applies the equipment's safety buffer.
+5. System rounds up the demand to the nearest whole integer.
+6. System subtracts the total owned physical stock from the required demand.
+7. System formats all items with a "To Buy" value > 0 into a `UiTable`.
+8. System displays the formatted report.
+   Use case ends.
+
+**Extensions**
+* 2a. The inventory is completely empty.
+  * 2a1. System displays an empty inventory message.
+  * Use case ends.
+* 7a. No equipment falls below the required threshold (nothing to buy).
+  * 7a1. System displays a "No procurement needed" message.
+  * Use case ends.
 
 
 ## Non-Functional Requirements (NFR)
@@ -890,3 +942,14 @@ To test the system with pre-populated data without typing everything manually:
 2.  **Fuzzy Search**: Enhance the `find` command with Levenshtein Distance algorithms to suggest the correct equipment name if the user makes a minor typo.
 3.  **Batch Processing**: Support for reading multiple commands from a `.csv` file for high-volume start-of-semester equipment intake.
 4.  **Export Utility**: Add a command to export reports (Aging/Procurement) into `.csv` format for integration with University financial systems.
+
+
+## Appendix: Project Effort
+
+While this project was built upon the architectural foundations taught in CS2113, the development of **Equipment Master** required significant effort to move beyond a simple "flat-list" address book into a **relational database management tool**.
+
+Key technical challenges our team overcame include:
+1. **Relational Data Mapping (Many-to-Many)**: Unlike standard address books where an item exists in isolation, our system links physical `Equipment` to abstract `Modules`. We had to engineer a safe cross-referencing system (Safe Dereferencing) to ensure data integrity during deletions, preventing ghost references.
+2. **Dynamic UI Rendering**: Creating the `UiTable` utility required developing an algorithm that pre-scans all generic row data to calculate dynamic column widths. This ensures perfect alignment in the CLI without hardcoding string lengths.
+3. **Advanced Algorithmic Forecasting**: The `Procurement Report` is not a simple filter. It is an algorithmic engine that aggregates pax, ratios, applies percentage buffers, handles mathematical ceiling logic, and offsets against total ownership.
+4. **Semantic Time Parsing**: We replaced standard `java.time` libraries with a custom `AcademicSemester` parser to evaluate equipment aging based on university lifecycles (e.g., `AY24/25 Sem1`), requiring custom string extraction and floating-point normalization.

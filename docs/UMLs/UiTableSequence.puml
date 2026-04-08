@@ -1,0 +1,46 @@
+@startuml
+participant ":ListCommand" as Command
+participant "table:UiTable" as Table
+participant ":EquipmentList" as EqList
+participant "eq:Equipment" as Eq
+participant ":Ui" as Ui
+
+[-> Command : execute(context)
+activate Command
+
+Command -> Table ** : new UiTable(hasHeader=true)
+activate Table
+Table --> Command
+deactivate Table
+
+Command -> EqList : getEquipments()
+activate EqList
+EqList --> Command : equipmentList
+deactivate EqList
+
+loop for each eq in equipmentList
+    Command -> Eq : toTableRow()
+    activate Eq
+    Eq --> Command : rowData
+    deactivate Eq
+
+    Command -> Table : addRow(rowData)
+    activate Table
+    Table --> Command
+    deactivate Table
+end
+
+Command -> Table : toString()
+activate Table
+note right of Table: Calculates dynamic\ncolumn widths here
+Table --> Command : formattedString
+deactivate Table
+
+Command -> Ui : print(formattedString)
+activate Ui
+Ui --> Command
+deactivate Ui
+
+[<-- Command
+deactivate Command
+@enduml
