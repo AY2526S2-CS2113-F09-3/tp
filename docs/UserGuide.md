@@ -148,7 +148,7 @@ Proactively audit your inventory to find equipment that has exceeded its expecte
 
 #### Setting the Academic Context: `setsem`
 Sets the current academic semester of the system, which is used as the baseline for calculating equipment age.
-* **Format:** `setsem AYYYYY/YY SemX` (where X is 1 or 2)
+* **Format:** `setsem AY[YYYY]/[YY] Sem[1/2]`
 * **Example:** `setsem AY2025/26 Sem1`
 * **Smart Reminder:** If the semester changes and modules exist in the system, a warning will remind you to update enrollment numbers (`pax`) using `updatemod` to maintain report accuracy.
 
@@ -159,7 +159,7 @@ Displays the currently configured academic semester of the system. This is highl
 
 #### Generating the Aging Report: `report aging`
 Scans the inventory and generates a report of all equipment whose age (calculated from their purchase semester to the current semester) meets or exceeds their defined lifespan.
-* **Format:** `* **Format:** report aging [AYYYYY/YY SemX]`
+* **Format:** `report aging [AY[YYYY]/[YY] Sem[1/2]]`
     * *(Note: If the optional semester argument is omitted, it defaults to the system's current semester set via `setsem`.)*
 * **Example:** `report aging`
 * **Example:** `report aging AY2026/27 Sem1` (Simulates an audit for a future semester)
@@ -231,7 +231,7 @@ Updates the loaned or available count of an equipment item to reflect real-time 
   * `setstatus n/NAME q/COUNT s/STATUS` — updates by name
   * `setstatus INDEX q/COUNT s/STATUS` — updates by list index
   * *(where STATUS is strictly `loaned` or `available`)*
-* **Example:** `setstatus n/BasyS3 FPGA q/5 s/loaned`
+* **Example:** `setstatus n/Basys3 FPGA q/5 s/loaned`
 * **Example:** `setstatus 1 q/3 s/available`
 
 > **Note:** The count must be a positive whole number (zero and negatives are rejected). When loaning, the count cannot exceed current available stock. When returning, the count cannot exceed current loaned quantity.
@@ -376,8 +376,8 @@ When an error occurs, the system will reject the invalid input, print a clear er
 * **Update Pax:** `updatemod n/NAME pax/QTY`
 * **Delete Module:** `delmod n/NAME`
 * **Find Equipment:** `find KEYWORD`
-* **Set Semester:** `setsem AYYYYY/YY SemX`
-* **Aging Report:** `report aging [AYYYYY/YY SemX]`
+* **Set Semester:** `setsem AY[YYYY]/[YY] Sem[1/2]`
+* **Aging Report:** `report aging [AY[YYYY]/[YY] Sem[1/2]]`
 * **Set Buffer:** `setbuffer n/NAME b/PERCENTAGE` or `setbuffer i/INDEX b/PERCENTAGE`
 * **Update Loan Status:** `setstatus n/NAME q/COUNT s/STATUS` or `setstatus INDEX q/COUNT s/STATUS` *(where STATUS is `loaned` or `available`)*
 * **Set Min Threshold:** `setmin [n/NAME | INDEX] min/QUANTITY`
