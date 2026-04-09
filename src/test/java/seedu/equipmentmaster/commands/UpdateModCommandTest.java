@@ -12,7 +12,12 @@ import seedu.equipmentmaster.ui.Ui;
 
 import java.nio.file.Path;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+
 
 /**
  * JUnit tests for the {@code UpdateModCommand} class.
@@ -518,7 +523,7 @@ public class UpdateModCommandTest {
 
     // Consolidated null storage test
     @Test
-    public void execute_nullStorage_skipsSave_success() throws EquipmentMasterException {
+    public void execute_nullStorage_skipsSave() throws EquipmentMasterException {
         moduleList.addModule(new Module("CG2271", 100));
         Ui ui = new Ui();
         // Context with explicitly null storage handler
