@@ -1,5 +1,49 @@
 # User Guide
 
+## Table of Contents<!-- TOC -->
+* [User Guide](#user-guide)
+  * [Table of Contents](#table-of-contents)
+  * [Introduction](#introduction)
+  * [Quick Start](#quick-start)
+  * [Notes about the command format](#notes-about-the-command-format)
+  * [Features](#features)
+    * [1. Equipment Inventory Management](#1-equipment-inventory-management)
+      * [Adding new equipment: `add`](#adding-new-equipment-add)
+    * [2. Module Tracking System](#2-module-tracking-system)
+      * [Adding a new module: `addmod`](#adding-a-new-module-addmod)
+      * [Listing all modules: `listmod`](#listing-all-modules-listmod)
+      * [Updating a module's pax: `updatemod`](#updating-a-modules-pax-updatemod)
+      * [Deleting a module: `delmod`](#deleting-a-module-delmod)
+      * [Linking equipment to a module: `tag`](#linking-equipment-to-a-module-tag)
+      * [Unlinking equipment from a module: `untag`](#unlinking-equipment-from-a-module-untag)
+    * [3. Enhanced Find Feature](#3-enhanced-find-feature)
+      * [Searching the inventory: `find`](#searching-the-inventory-find)
+    * [4. Aging Equipment Report](#4-aging-equipment-report)
+      * [Setting the Academic Context: `setsem`](#setting-the-academic-context-setsem)
+      * [Viewing the current academic semester: `getsem`](#viewing-the-current-academic-semester-getsem)
+      * [Generating the Aging Report: `report aging`](#generating-the-aging-report-report-aging)
+    * [5. Advanced Inventory Reports](#5-advanced-inventory-reports)
+      * [Generating the Low Stock Report: `report lowstock`](#generating-the-low-stock-report-report-lowstock)
+      * [Setting a Safety Buffer: `setbuffer`](#setting-a-safety-buffer-setbuffer)
+      * [Generating the Procurement Report: `report procurement`](#generating-the-procurement-report-report-procurement)
+    * [6. Equipment Status Management](#6-equipment-status-management)
+      * [Updating equipment loan status: `setstatus`](#updating-equipment-loan-status-setstatus)
+    * [7. Core Commands](#7-core-commands)
+      * [Listing all equipment: `list`](#listing-all-equipment-list)
+      * [Viewing the interactive manual: `help`](#viewing-the-interactive-manual-help)
+      * [Setting low stock thresholds: `setmin`](#setting-low-stock-thresholds-setmin)
+      * [Deleting specific quantities: `delete`](#deleting-specific-quantities-delete)
+      * [Exiting the application: `bye`](#exiting-the-application-bye)
+    * [8. Data Management](#8-data-management)
+      * [Automatic Data Saving](#automatic-data-saving)
+      * [Automatic Data Loading](#automatic-data-loading)
+  * [Error Handling](#error-handling)
+  * [FAQ](#faq)
+  * [Command Summary (Cheat Sheet)](#command-summary-cheat-sheet)
+<!-- TOC -->
+
+---
+
 ## Introduction
 Equipment Master is a Command Line Interface (CLI) application designed specifically for University Laboratory Technicians. It transforms chaotic peak-hour equipment loans into a streamlined, 100% accountable digital process. By tracking inventory against academic modules and student enrollment, it helps you forecast procurement needs instantly.
 
@@ -10,6 +54,19 @@ Equipment Master is a Command Line Interface (CLI) application designed specific
 2. Download the latest version of `EquipmentMaster.jar` into an empty folder.
 3. Open a command terminal, navigate to the folder, and run: `java -jar EquipmentMaster.jar`.
 4. Type `help` to view the command summary.
+
+---
+
+## Notes about the command format
+Before you start using the commands, please note the following formatting rules:
+* Words in `UPPER_CASE` are the parameters to be supplied by the user.
+  * e.g. in `addmod n/NAME`, `NAME` is a parameter which can be used as `addmod n/CG2111A`.
+* Items in square brackets are optional.
+  * e.g `n/NAME [min/MIN_QTY]` can be used as `n/STM32 min/10` or as `n/STM32`.
+* Items with `...` after them can be used multiple times including zero times.
+  * e.g. `[m/MODULE_CODE]...` can be used as ` ` (i.e. 0 times), `m/CG2111A`, `m/CG2111A m/EE2026` etc.
+* Parameters can be in any order if they are specified with flags.
+  * e.g. if the command specifies `n/NAME q/QUANTITY`, `q/QUANTITY n/NAME` is also acceptable.
 
 ---
 
@@ -42,6 +99,17 @@ Registers a new academic course module into the system along with its expected s
 #### Listing all modules: `listmod`
 Displays a summary of all registered modules and their respective student enrollments.
 * **Format:** `listmod`
+
+* **Example Output:**
+```text
++----+-------------+-----------------+
+| ID | Module Code | Enrollment (Pax)|
++----+-------------+-----------------+
+| 1  | CG2111A     | 180             |
+| 2  | EE2026      | 250             |
+| 3  | CS2113      | 150             |
++----+-------------+-----------------+
+```
 
 #### Updating a module's pax: `updatemod`
 Updates the student enrollment size of an existing module. The system will automatically use this new pax to recalculate future equipment demands.
@@ -80,7 +148,7 @@ Proactively audit your inventory to find equipment that has exceeded its expecte
 
 #### Setting the Academic Context: `setsem`
 Sets the current academic semester of the system, which is used as the baseline for calculating equipment age.
-* **Format:** `setsem AY[YYYY]/[YY] Sem[1/2]`
+* **Format:** `setsem AYYYYY/YY SemX` (where X is 1 or 2)
 * **Example:** `setsem AY2025/26 Sem1`
 * **Smart Reminder:** If the semester changes and modules exist in the system, a warning will remind you to update enrollment numbers (`pax`) using `updatemod` to maintain report accuracy.
 
@@ -91,7 +159,7 @@ Displays the currently configured academic semester of the system. This is highl
 
 #### Generating the Aging Report: `report aging`
 Scans the inventory and generates a report of all equipment whose age (calculated from their purchase semester to the current semester) meets or exceeds their defined lifespan.
-* **Format:** `report aging [AY[YYYY]/[YY] Sem[1/2]]`
+* **Format:** `* **Format:** report aging [AYYYYY/YY SemX]`
     * *(Note: If the optional semester argument is omitted, it defaults to the system's current semester set via `setsem`.)*
 * **Example:** `report aging`
 * **Example:** `report aging AY2026/27 Sem1` (Simulates an audit for a future semester)
@@ -105,6 +173,20 @@ Forecast your laboratory equipment needs and proactively identify critical short
 Scans your entire inventory and generates a report of all equipment where the current total quantity (`q/`, including items that may be on loan) is strictly less than its configured minimum threshold (`min/`). This allows you to quickly identify immediate shortages before a busy lab session.
 * **Format:** `report lowstock`
 
+* **Example Output:**
+```text
+!!! CRITICAL LOW STOCK WARNING !!!
+
++----+--------------------+-------+--------+-------+-----+
+| ID | Equipment Name     | Avail | Loaned | Total | Min |
++----+--------------------+-------+--------+-------+-----+
+| 2  | Oscilloscope       | 0     | 1      | 1     | 2   |
+| 4  | Basys3 FPGA        | 2     | 5      | 7     | 10  |
++----+--------------------+-------+--------+-------+-----+
+
+Action Required: Please arrange for immediate equipment recovery or procurement.
+```
+
 #### Setting a Safety Buffer: `setbuffer`
 Sets a percentage safety buffer on specific equipment. This ensures you buy slightly more than the baseline module enrollments to account for potential damage, loss, or unexpected student increases.
 * **Format:** `setbuffer n/NAME b/PERCENTAGE` or `setbuffer i/INDEX b/PERCENTAGE`
@@ -112,6 +194,20 @@ Sets a percentage safety buffer on specific equipment. This ensures you buy slig
 
 #### Generating the Procurement Report: `report procurement`
 Calculates the exact total number of items needed for the upcoming semester by cross-referencing your current stock levels against the student enrollment sizes (pax) of all associated modules, including any configured safety buffers. This allows you to proactively justify budget requests for equipment shortfalls.
+
+* **Example Output:**
+```text
+Generating Procurement Report for upcoming semester...
+
++----+--------------------+-------+--------+----------+--------+
+| ID | Equipment Name     | Owned | Buffer | Required | To Buy |
++----+--------------------+-------+--------+----------+--------+
+| 1  | STM32              | 150   | 10.0%  | 198      | 48     |
+| 2  | Basys3 FPGA        | 40    | 5.0%   | 53       | 13     |
+| 3  | Soldering Iron     | 25    | 0.0%   | 30       | 5      |
++----+--------------------+-------+--------+----------+--------+
+```
+*Note: 'Required' is calculated based on module enrollment pax, mapped ratios, and the safety buffer (rounded up).*
 
 **How the Calculation Works:**
 1. **Determine Base Demand:** For each equipment, the system checks all the modules it is currently mapped to. It adds up the student enrollment sizes (pax) of these associated modules.
@@ -132,9 +228,9 @@ If `STM32` boards are needed for `CG2111A` (150 pax) and `CS2113` (50 pax), the 
 Updates the loaned or available count of an equipment item to reflect real-time borrowing and return activity. You can target equipment by name or by its 1-based index in the list.
 
 * **Format:**
-    * `setstatus n/NAME q/COUNT s/loaned` — loans out COUNT units, decreasing available stock
-    * `setstatus n/NAME q/COUNT s/available` — returns COUNT units, increasing available stock
-    * `setstatus INDEX q/COUNT s/loaned/available` — same as above but targets by list index
+  * `setstatus n/NAME q/COUNT s/STATUS` — updates by name
+  * `setstatus INDEX q/COUNT s/STATUS` — updates by list index
+  * *(where STATUS is strictly `loaned` or `available`)*
 * **Example:** `setstatus n/BasyS3 FPGA q/5 s/loaned`
 * **Example:** `setstatus 1 q/3 s/available`
 
@@ -149,6 +245,18 @@ These commands form the foundation of navigating and managing your current lab i
 Displays your entire equipment inventory in a cleanly aligned, responsive table format.
 * **Format:** `list`
 * **Note:** The table includes a **Min:** column so you can monitor your safety thresholds alongside current stock levels.
+* **Example Output:**
+```text
++----+--------------------+-------+--------+-------+-----+------------------+
+| ID | Equipment Name     | Avail | Loaned | Total | Min | Tagged Modules   |
++----+--------------------+-------+--------+-------+-----+------------------+
+| 1  | STM32              | 100   | 50     | 150   | 20  | CG2111A, EE2028  |
+| 2  | Oscilloscope       | 8     | 2      | 10    | 2   | EE2026           |
+| 3  | Soldering Iron     | 25    | 0      | 25    | 5   | CS2113           |
+| 4  | Basys3 FPGA        | 35    | 5      | 40    | 10  | EE2026           |
+| 5  | Jumper Wires       | 480   | 20     | 500   | 100 | CG2111A          |
++----+--------------------+-------+--------+-------+-----+------------------+
+```
 
 #### Viewing the interactive manual: `help`
 Provides a comprehensive, in-application guide to all available commands, their parameters, and usage examples.
@@ -171,6 +279,30 @@ Removes a specific number of units from either the available or loaned pool.
 #### Exiting the application: `bye`
 Exits the Equipment Master application safely and gracefully.
 * **Format:** `bye`
+
+---
+
+### 8. Data Management
+You do not need to manually save your inventory. The system handles it for you automatically.
+
+#### Automatic Data Saving
+Equipment Master data is saved in the hard disk automatically after any command that changes the data (e.g., `add`, `delete`, `updatemod`, `setstatus`). There is no need to manually save.
+
+#### Automatic Data Loading
+Upon launching the application, Equipment Master will automatically load your data from the `data/` folder located in the same directory as the `.jar` file (specifically, `data/equipment.txt` and `data/module.txt`).
+
+> **Warning:** The data is saved as human-readable `.txt` files. While advanced users can tweak these files, modifying them manually is strictly not recommended. Incorrect formatting (e.g., adding reserved characters like `|` or `=`) may corrupt the file, causing the system to skip loading the corrupted records.
+
+---
+
+## Error Handling
+Equipment Master is built with robust validation to prevent accidental data corruption. Common reasons a command may fail include:
+* Missing mandatory fields or fields entered with incorrect prefixes.
+* Providing negative numbers or text where positive integers are expected (e.g., quantities, pax).
+* Entering reserved characters (`|`, `=`, `,`) in equipment names.
+* Referencing a module or equipment that does not exist in the registry.
+
+When an error occurs, the system will reject the invalid input, print a clear error message explaining what went wrong, and safely wait for your next command without crashing.
 
 ---
 
@@ -244,12 +376,12 @@ Exits the Equipment Master application safely and gracefully.
 * **Update Pax:** `updatemod n/NAME pax/QTY`
 * **Delete Module:** `delmod n/NAME`
 * **Find Equipment:** `find KEYWORD`
-* **Set Semester:** `setsem AY[YYYY]/[YY] Sem[1/2]`
-* **Aging Report:** `report aging [AY[YYYY]/[YY] Sem[1/2]]`
+* **Set Semester:** `setsem AYYYYY/YY SemX`
+* **Aging Report:** `report aging [AYYYYY/YY SemX]`
 * **Set Buffer:** `setbuffer n/NAME b/PERCENTAGE` or `setbuffer i/INDEX b/PERCENTAGE`
-* **Update Loan Status:** `setstatus n/NAME q/COUNT s/loaned/available` or `setstatus INDEX q/COUNT s/loaned/available`
+* **Update Loan Status:** `setstatus n/NAME q/COUNT s/STATUS` or `setstatus INDEX q/COUNT s/STATUS` *(where STATUS is `loaned` or `available`)*
 * **Set Min Threshold:** `setmin [n/NAME | INDEX] min/QUANTITY`
-* **Delete Specific Quantity:** `delete [n/NAME | INDEX] q/QUANTITY s/STATUS`
+* **Delete Specific Quantity:** `delete [n/NAME | INDEX] q/QUANTITY s/STATUS` *(where STATUS is `loaned` or `available`)*
 * **List Equipment:** `list`
 * **Help Manual:** `help`
 * **Procurement Report:** `report procurement`
