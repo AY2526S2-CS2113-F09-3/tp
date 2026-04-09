@@ -101,6 +101,7 @@ Displays a summary of all registered modules and their respective student enroll
 * **Format:** `listmod`
 
 * **Example Output:**
+
 ```text
 +----+-------------+-----------------+
 | ID | Module Code | Enrollment (Pax)|
@@ -196,6 +197,7 @@ Sets a percentage safety buffer on specific equipment. This ensures you buy slig
 Calculates the exact total number of items needed for the upcoming semester by cross-referencing your current stock levels against the student enrollment sizes (pax) of all associated modules, including any configured safety buffers. This allows you to proactively justify budget requests for equipment shortfalls.
 
 * **Example Output:**
+
 ```text
 Generating Procurement Report for upcoming semester...
 
@@ -207,6 +209,7 @@ Generating Procurement Report for upcoming semester...
 | 3  | Soldering Iron     | 25    | 0.0%   | 30       | 5      |
 +----+--------------------+-------+--------+----------+--------+
 ```
+
 *Note: 'Required' is calculated based on module enrollment pax, mapped ratios, and the safety buffer (rounded up).*
 
 **How the Calculation Works:**
@@ -246,6 +249,7 @@ Displays your entire equipment inventory in a cleanly aligned, responsive table 
 * **Format:** `list`
 * **Note:** The table includes a **Min:** column so you can monitor your safety thresholds alongside current stock levels.
 * **Example Output:**
+
 ```text
 +----+--------------------+-------+--------+-------+-----+------------------+
 | ID | Equipment Name     | Avail | Loaned | Total | Min | Tagged Modules   |
@@ -310,8 +314,7 @@ When an error occurs, the system will reject the invalid input, print a clear er
 
 **Q: Why am I getting an "Invalid name!" error when trying to add equipment?**
 
-**A:** To protect the integrity of the application's save files, equipment names cannot contain certain reserved characters. Ensure your equipment name does not include vertical bars (|), commas (,), or equals signs (=).
-
+**A:** To protect the integrity of the application's save files, equipment names cannot contain certain reserved characters. Ensure your equipment name does not include vertical bars (`|`), commas (`,`), or equals signs (`=`).
 
 **Q: Can I add a lifespan to an item without specifying when it was bought?**
 
