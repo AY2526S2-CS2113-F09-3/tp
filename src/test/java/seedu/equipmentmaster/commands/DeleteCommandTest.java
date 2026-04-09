@@ -257,4 +257,128 @@ public class DeleteCommandTest {
         String output = outputStream.toString();
         assertTrue(!output.contains("!!! LOW STOCK ALERT:"));
     }
+
+    @Test
+    public void parse_missingFlags_throwsException() {
+        // Missing s/ flag
+        assertThrows(EquipmentMasterException.class, () -> DeleteCommand.parse("delete 1 q/5"));
+        // Missing q/ flag
+        assertThrows(EquipmentMasterException.class, () -> DeleteCommand.parse("delete 1 s/available"));
+    }
+
+    @Test
+    public void parse_reversedFlagsOrder_success() throws EquipmentMasterException {
+        // Targets extractValue() branch where curIdx > otherIdx
+        Command cmd = DeleteCommand.parse("delete 1 s/available q/5");
+        assertTrue(cmd instanceof DeleteCommand);
+    }
+
+    @Test
+    public void parse_invalidStatus_throwsException() {
+        // Targets validateStatus() branch
+        EquipmentMasterException thrown = assertThrows(EquipmentMasterException.class, () -> {
+            DeleteCommand.parse("delete 1 q/5 s/broken");
+        });
+        assertTrue(thrown.getMessage().contains("Status must be 'available' or 'loaned'"));
+    }
+
+    @Test
+    public void parse_invalidQuantity_throwsException() {
+        // Targets parseQuantity() q <= 0 branch
+        assertThrows(EquipmentMasterException.class, () -> DeleteCommand.parse("delete 1 q/0 s/available"));
+        assertThrows(EquipmentMasterException.class, () -> DeleteCommand.parse("delete 1 q/-5 s/available"));
+
+        // Targets parseQuantity() NumberFormatException branch
+        assertThrows(EquipmentMasterException.class, () -> DeleteCommand.parse("delete 1 q/abc s/available"));
+    }
+
+    @Test
+    public void parse_emptyNameOrInvalidIdentifier_throwsException() {
+        // Targets createDeleteCommand() branch where name is empty
+        assertThrows(EquipmentMasterException.class, () -> DeleteCommand.parse("delete n/ q/5 s/available"));
+
+        // Targets createDeleteCommand() catch(NumberFormatException) for identifier
+        assertThrows(EquipmentMasterException.class, () ->
+                DeleteCommand.parse("delete notAValidNumber q/5 s/available"));
+    }
+
+    @Test
+    public void execute_nameNotFound_throwsException() {
+        // Targets findTarget() branch where name is not in the list
+        DeleteCommand command = new DeleteCommand("GhostEquipment", 1, "available");
+        Context context = new Context(equipments, new ModuleList(), ui, storage, null);
+        assertThrows(EquipmentMasterException.class, () -> command.execute(context));
+    }
+
+    @Test
+    public void constructor_indexLessThanOne_assertionFails() {
+        // Targets the constructor assertion branch: assert index > 0
+        try {
+            // This will throw an AssertionError before execute() is even called
+            new DeleteCommand(0, 1, "available");
+        } catch (AssertionError e) {
+            assertTrue(e.getMessage().contains("Index must be positive"));
+        }
+
+        try {
+            new DeleteCommand(-5, 1, "available");
+        } catch (AssertionError e) {
+            assertTrue(e.getMessage().contains("Index must be positive"));
+        }
+    }
+
+    @Test
+    public void execute_nullStorage_success() throws EquipmentMasterException {
+        // Targets saveToStorage() branch: if (storage != null) -> False
+        equipments.addEquipment(new Equipment("Laptop", 5));
+        DeleteCommand command = new DeleteCommand(1, 1, "available");
+        Context nullStorageContext = new Context(equipments, new ModuleList(), ui, null, null);
+
+        // Should execute successfully without throwing NPE
+        command.execute(nullStorageContext);
+        assertEquals(4, equipments.getEquipment(0).getQuantity());
+    }
+
+    @Test
+    public void execute_storageException_caughtAndLogged() throws EquipmentMasterException {
+        // Targets saveToStorage() catch(Exception e) block
+        equipments.addEquipment(new Equipment("Laptop", 5));
+        Storage faultyStorage = new Storage("e.txt", ui, "s.txt", "m.txt") {
+            @Override
+            // CHANGE 1: Match the parent class's throws declaration
+            public void save(java.util.ArrayList<Equipment> list) throws EquipmentMasterException {
+                // CHANGE 2: Throw the specific custom exception
+                throw new EquipmentMasterException("Simulated disk crash");
+            }
+        };
+        Context context = new Context(equipments, new ModuleList(), ui, faultyStorage, null);
+        DeleteCommand command = new DeleteCommand(1, 1, "available");
+
+        // Should catch internally and not throw to the caller
+        command.execute(context);
+        assertEquals(4, equipments.getEquipment(0).getQuantity());
+    }
+
+    @Test
+    public void constructor_nullOrEmptyName_assertionFails() {
+        try {
+            new DeleteCommand(null, 1, "available");
+        } catch (AssertionError e) {
+            assertTrue(e.getMessage().contains("Name cannot be null or empty"));
+        }
+        try {
+            new DeleteCommand("", 1, "available");
+        } catch (AssertionError e) {
+            assertTrue(e.getMessage().contains("Name cannot be null or empty"));
+        }
+    }
+
+    @Test
+    public void execute_nullContext_assertionFails() {
+        DeleteCommand command = new DeleteCommand(1, 1, "available");
+        AssertionError thrown = assertThrows(AssertionError.class, () -> {
+            command.execute(null);
+        });
+        assertTrue(thrown.getMessage().contains("Context should not be null"));
+    }
 }

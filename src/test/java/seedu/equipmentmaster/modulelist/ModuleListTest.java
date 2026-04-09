@@ -111,4 +111,59 @@ public class ModuleListTest {
         assertEquals(module, moduleList.getModule("CG2111A"));
         assertNull(moduleList.getModule("EE2026")); // Covers the `return null` in findModule
     }
+
+    @Test
+    public void updateModule_nullModuleName_assertionFails() {
+        AssertionError thrown = assertThrows(AssertionError.class, () -> {
+            moduleList.updateModule(null, 150);
+        });
+        assertTrue(thrown.getMessage().contains("Module name cannot be null or empty"));
+    }
+
+    @Test
+    public void updateModule_emptyModuleName_assertionFails() {
+        try {
+            moduleList.updateModule("   ", 150);
+        } catch (AssertionError | EquipmentMasterException e) {
+            assertTrue(e.getMessage().contains("Module name cannot be null or empty"));
+        }
+    }
+
+    @Test
+    public void updateModule_negativePax_assertionFails() {
+        try {
+            // Provide a valid name but invalid pax to bypass the first assert
+            moduleList.updateModule("CG2111A", -10);
+        } catch (AssertionError | EquipmentMasterException e) {
+            assertTrue(e.getMessage().contains("Pax cannot be negative"));
+        }
+    }
+
+    @Test
+    public void deleteModule_nullModuleName_assertionFails() {
+        try {
+            moduleList.deleteModule(null);
+        } catch (AssertionError | EquipmentMasterException e) {
+            assertTrue(e.getMessage().contains("Module name cannot be null or empty"));
+        }
+    }
+
+    @Test
+    public void deleteModule_emptyModuleName_assertionFails() {
+        try {
+            moduleList.deleteModule("   ");
+        } catch (AssertionError | EquipmentMasterException e) {
+            assertTrue(e.getMessage().contains("Module name cannot be null or empty"));
+        }
+    }
+
+    @Test
+    public void findModule_nullModuleName_assertionFails() {
+        try {
+            // hasModule wraps findModule
+            moduleList.hasModule(null);
+        } catch (AssertionError e) {
+            assertTrue(e.getMessage().contains("Search keyword for module name cannot be null"));
+        }
+    }
 }

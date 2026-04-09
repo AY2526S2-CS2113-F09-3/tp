@@ -291,4 +291,106 @@ public class ReportCommandTest {
         command.execute(context);
         assertTrue(outContent.toString().contains("Great news! No equipment needs replacement"));
     }
+
+    /**
+     * Targets resolveTargetSemester(): Exercises the branch where targetSemStr is explicitly null.
+     */
+    @Test
+    public void execute_nullTargetSem_success() throws EquipmentMasterException {
+        AcademicSemester systemSem = new AcademicSemester("AY2024/25 Sem1");
+        // Bypass parse() to directly inject a null string
+        ReportCommand command = new ReportCommand("aging", null);
+        Context context = new Context(equipments, new ModuleList(), ui, null, systemSem);
+        command.execute(context);
+
+        assertTrue(outContent.toString().contains("Calculated for: AY2024/25 Sem1"));
+    }
+
+    /**
+     * Targets resolveTargetSemester(): Exercises the branch where targetSemStr is only spaces.
+     */
+    @Test
+    public void execute_blankTargetSem_success() throws EquipmentMasterException {
+        AcademicSemester systemSem = new AcademicSemester("AY2024/25 Sem1");
+        // String containing only spaces to trigger !targetSemStr.trim().isEmpty() == false
+        ReportCommand command = new ReportCommand("aging", "   ");
+        Context context = new Context(equipments, new ModuleList(), ui, null, systemSem);
+        command.execute(context);
+
+        assertTrue(outContent.toString().contains("Calculated for: AY2024/25 Sem1"));
+    }
+
+    /**
+     * Targets displayAgingEquipments(): Exercises the catch(EquipmentMasterException) block.
+     */
+    @Test
+    public void execute_calcAgeException_caught() {
+        // We use an anonymous subclass to FORCE calculateAgeInYears to throw an exception
+        Equipment faultyEq = new Equipment("FaultyEq", 10) {
+            @Override
+            public AcademicSemester getPurchaseSem() {
+                try {
+                    return new AcademicSemester("AY2024/25 Sem1") {
+                        @Override
+                        public double calculateAgeInYears(AcademicSemester target) throws EquipmentMasterException {
+                            throw new EquipmentMasterException("Simulated calculation exception");
+                        }
+                    };
+                } catch (Exception e) {
+                    return null;
+                }
+            }
+
+            @Override
+            public double getLifespanYears() {
+                return 5.0; // Valid lifespan so it doesn't trigger the 'continue' on line 124
+            }
+        };
+
+        equipments.addEquipment(faultyEq);
+        ReportCommand command = new ReportCommand("aging", "AY2028/29 Sem1");
+        Context context = new Context(equipments, new ModuleList(), ui, null, null);
+        command.execute(context);
+
+        // Verifies the catch block (around line 130) is executed and logs the warning
+        assertTrue(outContent.toString().contains("Warning: Skipping equipment 'FaultyEq' " +
+                "due to invalid purchase semester data."));
+    }
+
+    /**
+     * Targets the assertions at the start of executeAgingReport().
+     */
+    @Test
+    public void execute_nullEquipments_assertionFails() {
+        ReportCommand command = new ReportCommand("aging", "AY2024/25 Sem1");
+        Context context = new Context(null, new ModuleList(), ui, null, null);
+
+        AssertionError thrown = assertThrows(AssertionError.class, () -> {
+            command.execute(context);
+        });
+        assertTrue(thrown.getMessage().contains("EquipmentList must not be null"));
+    }
+
+    /**
+     * Targets the assertions at the start of executeAgingReport().
+     */
+    @Test
+    public void execute_nullUi_assertionFails() {
+        ReportCommand command = new ReportCommand("aging", "AY2024/25 Sem1");
+        Context context = new Context(equipments, new ModuleList(), null, null, null);
+
+        // Catching either AssertionError or NPE based on which guard hits first
+        assertThrows(Throwable.class, () -> {
+            command.execute(context);
+        });
+    }
+
+    @Test
+    public void execute_nullContext_assertionFails() {
+        ReportCommand command = new ReportCommand("aging", "AY2024/25 Sem1");
+        AssertionError thrown = assertThrows(AssertionError.class, () -> {
+            command.execute(null);
+        });
+        assertTrue(thrown.getMessage().contains("Context should not be null during execution"));
+    }
 }

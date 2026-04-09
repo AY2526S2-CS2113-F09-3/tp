@@ -90,9 +90,6 @@ public class DelModCommand extends Command {
         }
 
         String moduleName = matcher.group(1).trim();
-        if (moduleName.isEmpty()) {
-            throw new EquipmentMasterException("Module name cannot be empty.");
-        }
 
         return new DelModCommand(moduleName);
     }

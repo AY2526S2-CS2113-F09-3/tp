@@ -221,4 +221,59 @@ public class SetSemCommandTest {
         command.execute(context);
         // The warning branch is skipped because moduleList is null
     }
+
+    /**
+     * Targets line 54 in SetSemCommand.java.
+     * Exercises the assertion branch where the context is null.
+     */
+    @Test
+    public void execute_nullContext_assertionFails() {
+        SetSemCommand command = new SetSemCommand("AY2025/26 Sem1");
+        AssertionError thrown = assertThrows(AssertionError.class, () -> {
+            command.execute(null);
+        });
+        assertTrue(thrown.getMessage().contains("Context should not be null during execution"));
+    }
+
+    /**
+     * Targets line 81 in SetSemCommand.java (the implicit 'else' of if (storage != null)).
+     * Ensures the program skips saving gracefully without throwing a NullPointerException.
+     */
+    @Test
+    public void execute_nullStorage_skipsSaveWithoutError() throws EquipmentMasterException {
+        // Initialize Context with explicitly null storage
+        Context contextWithNullStorage = new Context(equipments, moduleList, new Ui(), null, null);
+        SetSemCommand command = new SetSemCommand("AY2025/26 Sem1");
+
+        // Should execute successfully and just skip the save block
+        command.execute(contextWithNullStorage);
+        // Verify the context's semester was still updated in memory
+        assertTrue(contextWithNullStorage.getCurrentSemester().toString().contains("AY2025/26 Sem1"));
+    }
+
+    /**
+     * Targets line 84 in SetSemCommand.java (the catch block).
+     * Simulates a storage crash to verify the catch block and warning message logic.
+     */
+    @Test
+    public void execute_storageSaveException_caughtAndWarningShown() throws EquipmentMasterException {
+        // Use an anonymous subclass to FORCE an exception during saveSettings()
+        Storage faultyStorage = new Storage("e.txt", new Ui(), "s.txt", "m.txt") {
+            @Override
+            public void saveSettings(AcademicSemester sem) throws EquipmentMasterException {
+                throw new EquipmentMasterException("Simulated disk write error");
+            }
+        };
+
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+        Ui ui = new Ui(System.in, new PrintStream(outputStream));
+        Context faultyContext = new Context(equipments, moduleList, ui, faultyStorage, null);
+
+        SetSemCommand command = new SetSemCommand("AY2025/26 Sem1");
+        command.execute(faultyContext);
+
+        // Verify the catch block executed by checking if the UI printed the warning
+        String output = outputStream.toString();
+        assertTrue(output.contains("Warning: Semester updated in memory but failed to save to disk."));
+    }
 }

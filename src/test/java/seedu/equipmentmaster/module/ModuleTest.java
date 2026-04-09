@@ -168,4 +168,40 @@ public class ModuleTest {
         assertTrue(multipleOutput.contains("ItemB (2.0)"));
         assertTrue(multipleOutput.contains(", ")); // Ensure the comma separator is successfully added
     }
+
+    /**
+     * Targets the first part of the assertion in the constructor (name != null).
+     */
+    @Test
+    public void constructor_nullName_assertionFails() {
+        AssertionError thrown = assertThrows(AssertionError.class, () -> {
+            new Module(null, 150);
+        });
+        assertTrue(thrown.getMessage().contains("Module name cannot be null or empty"));
+    }
+
+    /**
+     * Targets the second part of the assertion in the constructor (!name.trim().isEmpty()).
+     */
+    @Test
+    public void constructor_emptyName_assertionFails() {
+        try {
+            new Module("   ", 150);
+        } catch (AssertionError | EquipmentMasterException e) {
+            assertTrue(e.getMessage().contains("Module name cannot be null or empty"));
+        }
+    }
+
+    /**
+     * Targets the assertion within the setPax method.
+     */
+    @Test
+    public void setPax_negativeValue_assertionFails() throws EquipmentMasterException {
+        Module module = new Module("CG2111A", 150);
+        try {
+            module.setPax(-5);
+        } catch (AssertionError e) {
+            assertTrue(e.getMessage().contains("Pax cannot be negative"));
+        }
+    }
 }

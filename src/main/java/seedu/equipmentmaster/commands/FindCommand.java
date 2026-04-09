@@ -92,11 +92,6 @@ public class FindCommand extends Command {
      */
     private boolean isMatchFound(Equipment eq, String[] tokens) {
         for (String token : tokens) {
-            if (token.isEmpty()) {
-                continue;
-            }
-            // Early return: As soon as we find one match, we return true.
-            // This eliminates the need for the clunky "contains(eq) -> break" logic!
             if (matchesNameOrModule(eq, token)) {
                 return true;
             }

@@ -8,6 +8,9 @@ import seedu.equipmentmaster.exception.EquipmentMasterException;
 import seedu.equipmentmaster.semester.AcademicSemester;
 import seedu.equipmentmaster.ui.Ui;
 
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 public class GetSemCommandTest {
 
     private Ui ui;
@@ -35,5 +38,18 @@ public class GetSemCommandTest {
 
         GetSemCommand command = new GetSemCommand();
         command.execute(context);
+    }
+
+    /**
+     * Targets line 24 in GetSemCommand.java.
+     * Exercises the assertion branch where the context is null.
+     */
+    @Test
+    public void execute_nullContext_assertionFails() {
+        GetSemCommand command = new GetSemCommand();
+        AssertionError thrown = assertThrows(AssertionError.class, () -> {
+            command.execute(null);
+        });
+        assertTrue(thrown.getMessage().contains("Context should not be null during execution"));
     }
 }

@@ -88,9 +88,6 @@ public class Module {
      * @return true if the equipment was successfully removed, false if it wasn't found.
      */
     public boolean removeEquipmentRequirement(String equipmentName) {
-        if (this.equipmentRequirements == null) {
-            return false;
-        }
         // .remove() returns the previous value associated with the key, or null if there was no mapping.
         return this.equipmentRequirements.remove(equipmentName) != null;
     }

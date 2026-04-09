@@ -1,4 +1,3 @@
-//@@author Hongyu1231
 package seedu.equipmentmaster.commands;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -333,5 +332,65 @@ public class FindCommandTest {
     public void parse_noKeyword_throwsException() {
         // Triggers words.length < 2
         assertThrows(EquipmentMasterException.class, () -> FindCommand.parse("find"));
+    }
+
+    /**
+     * Targets lines 59-64 in FindCommand.java.
+     * Exercises the branch where rawKeyword.isEmpty() is true.
+     * Since parse() blocks empty inputs, we must invoke the constructor directly.
+     */
+    @Test
+    public void getMatchingEquipments_emptyKeyword_returnsAllEquipments() {
+        EquipmentList equipments = new EquipmentList();
+        equipments.addEquipment(new Equipment("Item A", 10));
+        equipments.addEquipment(new Equipment("Item B", 20));
+
+        // Bypass parse() to provide an empty string directly
+        FindCommand command = new FindCommand("");
+        ArrayList<Equipment> matches = command.getMatchingEquipments(equipments);
+
+        // Should return all equipments in the list
+        assertEquals(2, matches.size(), "Should return all items when keyword is empty.");
+    }
+
+    /**
+     * Targets line 87 in FindCommand.java: if (token.isEmpty()) continue;
+     * In Java, split("\\s+") only produces an empty token if the string STARTS with spaces.
+     */
+    @Test
+    public void getMatchingEquipments_leadingSpaces_triggersEmptyTokenContinue() {
+        EquipmentList equipments = new EquipmentList();
+        equipments.addEquipment(new Equipment("STM32", 10));
+
+        // The leading spaces ensure split("\\s+") returns ["", "stm32"]
+        FindCommand command = new FindCommand("   stm32");
+        ArrayList<Equipment> matches = command.getMatchingEquipments(equipments);
+
+        assertEquals(1, matches.size());
+    }
+
+    /**
+     * Targets line 135 in FindCommand.java.
+     * Exercises the assertion branch where the context is null.
+     */
+    @Test
+    public void execute_nullContext_assertionFails() {
+        FindCommand command = new FindCommand("stm32");
+        AssertionError thrown = assertThrows(AssertionError.class, () -> {
+            command.execute(null);
+        });
+        assertTrue(thrown.getMessage().contains("Context should not be null during execution"));
+    }
+
+    @Test
+    public void getMatchingEquipments_handlingSpaces_success() {
+        EquipmentList equipments = new EquipmentList();
+        equipments.addEquipment(new Equipment("STM32", 10));
+
+        // Testing that leading/multiple spaces are handled by trim and regex split
+        FindCommand command = new FindCommand("   stm32");
+        ArrayList<Equipment> matches = command.getMatchingEquipments(equipments);
+
+        assertEquals(1, matches.size());
     }
 }

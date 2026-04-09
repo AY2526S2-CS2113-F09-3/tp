@@ -58,6 +58,8 @@ public class ReportCommand extends Command {
      */
     @Override
     public void execute(Context context) {
+        assert context != null : "Context should not be null during execution";
+
         Ui ui = context.getUi();
         EquipmentList equipments = context.getEquipments();
 

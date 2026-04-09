@@ -3,8 +3,10 @@ package seedu.equipmentmaster.commands;
 
 import org.junit.jupiter.api.Test;
 import seedu.equipmentmaster.context.Context;
-import static org.junit.jupiter.api.Assertions.assertFalse;
+
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+
 
 public class CommandTest {
 
