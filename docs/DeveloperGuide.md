@@ -154,11 +154,8 @@ The `EquipmentMaster` class acts as the main entry point. Upon initialization, i
 The application then enters a continuous loop: the `Ui` reads user input, the `Parser` translates this string into a specific executable `Command`, and the `Command` executes its logic by interacting with the shared `Context`.
 
 <div align="center">
-
-![Equipment Master Diagram](images/EquipmentMaster.png)
-  
-*Figure 1: High-level architecture diagram illustrating the core components and their interactions.*
-
+  <img src="images/EquipmentMaster.png" width="100%" />
+  <p><em>Figure 1: High-level architecture diagram illustrating the core components and their interactions.</em></p>
 </div>
 
 ---
@@ -174,11 +171,8 @@ This design choice ensures:
 To better understand how data is structured in memory during runtime, the following object diagram provides a snapshot of the `Context` object. It shows how `Equipment` items are logically linked to `Module` codes through string-based tagging.
 
 <div align="center">
-
-![Object Snapshot Diagram](images/ObjectSnapshot.png)
-
-*Figure 2: Object diagram snapshot of the Context pattern, showing in-memory data references.*
-
+  <img src="images/ObjectSnapshot.png" width="800" />
+  <p><em>Figure 2: Object diagram snapshot of the Context pattern, showing in-memory data references.</em></p>
 </div>
 
 ---
@@ -242,12 +236,10 @@ static {
 
 #### 3. UML Class Diagram
 **Class Diagram: Parser Component**
+
 <div align="center">
-
-![Parser Class Diagram](images/parser.png)
-
-*Figure 3: Class diagram of the Parser component utilizing the Command Factory pattern.*
-
+  <img src="images/parser.png" width="100%" />
+  <p><em>Figure 3: Class diagram of the Parser component utilizing the Command Factory pattern.</em></p>
 </div>
 
 #### 4. Design Considerations
@@ -279,22 +271,16 @@ The `AddCommand` is instantiated via its static `parse` method. The execution fl
 (Note: This diagram focuses strictly on the internal structure of `AddCommand` and its inheritance from `Command`. Associated domain classes like `Context`, `Equipment`, and `AcademicSemester` are shown as data types, but their full class definitions are omitted here for clarity.)
 
 <div align="center">
-
-![AddCommand Class Diagram](images/AddCommandClass.png)
-
-*Figure 4: Class diagram detailing the internal structure of the AddCommand.*
-
+  <img src="images/AddCommandClass.png" width="100%" />
+  <p><em>Figure 4: Class diagram detailing the internal structure of the AddCommand.</em></p>
 </div>
 
 **Sequence Diagram: Execution Flow**
 (Note: This diagram illustrates the `execute()` phase of the command. The initial string parsing and validation steps are handled prior to execution and are omitted for brevity. Storage file I/O operations are shown at a high level.)
 
 <div align="center">
-
-![AddCommand Sequence Diagram](images/AddCommand.png)
-
-*Figure 5: Sequence diagram showing the execution flow of the Core Inventory Ingestion process.*
-
+  <img src="images/AddCommand.png" width="100%" />
+  <p><em>Figure 5: Sequence diagram showing the execution flow of the Core Inventory Ingestion process.</em></p>
 </div>
 
 #### 4. Design Considerations
@@ -324,11 +310,8 @@ When an equipment item is deleted (e.g., `delete n/STM32 q/5 s/AVAILABLE`), the 
 If an equipment is completely removed from the inventory, the system must perform a reverse-cleanup: it automatically triggers an `untag` operation across all modules to ensure no module still expects a requirement ratio from a non-existent item.
 
 <div align="center">
-
-![Delete Equipment Sequence Diagram](images/DeleteCommand.png)
-
-*Figure 6: Sequence diagram of the Delete feature, highlighting the synchronous reverse-cleanup mechanism.*
-
+  <img src="images/DeleteCommand.png" width="100%" />
+  <p><em>Figure 6: Sequence diagram of the Delete feature, highlighting the synchronous reverse-cleanup mechanism.</em></p>
 </div>
 
 #### 3. Design Considerations
@@ -355,11 +338,8 @@ Each entity is stored in a dedicated `.txt` file using the **Pipe-Delimited Form
 #### 2. Loading Logic (The "Robust Loader")
 
 <div align="center">
-
-![Storage Loading Sequence Diagram](images/StorageLoadingSequence.png)
-
-*Figure 7: Sequence diagram demonstrating the "Silent Recovery" mechanism during Storage loading.*
-
+  <img src="images/StorageLoadingSequence.png" width="100%" />
+  <p><em>Figure 7: Sequence diagram demonstrating the "Silent Recovery" mechanism during Storage loading.</em></p>
 </div>
 
 During the initialization phase, the `Storage` class reads files line-by-line. To ensure system stability, it employs a **Silent Recovery** mechanism:
@@ -413,11 +393,8 @@ setbuffer i/1 b/10
 *(Note: Storage persistence and UI confirmation steps are shown at a high level. The name/index-lookup logic within `EquipmentList` is abstracted for brevity.)*
 
 <div align="center">
-
-![SetBufferCommand Sequence Diagram](images/SetBufferCommand.png)
-
-*Figure 8: Sequence diagram showing the dual-targeting (name/index) execution flow for SetBufferCommand.*
-
+  <img src="images/SetBufferCommand.png" width="100%" />
+  <p><em>Figure 8: Sequence diagram showing the dual-targeting (name/index) execution flow for SetBufferCommand.</em></p>
 </div>
 
 #### 4. Design Considerations
@@ -468,11 +445,8 @@ setstatus 1 q/3 s/available
 *(Note: The index-resolution and name-resolution paths share the same downstream logic once the target `Equipment` is identified. The diagram abstracts the branching lookup into a single `resolveTarget()` call for clarity.)*
 
 <div align="center">
-
-![SetStatusCommand Sequence Diagram](images/SetStatusCommand.png)
-
-*Figure 9: Sequence diagram illustrating the loan/available status update process.*
-
+  <img src="images/SetStatusCommand.png" width="100%" />
+  <p><em>Figure 9: Sequence diagram illustrating the loan/available status update process.</em></p>
 </div>
 
 #### 4. Design Considerations
@@ -504,11 +478,8 @@ The execution flow follows these steps:
 The following sequence diagram illustrates the interaction between the `DeleteCommand`, the `Equipment` model, and the `Ui` during a stock breach:
 
 <div align="center">
-
-![LowStockAlert Sequence Diagram](./images/LowStockAlert.png)
-
-*Figure 10: Sequence diagram of the Low Stock Alert system triggering a UI warning post-transaction.*
-
+  <img src="images/LowStockAlert.png" width="100%" />
+  <p><em>Figure 10: Sequence diagram of the Low Stock Alert system triggering a UI warning post-transaction.</em></p>
 </div>
 
 #### 4. Design Considerations
@@ -562,22 +533,16 @@ To illustrate this feature without cluttering a single diagram, the logic is div
 *(This diagram omits UI rendering steps to focus purely on the search algorithm's fast-fail mechanism.)*
 
 <div align="center">
-
-![FindCommand Activity Diagram](images/find_activity.png)
-
-*Figure 11: Activity diagram showcasing the "Early Return" matching logic in the Find feature.*
-
+  <img src="images/find_activity.png" width="600" />
+  <p><em>Figure 11: Activity diagram showcasing the "Early Return" matching logic in the Find feature.</em></p>
 </div>
 
 **Sequence Diagram: Execution Flow**
 *(Note: Minor parameter details are omitted as `...` for brevity. The low-level matching logic is abstracted into a `ref` frame.)*
 
 <div align="center">
-
-![FindCommand Sequence Diagram](images/find.png)
-
-*Figure 12: Sequence diagram detailing the iteration and abstraction levels of the FindCommand.*
-
+  <img src="images/find.png" width="100%" />
+  <p><em>Figure 12: Sequence diagram detailing the iteration and abstraction levels of the FindCommand.</em></p>
 </div>
 
 #### 4. Design Considerations
@@ -652,22 +617,16 @@ To illustrate the data structure and execution flow of the Module Tracking Syste
 *(Note: Minor exception classes and standard Java libraries are omitted. The diagram highlights the inheritance of commands and the normalized separation between the `ModuleList` and `Context`.)*
 
 <div align="center">
-
-![Module System Class Diagram](images/module_class.png)
-
-*Figure 13: Class diagram of the Module Tracking System architecture.*
-
+  <img src="images/module_class.png" width="100%" />
+  <p><em>Figure 13: Class diagram of the Module Tracking System architecture.</em></p>
 </div>
 
 **Sequence Diagram: Update Module Execution Flow**
 *(Note: UI rendering steps and generic self-calls have been abstracted to focus on the core Model interactions during an update operation.)*
 
 <div align="center">
-
-![UpdateMod Sequence Diagram](images/updatemod.png)
-
-*Figure 14: Sequence diagram for updating academic module metadata (e.g., student pax).*
-
+  <img src="images/updatemod.png" width="100%" />
+  <p><em>Figure 14: Sequence diagram for updating academic module metadata (e.g., student pax).</em></p>
 </div>
 
 #### 4. Design Considerations
@@ -715,21 +674,15 @@ The following sequence diagrams illustrate the execution flow for the `TagComman
 **Tag Command Flow**
 
 <div align="center">
-
-![Tag Command Sequence Diagrams](images/TagCommand.png)
-
-*Figure 15: Sequence diagram illustrating the Academic Dependency Mapping (Tagging) process.*
-
+  <img src="images/TagCommand.png" width="100%" />
+  <p><em>Figure 15: Sequence diagram illustrating the Academic Dependency Mapping (Tagging) process.</em></p>
 </div>
 
 **Untag Command Flow**
 
 <div align="center">
-
-![Untag Command Sequence Diagrams](images/UntagCommand.png)
-
-*Figure 16: Sequence diagram showing the removal of a requirement ratio link.*
-
+  <img src="images/UntagCommand.png" width="100%" />
+  <p><em>Figure 16: Sequence diagram showing the removal of a requirement ratio link.</em></p>
 </div>
 
 #### 4. Design Considerations
@@ -752,11 +705,8 @@ A critical challenge in the Academic Mapping system is maintaining data integrit
 When a module is deleted (e.g., `delmod n/CG2111A`), the system ensures that no equipment remains "tagged" to a non-existent entity.
 
 <div align="center">
-
-![Safe Dereferencing Sequence Diagram](images/SafeDereferencing.png)
-
-*Figure 17: Sequence diagram of the Safe Dereferencing protocol during module deletion.*
-
+  <img src="images/SafeDereferencing.png" width="100%" />
+  <p><em>Figure 17: Sequence diagram of the Safe Dereferencing protocol during module deletion.</em></p>
 </div>
 
 1.  **Identification**: The `DelModCommand` queries the `EquipmentList` for any items containing the module code.
@@ -791,11 +741,8 @@ During execution:
 *(Note: Pseudocode like `calculate age` is used in place of exact mathematical method calls like `calculateAgeInYears()` to keep the diagram abstracted and focused on object interactions.)*
 
 <div align="center">
-
-![ReportAging Sequence Diagram](images/reportAging.png)
-
-*Figure 18: Sequence diagram for generating the Aging Equipment Report.*
-
+  <img src="images/reportAging.png" width="100%" />
+  <p><em>Figure 18: Sequence diagram for generating the Aging Equipment Report.</em></p>
 </div>
 
 #### 4. Design Considerations
@@ -818,11 +765,8 @@ A core challenge in the `Aging Report` and `Procurement Report` is performing ma
 #### 1. The Normalization Algorithm
 
 <div align="center">
-
-![Academic Semester Logic Diagram](images/AcademicSemesterLogic.png)
-
-*Figure 19: Class and logic diagram outlining the Academic Semester normalization algorithm.*
-
+  <img src="images/AcademicSemesterLogic.png" width="700" />
+  <p><em>Figure 19: Class and logic diagram outlining the Academic Semester normalization algorithm.</em></p>
 </div>
 
 To compare two semesters or calculate the age of an item, the `AcademicSemester` class converts strings into a **Numeric Offset**.
@@ -865,11 +809,8 @@ The calculation follows this strict algorithm for each equipment item:
 _(Note: The `getModuleByName` logic is represented as a self-invocation within the `ReportCommand`, and standard math calculations for demand are abstracted to focus on object interactions.)_
 
 <div align="center">
-
-![Procurement Report Diagram](images/ProcurementReport.png)
-
-*Figure 20: Sequence diagram showing the object interactions for generating the Procurement Report.*
-
+  <img src="images/ProcurementReport.png" width="100%" />
+  <p><em>Figure 20: Sequence diagram showing the object interactions for generating the Procurement Report.</em></p>
 </div>
 
 #### 4. Design Considerations
@@ -885,11 +826,8 @@ _(Note: The `getModuleByName` logic is represented as a self-invocation within t
 The Procurement Report is the most mathematically intensive feature of Equipment Master. It avoids floating-point errors and ensures realistic procurement values by following a strict rounding-up policy.
 
 <div align="center">
-
-![Procurement Calculation Activity Diagram](images/ProcurementCalculation.png)
-
-*Figure 21: Activity diagram detailing the mathematical pipeline for the procurement calculation engine.*
-
+  <img src="images/ProcurementCalculation.png" width="700" />
+  <p><em>Figure 21: Activity diagram detailing the mathematical pipeline for the procurement calculation engine.</em></p>
 </div>
 
 **The Formula:**
@@ -928,21 +866,15 @@ Similarly, `HelpCommand` utilizes `UiTable` but enables the `hasHeader` flag, al
 The following sequence diagram illustrates how `ListCommand` utilizes `UiTable` to dynamically construct and format the inventory output before passing it to the `Ui` for display.
 
 <div align="center">
-
-![UiTable Sequence Diagram](images/UiTableSequence.png)
-
-*Figure 22: Sequence diagram illustrating how ListCommand utilizes UiTable for dynamic rendering.*
-
+  <img src="images/UiTableSequence.png" width="100%" />
+  <p><em>Figure 22: Sequence diagram illustrating how ListCommand utilizes UiTable for dynamic rendering.</em></p>
 </div>
 
 #### 3. Class Diagram
 
 <div align="center">
-
-![UiTable Class Diagram](images/uiTable.png)
-
-*Figure 23: Class diagram of the Dynamic UI Table Generation utility.*
-
+  <img src="images/uiTable.png" width="700" />
+  <p><em>Figure 23: Class diagram of the Dynamic UI Table Generation utility.</em></p>
 </div>
 
 #### 4. Design Considerations
@@ -968,11 +900,8 @@ The `HelpCommand` leverages the `UiTable` utility and the centralized `Parser` r
 When executed, it retrieves the static list of `CommandSpec` objects from the `Parser`. It iterates through this registry, extracting the keyword and format string of every registered command, and maps them into `UiTableRow` objects to render a perfectly aligned table.
 
 <div align="center">
-
-![Help Command Sequence Diagram](images/HelpCommand.png)
-
-*Figure 24: Sequence diagram showing the dynamic generation of the Help menu from the Parser registry.*
-
+  <img src="images/HelpCommand.png" width="100%" />
+  <p><em>Figure 24: Sequence diagram showing the dynamic generation of the Help menu from the Parser registry.</em></p>
 </div>
 
 #### 3. Design Considerations
