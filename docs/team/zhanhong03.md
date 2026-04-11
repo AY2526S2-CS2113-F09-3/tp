@@ -13,7 +13,7 @@ I implemented critical inventory safety mechanisms and UX refinements that ensur
 
 1. **Inventory Safety Threshold System (`setmin`, `add`, `delete`)**
     * **What it does:** Allows technicians to define a "Minimum Stock Level" for any asset. The system proactively triggers a high-visibility `!!! LOW STOCK ALERT` whenever stock is added or deleted such that the available quantity falls to or below the safety buffer.
-    * **Justification & Depth:** In a high-stakes laboratory environment, discovering a stockout during a lab session is a critical failure. I engineered a proactive notification layer within the execute() methods of AddCommand and DeleteCommand. This ensures the system acts as an active monitor rather than a passive database.
+    * **Justification & Depth:** In a high-stakes laboratory environment, discovering a stockout during a lab session is a critical failure. I engineered a proactive notification layer within the execute() methods of AddCommand and DeleteCommand. This ensures the system acts as an active monitor rather than a passive database. Additionally, extended SetMinCommand to support index-based targeting (e.g., setmin 1 min/10), consistent with the dual-targeting pattern used across other commands such as delete and setstatus.
 
 2. **Context-Aware Semester Enrollment Warnings (`setsem`)**
     * **What it does:** Detects academic semester shifts and issues a "Smart Reminder" to the technician to update student enrollment data (pax) for the new term.
@@ -22,6 +22,10 @@ I implemented critical inventory safety mechanisms and UX refinements that ensur
 3. **UI Resilience & Table Optimization (`UiTableRow`)**
     * **What it does:** Integrated the `Min`: threshold display into the main inventory list and refactored the row-rendering logic.
     * **Justification & Depth:** I identified and resolved a critical Column Count Mismatch bug. In the original architecture, mixing equipment with module tags and those without caused the UiTable to crash. I refactored the constructor to handle dynamic column lengths, ensuring a stable and responsive ASCII display regardless of data complexity.
+
+4. **Defensive Storage Architecture & Failure Testing (`TagCommand`, `DelModCommand`)**
+    * **What it does:** Hardened the TagCommand and DelModCommand against "Ghost References" and simulated disk failures using advanced mocking techniques.
+    * **Justification & Depth:** I implemented a Double Ghost Reference Check to maintain database integrity between the Module and Equipment lists. To verify this, I designed a test suite using Anonymous Class Mocking to inject simulated EquipmentMasterException triggers during the storage save process. This allowed me to achieve 100% Branch Coverage and prove that the application can recover gracefully from file-system errors.
 
 ### Contributions to the User Guide (UG)
 * **Authored the "Inventory Safety & Management" section:** Documented the usage for setmin and the advanced delete command, including clear explanations of how the status-based (`s/available` or `s/loaned`) logic interacts with stock alerts.

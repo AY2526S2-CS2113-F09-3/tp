@@ -492,6 +492,33 @@ The following sequence diagram illustrates the interaction between the `DeleteCo
 * **Why it was rejected:** This would force the `Equipment` class to depend on a UI component, which is poor architectural practice. It would also trigger unwanted alerts during "silent" operations, such as loading data from a save file on startup.
 
 ---
+### SetMinCommand Index Support
+
+#### 1. Overview
+The SetMinCommand was extended to support index-based targeting, allowing technicians to set the minimum stock threshold for an equipment item using either its name or its 1-based list index. This makes it consistent with the dual-targeting pattern used across other commands such as delete and setstatus.
+
+#### 2. Implementation Details
+The command supports two formats:
+- setmin n/NAME min/QUANTITY — targets equipment by name
+- setmin INDEX min/QUANTITY — targets equipment by 1-based list index
+
+Execution flow:
+- The Parser processes the input and instantiates a SetMinCommand with either the equipment name or index, and the minimum quantity value.
+- SetMinCommand#execute(Context) is invoked.
+- The command resolves the target Equipment via the findTarget() helper method, which branches based on whether name or index was provided.
+- If no match is found or the index is out of bounds, an EquipmentMasterException is thrown.
+- Equipment#setMinQuantity() is called to update the threshold.
+- Storage#save() is invoked to persist the change.
+- The Ui displays a confirmation message. If the current quantity is already below the new threshold, a warning is shown immediately.
+
+#### 3. Design Considerations
+Alternative 1 (Current Implementation): Dual Targeting (Name or Index)
+- Why it was chosen: Mirrors the targeting pattern used by delete and setstatus, providing a consistent user experience. Index-based targeting is faster during busy lab sessions when the technician already knows the item's position from a recent list output.
+
+Alternative 2: Name-Only Targeting
+- Why it was rejected: Forcing technicians to always type the full equipment name adds unnecessary friction, especially for long names like STM32 Development Board.
+
+---
 
 ### Enhanced Find Feature
 
@@ -577,7 +604,11 @@ When `updatemod n/CG2111A pax/180` is executed:
 1. The command extracts the `ModuleList` from the `Context`.
 2. It delegates the update to `ModuleList#updateModule(moduleName, newPax)`, which performs the lookup and applies the change internally.
 3. Internally, the target `Module`'s enrollment size is updated via `Module#setPax(newPax)`.
-4. `Storage#saveModules()` is invoked to persist the updated state.
+4. `Storage#saveModules()` is invoked to persist the updated state. 
+
+* **Defensive Deletion:** The `DelModCommand#execute` directly invokes `moduleList.deleteModule(moduleName)`. If the module is missing, the underlying model throws an exception which is caught by the execution loop. This avoids redundant pre-checks and ensures a streamlined control flow.
+
+* **Storage Resilience:** To ensure data integrity, the command wraps `Storage#saveModules()` in a try-catch block. This prevents the application from crashing during hardware or file system failures, notifying the user via the Ui instead.
 
 **Code Snippet: Defensive Programming and Validation**
 To demonstrate our adherence to defensive programming, the parsing and validation logic for `UpdateModCommand` ensures that critical metadata like `pax` cannot be set to invalid states (e.g., negative numbers) before the command is even instantiated:
@@ -656,7 +687,8 @@ Execution flow of `TagCommand#execute(Context)`:
 
 1.  **State Extraction:** The command retrieves both the `ModuleList` and `EquipmentList` from the `Context`.
 
-2.  **Double Ghost Reference Check:** The system queries both lists to verify existence: `modules.hasModule(moduleName)` and `equipments.hasEquipment(equipmentName)`.
+   2.  **Double Ghost Reference Check:** The system queries both lists to verify existence: `modules.hasModule(moduleName)` and `equipments.hasEquipment(equipmentName)`.
+       * **Edge Case Handling: If either entity is missing, the command "fails fast" by throwing an EquipmentMasterException. This prevents "orphaned tags" where equipment is mapped to a non-existent course, ensuring the Procurement Report never encounters a NullPointerException.**
 
 3.  **Target Resolution:** If either entity is missing, the operation is immediately aborted, throwing a detailed exception explaining exactly which entity (or both) is missing.
 
@@ -718,6 +750,22 @@ When a module is deleted (e.g., `delmod n/CG2111A`), the system ensures that no 
   * **Justification**: Guarantees that the `Procurement Report` will never encounter a missing reference. This "Eager" approach keeps the data files clean and easy to read manually.
 * **Alternative 2: Lazy Cleanup (Cleanup during Report generation)**
   * **Rejection**: Increases the risk of inconsistent data if the reporting logic is interrupted. It also complicates the `Storage` component as it would have to handle "Ghost Tags" during loading.
+
+---
+
+### Quality Assurance (Unit Testing)
+
+#### 1. Overview
+A comprehensive JUnit 5 test suite was developed to ensure the reliability of core commands, specifically targeting 100% Branch Coverage for the Tag and DelMod logic paths.
+
+#### 2. Implementation Details: Failure Simulation
+To test the system’s robustness against disk errors, we utilized Anonymous Class Mocking. By overriding Storage#saveModules() to throw a simulated EquipmentMasterException, we verified that the commands handle exceptions gracefully without crashing the application.
+
+#### 3. UML Sequence Diagram: Testing Storage Failure
+![Testing Failure Injection](images/TestingFailureInjection.png)
+
+#### 4. Design Considerations
+Boundary Value Analysis: The parser is tested against boundary inputs like empty flags (n/  ) and case-insensitive triggers (DELMOD) using JaCoCo to ensure every logical branch is validated.
 
 ---
 
@@ -1144,6 +1192,11 @@ To test the system with pre-populated data without typing everything manually:
 3. **Setting Buffer Percentage:**
   * **Test Case:** Type `setbuffer n/Oscilloscope b/15`.
   * **Expected:** The safety buffer for Oscilloscope is updated to 15%.
+4. **Setting Minimum Threshold by Index:**
+  * **Test Case:** Type `setmin 1 min/5`.
+  * **Expected:** The minimum threshold for the first item in the list is updated to 5, identical to using the name-based format.
+  * **Test Case:** Type `setmin 99 min/5`.
+  * **Expected:** System displays an error message indicating the index is invalid.
 
 ### 8. Testing Additional Reports
 1. **Low Stock Report:**
@@ -1211,3 +1264,11 @@ Key technical challenges our team overcame include:
 2. **Dynamic UI Rendering**: Creating the `UiTable` utility required developing an algorithm that pre-scans all generic row data to calculate dynamic column widths. This ensures perfect alignment in the CLI without hardcoding string lengths.
 3. **Advanced Algorithmic Forecasting**: The `Procurement Report` is not a simple filter. It is an algorithmic engine that aggregates pax, ratios, applies percentage buffers, handles mathematical ceiling logic, and offsets against total ownership.
 4. **Semantic Time Parsing**: We replaced standard `java.time` libraries with a custom `AcademicSemester` parser to evaluate equipment aging based on university lifecycles (e.g., `AY24/25 Sem1`), requiring custom string extraction and floating-point normalization.
+
+### 12. Testing Defensive Parsing & Storage Failures
+1.  **Ghost Reference Prevention:**
+  * **Test Case:** Type `tag m/NON_EXISTENT n/STM32 req/0.5`.
+  * **Expected:** Execution is aborted with: `Aborted: Module 'NON_EXISTENT' does not exist.`
+2.  **Case-Insensitive Parsing:**
+  * **Test Case:** Type `DELMOD n/CG2111A`.
+  * **Expected:** The command executes exactly like the lowercase version.
