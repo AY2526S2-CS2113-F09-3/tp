@@ -92,4 +92,25 @@ public class UiTableTest {
         String expectedOutput = "<empty table>";
         assertEquals(expectedOutput, uiTable.toString());
     }
+
+    @Test
+    public void addRow_differentColumnSize_throwsIllegalArgumentException() {
+        UiTable uiTable = new UiTable();
+        uiTable.addRow(new UiTableRow("A", "B"));
+        try {
+            uiTable.addRow(new UiTableRow("A", "B", "C"));
+        } catch (IllegalArgumentException e) {
+            assertEquals("All rows must have the same number of columns", e.getMessage());
+        }
+    }
+
+    @Test
+    public void getColumnCount_emptyTable_throwsIllegalArgumentException() {
+        UiTable uiTable = new UiTable();
+        try {
+            uiTable.getColumnCount();
+        } catch (IllegalArgumentException e) {
+            assertEquals("No rows have been added", e.getMessage());
+        }
+    }
 }

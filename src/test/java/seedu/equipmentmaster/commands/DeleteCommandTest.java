@@ -265,6 +265,27 @@ public class DeleteCommandTest {
     }
 
     @Test
+    public void parse_missingQOrSFlags_throwsException() {
+        assertThrows(EquipmentMasterException.class, () -> DeleteCommand.parse("delete 1"));
+        assertThrows(EquipmentMasterException.class, () -> DeleteCommand.parse("delete 1 s/available"));
+        assertThrows(EquipmentMasterException.class, () -> DeleteCommand.parse("delete 1 q/5"));
+    }
+
+
+    @Test
+    public void parse_qAfterS_success() throws EquipmentMasterException {
+        Command cmd = DeleteCommand.parse("delete n/STM32 s/available q/2");
+        assertTrue(cmd instanceof DeleteCommand);
+    }
+
+    @Test
+    public void parse_emptyName_throwsException() {
+        assertThrows(EquipmentMasterException.class, () -> DeleteCommand.parse("delete n/ q/5 s/available"));
+    }
+
+
+
+    @Test
     public void parse_missingFlags_throwsException() {
         // Missing s/ flag
         assertThrows(EquipmentMasterException.class, () -> DeleteCommand.parse("delete 1 q/5"));
