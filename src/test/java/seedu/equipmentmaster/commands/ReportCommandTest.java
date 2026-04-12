@@ -187,6 +187,7 @@ public class ReportCommandTest {
         ModuleList moduleList = new ModuleList();
         moduleList.addModule(new Module("CG2111A", 30));
         moduleList.addModule(new Module("EE2026", 0)); // No demand from this one
+        moduleList.getModule("CG2111A").addEquipmentRequirement("STM32", 1.0);
 
         ArrayList<String> modules = new ArrayList<>(List.of("CG2111A"));
         // Name, Qty, Avail, Loaned, Sem, Life, Modules, Min, Buffer

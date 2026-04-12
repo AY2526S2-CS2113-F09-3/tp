@@ -200,32 +200,34 @@ Sets a percentage safety buffer on specific equipment. This ensures you buy slig
 * **Example:** `setbuffer n/STM32 b/10` (Sets a 10% procurement buffer for STM32 boards)
 
 #### Generating the Procurement Report: `report procurement`
-Calculates the exact total number of items needed for the upcoming semester by cross-referencing your current stock levels against the student enrollment sizes (pax) of all associated modules, including any configured safety buffers. This allows you to proactively justify budget requests for equipment shortfalls.
+Calculates how many new items you need to buy for the next semester. It checks your current stock against the number of students (pax) in modules that use the equipment, plus any safety buffers you set.
 
 * **Example Output:**
 
 ```text
-Generating Procurement Report for upcoming semester...
-+----+--------------------+-------+--------+----------+--------+
-| ID | Equipment Name     | Owned | Buffer | Required | To Buy |
-+----+--------------------+-------+--------+----------+--------+
-| 1  | STM32              | 150   | 10.0%  | 198      | 48     |
-| 2  | Basys3 FPGA        | 40    | 5.0%   | 53       | 13     |
-| 3  | Soldering Iron     | 25    | 0.0%   | 30       | 5      |
-+----+--------------------+-------+--------+----------+--------+
+Procurement Report (Current Sem: AY2024/25 Sem1)
+1. STM32
+   - Base Need: 99 (from CS2113)
+   - Buffer: 0% (+0)
+   - Total Required: 99 | Available: 7 | TO BUY: 92
 ```
-
 
 *Note: 'Required' is calculated based on module enrollment pax, mapped ratios, and the safety buffer (rounded up).*
 
 **How the Calculation Works:**
-1. **Determine Base Demand:** For each equipment, the system checks all the modules it is currently mapped to. It adds up the student enrollment sizes (pax) of these associated modules.
-2. **Apply Safety Buffer & Indivisibility:** The system applies your configured `bufferPercentage` to the Base Demand. Following the "Indivisibility Rule," the result is mathematically rounded *up* to the nearest whole number to ensure you don't procure a fraction of a piece of equipment. This becomes the **Total Required**.
-3. **Calculate Shortfall:** The system then subtracts your current **total stock quantity** for that item (all units you own, including any that are currently on loan) from the Total Required quantity.
-4. **Generate Output:** If the Total Required exceeds your current total stock, the system flags a shortage. The item is added to the report, displaying the exact shortfall quantity you need to procure.
+1. **Calculate Module Need:** For each module using the equipment, the system multiplies the number of students (pax) by the requirement ratio. We round this up to a whole number (since you can't buy part of an item).
+2. **Find Total Need:** We add up the needs from all modules.
+3. **Add Safety Buffer:** We increase the total need by your set buffer percentage and round up again. This gives the **Required** amount.
+4. **Find Shortfall:** We subtract the total items you already own (including loaned items) from the **Required** amount. If you own fewer than you need, the difference is what you need **To Buy**.
 
-*Example scenario:* 
-If `STM32` boards are needed for `CG2111A` (150 pax) and `CS2113` (50 pax), the **Base Demand** is 200. With a 10% safety buffer set via `setbuffer`, the buffered demand becomes 220. If your current total stock (regardless of how many units are currently loaned out) is 180 units, the `report procurement` command will alert you to a shortfall (TO BUY) of 40 `STM32` boards.
+**Simple Step-by-Step Example:**
+Let's figure out how many `STM32` boards to buy.
+* They are used in `CG2111A` (150 students, ratio 0.5) -> Need = 75 boards.
+* They are also used in `CS2113` (55 students, ratio 1.0) -> Need = 55 boards.
+* **Total Need:** 75 + 55 = 130 boards.
+* **Buffer:** You set a 10% safety buffer. So, 130 + 10% = 143 boards **Required**.
+* **Current Stock:** You currently own 100 boards.
+* **To Buy:** 143 (Required) - 100 (Owned) = 43 boards. The report will tell you to buy 43 `STM32` boards.
 
 * **Format:** `report procurement`
 

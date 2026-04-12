@@ -30,6 +30,7 @@ public class ReportCommand extends Command {
 
     /**
      * Parses the arguments for the 'report' command.
+     *
      * @param fullCommand The complete input string.
      * @return A ReportCommand object.
      * @throws EquipmentMasterException If arguments are missing.
@@ -67,7 +68,7 @@ public class ReportCommand extends Command {
             executeLowStockReport(equipments, ui);
         } else if (reportType.equalsIgnoreCase("aging")) {
             executeAgingReport(equipments, ui, context);
-        } else if (reportType.equalsIgnoreCase("procurement")){
+        } else if (reportType.equalsIgnoreCase("procurement")) {
             executeProcurementReport(context);
         } else {
             ui.showMessage("Invalid report type. Currently supported: aging, lowstock, procurement.");
@@ -96,6 +97,7 @@ public class ReportCommand extends Command {
     }
 
     //@@author Hongyu1231
+
     /**
      * Executes the aging report generation.
      * Identifies and displays equipment that has reached or exceeded its designated lifespan.
@@ -138,7 +140,7 @@ public class ReportCommand extends Command {
      * @param context The application context.
      * @return The determined AcademicSemester.
      * @throws EquipmentMasterException If the user didn't provide a semester
-     *     and the system semester is not set.
+     *                                  and the system semester is not set.
      */
     private AcademicSemester resolveTargetSemester(Context context)
             throws EquipmentMasterException {
@@ -213,10 +215,22 @@ public class ReportCommand extends Command {
             int baseDemand = 0;
 
             for (String modCode : relatedModules) {
-                Module module = getModuleByName(moduleList, modCode);
+                Module module = moduleList.getModule(modCode);
                 if (module != null) {
-                    // TODO add requirement ratio later
-                    baseDemand += module.getPax();
+                    //This is not efficient due to the copying of the getER()
+                    var requirements = module.getEquipmentRequirements();
+                    if (!requirements.containsKey(eq.getName())) {
+                        ui.showMessage("Warning: Equipment '" + eq.getName() +
+                                "' is tagged to module '" + module.getName() +
+                                "' but not found in its equipment requirements. " +
+                                "Skipping this module for demand calculation.");
+                    } else {
+                        double ratio = requirements.get(eq.getName());
+                        baseDemand += (int) Math.ceil(module.getPax() * ratio);
+                    }
+                } else {
+                    ui.showMessage("Warning: Module '" + modCode + "' tagged to equipment '" + eq.getName() +
+                            "' not found in module list. Skipping this module for demand calculation.");
                 }
             }
 
@@ -250,15 +264,6 @@ public class ReportCommand extends Command {
         if (!foundProcurementNeeded) {
             ui.showMessage("Great news! No procurement needed based on current module requirements.");
         }
-    }
-
-    private Module getModuleByName(ModuleList moduleList, String name) {
-        for (Module m : moduleList.getModules()) {
-            if (m.getName().equalsIgnoreCase(name)) {
-                return m;
-            }
-        }
-        return null; // Orphaned tag or not found
     }
 }
 
