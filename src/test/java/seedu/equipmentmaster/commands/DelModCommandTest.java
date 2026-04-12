@@ -1,10 +1,10 @@
-//@@author Hongyu1231
 package seedu.equipmentmaster.commands;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 import seedu.equipmentmaster.context.Context;
+import seedu.equipmentmaster.equipmentlist.EquipmentList;
 import seedu.equipmentmaster.exception.EquipmentMasterException;
 import seedu.equipmentmaster.modulelist.ModuleList;
 import seedu.equipmentmaster.ui.Ui;
@@ -18,22 +18,31 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 
+/**
+ * JUnit test class for {@code DelModCommand}.
+ * Verifies both parsing logic and execution behavior, including safe dereferencing.
+ */
 public class DelModCommandTest {
     @TempDir
     Path tempDir; // JUnit 5 automatically creates and cleans up this directory
 
     private ModuleList moduleList;
+    private EquipmentList equipmentList; // Added to resolve NPE during safe dereferencing
     private Ui ui;
     private Storage storage;
     private Context context;
 
+    /**
+     * Sets up the test environment before each test case.
+     * Initializes lists, UI, and a temporary storage sandbox.
+     */
     @BeforeEach
     public void setUp() {
         moduleList = new ModuleList();
+        equipmentList = new EquipmentList();
         ui = new Ui();
 
         // 1. ARRANGE: Create isolated, temporary paths within the @TempDir sandbox.
-        // These paths are unique to each test run and won't pollute your project root.
         String tempEqPath = tempDir.resolve("temp_e.txt").toString();
         String tempSetPath = tempDir.resolve("temp_s.txt").toString();
         String tempModPath = tempDir.resolve("temp_m.txt").toString();
@@ -41,8 +50,9 @@ public class DelModCommandTest {
         // 2. INJECT: Use the temporary paths for the Storage instance.
         storage = new Storage(tempEqPath, ui, tempSetPath, tempModPath);
 
-        // 3. CONTEXT: Initialize the shared state for the commands.
-        context = new Context(null, moduleList, ui, storage, null);
+        // 3. CONTEXT: Initialize the shared state.
+        // equipmentList is now passed to prevent NPEs when command checks for tags.
+        context = new Context(equipmentList, moduleList, ui, storage, null);
     }
 
     @Test
@@ -54,6 +64,7 @@ public class DelModCommandTest {
 
     @Test
     public void parse_caseInsensitive_success() throws EquipmentMasterException {
+        // Verifies that the command keyword is case-insensitive
         DelModCommand command = DelModCommand.parse("DELMOD n/CG2111A");
         assertTrue(command instanceof DelModCommand);
     }
@@ -68,6 +79,7 @@ public class DelModCommandTest {
 
     @Test
     public void parse_noMatcherMatch_throwsException() {
+        // Ensures the parser rejects random text that doesn't follow the regex pattern
         assertThrows(EquipmentMasterException.class, () -> {
             DelModCommand.parse("delmod random_text");
         });
@@ -84,7 +96,7 @@ public class DelModCommandTest {
     @Test
     public void execute_existingModule_success() throws EquipmentMasterException {
         // Setup: add a module to be deleted
-        moduleList.addModule(new seedu.equipmentmaster.module.Module("CG2111A", 150));
+        moduleList.addModule(new Module("CG2111A", 150));
 
         DelModCommand command = new DelModCommand("CG2111A");
         command.execute(context);
@@ -105,8 +117,9 @@ public class DelModCommandTest {
 
     @Test
     public void execute_storageIsNull_success() throws EquipmentMasterException {
+        // Verifies the command still executes if storage is missing (e.g., during some tests)
         moduleList.addModule(new Module("CG2111A", 150));
-        Context nullStorageContext = new Context(null, moduleList, ui, null, null);
+        Context nullStorageContext = new Context(equipmentList, moduleList, ui, null, null);
         DelModCommand command = new DelModCommand("CG2111A");
 
         assertDoesNotThrow(() -> command.execute(nullStorageContext));
@@ -115,8 +128,8 @@ public class DelModCommandTest {
 
     @Test
     public void execute_storageSaveFailure_handlesGracefully() throws EquipmentMasterException {
-        // To cover the catch block for storage failures, we use a stub that throws an exception
-        moduleList.addModule(new seedu.equipmentmaster.module.Module("CG2111A", 150));
+        // Covers the catch block for storage failures using a mock-like stub
+        moduleList.addModule(new Module("CG2111A", 150));
 
         Storage faultyStorage = new Storage("e.txt", ui, "s.txt", "m.txt") {
             @Override
@@ -125,10 +138,10 @@ public class DelModCommandTest {
             }
         };
 
-        Context faultyContext = new Context(null, moduleList, ui, faultyStorage, null);
+        Context faultyContext = new Context(equipmentList, moduleList, ui, faultyStorage, null);
         DelModCommand command = new DelModCommand("CG2111A");
 
-        // The execution should catch the storage exception internally per your code logic
+        // The execution should catch the storage exception internally per implementation
         command.execute(faultyContext);
 
         // Ensure the module was still removed from memory even if saving to disk failed
@@ -137,41 +150,33 @@ public class DelModCommandTest {
 
     @Test
     public void parse_emptyModuleName_throwsException() {
-        // HITS BRANCH: if (moduleName.isEmpty()) after matching n/
+        // Hits the branch where moduleName is whitespace after matching the n/ flag
         assertThrows(EquipmentMasterException.class, () -> {
             DelModCommand.parse("delmod n/   ");
         });
     }
 
-    /**
-     * Targets the ternary operator branch (moduleName == null)
-     * and the subsequent assertion logic in the constructor.
-     */
     @Test
     public void constructor_nullName_assertionFails() {
+        // Targets the null check in the constructor
         AssertionError thrown = assertThrows(AssertionError.class, () -> {
             new DelModCommand(null);
         });
         assertTrue(thrown.getMessage().contains("Module name cannot be null or empty"));
     }
 
-    /**
-     * Targets the assertion branch where the name is not null,
-     * but becomes empty after the trim() operation.
-     */
     @Test
     public void constructor_emptyName_assertionFails() {
+        // Targets the empty/whitespace check in the constructor
         AssertionError thrown = assertThrows(AssertionError.class, () -> {
             new DelModCommand(" ");
         });
         assertTrue(thrown.getMessage().contains("Module name cannot be null or empty"));
     }
 
-    /**
-     * Targets the 'assert context != null' branch in the execute() method.
-     */
     @Test
     public void execute_nullContext_assertionFails() {
+        // Verifies the defensive assertion at the start of the execute method
         DelModCommand command = new DelModCommand("CG2111A");
         AssertionError thrown = assertThrows(AssertionError.class, () -> {
             command.execute(null);
@@ -179,22 +184,16 @@ public class DelModCommandTest {
         assertTrue(thrown.getMessage().contains("Context should not be null during execution"));
     }
 
-    /**
-     * Targets the regex zero-whitespace quantifier (\\s*) branch.
-     * Evaluates the behavior when 'delmod' is immediately followed by 'n/'.
-     */
     @Test
     public void parse_zeroWhitespaceAfterCommand_success() throws EquipmentMasterException {
-        // "delmodn/" instead of "delmod n/"
+        // Tests the regex flexibility: "delmodn/" instead of "delmod n/"
         DelModCommand command = DelModCommand.parse("delmodn/CG2111A");
         assertTrue(command instanceof DelModCommand);
     }
 
-    /**
-     * Targets the regex (.+) to ensure it correctly captures module names containing spaces.
-     */
     @Test
     public void parse_moduleNameWithSpaces_success() throws EquipmentMasterException {
+        // Ensures module names with spaces (e.g., "CS 2113") are captured correctly
         DelModCommand command = DelModCommand.parse("delmod n/CS 2113");
         assertTrue(command instanceof DelModCommand);
     }
