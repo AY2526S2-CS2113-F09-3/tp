@@ -83,15 +83,16 @@ class UntagCommandTest {
     // ==========================================
 
     @Test
-    void execute_bothModuleAndEquipmentMissing_throwsException() {
+    void execute_equipmentMissing_throwsException() {
+        // Even if the module is also missing ("GhostMod"), the equipment check fails first
         UntagCommand command = new UntagCommand("GhostMod", "GhostEq");
 
         EquipmentMasterException exception = assertThrows(EquipmentMasterException.class, () -> {
             command.execute(context);
         });
 
-        assertTrue(exception.getMessage().contains
-                ("Neither the module 'GhostMod' nor the equipment 'GhostEq' exists."));
+        // The system now throws the standard missing equipment message
+        assertTrue(exception.getMessage().contains("Aborted: Equipment 'GhostEq' does not exist."));
     }
 
     @Test
