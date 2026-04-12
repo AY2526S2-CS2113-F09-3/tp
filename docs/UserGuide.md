@@ -219,13 +219,13 @@ Generating Procurement Report for upcoming semester...
 *Note: 'Required' is calculated based on module enrollment pax, mapped ratios, and the safety buffer (rounded up).*
 
 **How the Calculation Works:**
-1. **Determine Base Demand:** For each equipment, the system checks all the modules it is currently mapped to. It adds up the student enrollment sizes (pax) of these associated modules.
-2. **Apply Safety Buffer & Indivisibility:** The system applies your configured `bufferPercentage` to the Base Demand. Following the "Indivisibility Rule," the result is mathematically rounded *up* to the nearest whole number to ensure you don't procure a fraction of a piece of equipment. This becomes the **Total Required**.
+1. **Determine Base Demand:** For each equipment, the system checks all the modules it is currently mapped to. For each module, it multiplies the student enrollment size (pax) by the equipment requirement ratio and mathematically rounds *up* to the nearest whole number (the "Indivisibility Rule"). It then sums up these values to find the overall **Base Demand**.
+2. **Apply Safety Buffer & Indivisibility:** The system applies your configured `bufferPercentage` to the **Base Demand** and rounds *up* again to ensure you don't procure a fraction of a piece of equipment. This becomes the **Total Required**.
 3. **Calculate Shortfall:** The system then subtracts your current **total stock quantity** for that item (all units you own, including any that are currently on loan) from the Total Required quantity.
 4. **Generate Output:** If the Total Required exceeds your current total stock, the system flags a shortage. The item is added to the report, displaying the exact shortfall quantity you need to procure.
 
 *Example scenario:* 
-If `STM32` boards are needed for `CG2111A` (150 pax) and `CS2113` (50 pax), the **Base Demand** is 200. With a 10% safety buffer set via `setbuffer`, the buffered demand becomes 220. If your current total stock (regardless of how many units are currently loaned out) is 180 units, the `report procurement` command will alert you to a shortfall (TO BUY) of 40 `STM32` boards.
+If `STM32` boards are needed for `CG2111A` (150 pax, ratio 0.5) and `CS2113` (55 pax, ratio 1.0), the requirement for `CG2111A` is 75, and for `CS2113` is 55. The **Base Demand** is 130. With a 10% safety buffer set via `setbuffer`, the buffered demand becomes 143. If your current total stock (regardless of how many units are currently loaned out) is 100 units, the `report procurement` command will alert you to a shortfall (TO BUY) of 43 `STM32` boards.
 
 * **Format:** `report procurement`
 

@@ -845,13 +845,12 @@ The Procurement Report is a computed report that calculates recommended semester
 The feature is integrated into the existing `ReportCommand` class to group all analytical logic in one place. The core logic resides in the `executeProcurementReport(Context)` method.
 
 The calculation follows this strict algorithm for each equipment item:
-1.  **Demand Aggregation**: The system iterates through the `moduleCodes` list associated with the equipment. It retrieves the latest enrollment numbers (pax) from the `ModuleList` and sums them up to determine the `Base Demand`.
+1.  **Demand Aggregation**: The system iterates through the `moduleCodes` list associated with the equipment. It retrieves the latest enrollment numbers (pax) from the `ModuleList`. For each module, it calculates the raw demand by multiplying the pax by the requirement ratio, then applies the **Indivisibility Rule** by rounding up to the nearest whole number using `Math.ceil()`. It sums these per-module values to determine the `Base Demand`.
   *   *Orphaned Tag Handling*: If a module code exists in the equipment's tag list but has been deleted from the `ModuleList`, it is gracefully ignored to prevent `NullPointerException`.
-2.  **Buffer Application**: The `Base Demand` is multiplied by `(1 + bufferPercentage / 100.0)`.
-3.  **Indivisibility Rule**: The result is rounded up to the nearest whole number using `Math.ceil()`. You cannot purchase 0.5 of a board.
-4.  **Gap Analysis**: The system subtracts the *Total Quantity* (owned inventory) from the *Total Required*.
+2.  **Buffer Application & Indivisibility**: The `Base Demand` is multiplied by `(1 + bufferPercentage / 100.0)` and the result is rounded up again using `Math.ceil()` to get the *Total Required*. You cannot purchase 0.5 of a board.
+3.  **Gap Analysis**: The system subtracts the *Total Quantity* (owned inventory) from the *Total Required*.
   *   Note: It uses *Total Quantity* rather than *Available Quantity* because procurement decisions are based on total asset ownership, regardless of whether items are currently loaned out.
-5.  **Output**: If `To Buy > 0`, the item is flagged in the report.
+4.  **Output**: If `To Buy > 0`, the item is flagged in the report.
 
 #### 3. Sequence Diagram: Procurement Report Execution
 _(Note: The `getModuleByName` logic is represented as a self-invocation within the `ReportCommand`, and standard math calculations for demand are abstracted to focus on object interactions.)_
@@ -879,9 +878,9 @@ The Procurement Report is the most mathematically intensive feature of Equipment
 </div>
 
 **The Formula:**
-`Recommended = ceil(Sum(Module_Pax * Requirement_Ratio) * (1 + Buffer)) - Total_Owned`
+`Recommended = ceil(Sum(ceil(Module_Pax * Requirement_Ratio)) * (1 + Buffer)) - Total_Owned`
 
-* **Indivisibility Rule**: The system applies `Math.ceil()` because lab equipment cannot be purchased in fractions.
+* **Indivisibility Rule**: The system applies `Math.ceil()` at both the per-module demand calculation and the final buffer calculation because lab equipment cannot be purchased in fractions, and each module class requires whole units.
 * **Ownership Offset**: It subtracts `Total_Quantity` (Available + Loaned) because procurement represents long-term asset acquisition, not immediate shelf availability.
 
 #### 6. Current Limitations & Future Improvements
