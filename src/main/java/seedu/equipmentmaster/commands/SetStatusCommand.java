@@ -249,8 +249,9 @@ public class SetStatusCommand extends Command {
         target.setLoaned(loan + quantity);
         ui.showMessage("Successfully LOANED " + quantity + " units of " + target.getName() + ".");
 
-        if (target.getAvailable() < target.getMinQuantity()) {
-            ui.showMessage("!!! LOW STOCK ALERT: " + target.getName() + " is below minimum threshold!");
+        if (target.getMinQuantity() > 0 && target.getAvailable() <= target.getMinQuantity()) {
+            ui.showMessage("!!! LOW STOCK ALERT: " + target.getName()
+                    + " is at or below minimum threshold!");
         }
     }
 

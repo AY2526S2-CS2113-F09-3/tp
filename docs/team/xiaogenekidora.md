@@ -23,6 +23,10 @@ I contributed significantly to the foundational architecture and user interface 
     * **What it does:** Implemented essential features for viewing and managing standard inventory. `list` displays current items, `help` provides an interactive command manual, and `report procurement` calculates the total number of items needed for the upcoming semester based on module enrollment and current stock levels.
     * **Justification & Depth:** The `report procurement` command required complex integration between module enrollment figures and existing equipment counts to accurately predict shortfall. This feature directly tackles the primary value proposition of the app: proactively forecasting procurement needs.
 
+4. **Testing**
+   * **What it does:** Developed comprehensive unit tests for not only own features but also other components like DeleteCommand etc. in order to increase the overall code coverage and ensure robustness.
+   * **Justification & Depth:** Given the critical nature of these components in ensuring the application's reliability and maintainability, I prioritized testing to catch edge cases.
+
 ### Contributions to the User Guide (UG)
 * **Authored the "Core Commands" section:** Documented the usage formats and parameters for `list` and `help`, complete with expected terminal outputs formatted using the new `UiTable`.
 * **Authored the "Procurement Report" section:** Explained the rationale and usage of the `report procurement` command, providing practical examples of how lab technicians can use this feature to justify budget requests.
@@ -32,3 +36,6 @@ I contributed significantly to the foundational architecture and user interface 
 * **Contributed UML Diagrams:** Authored PlantUML diagrams mapping out my specific architectural contributions, including:
     * Class Diagram detailing the new `Parser` Command Factory logic.
     * Visual representation of the `UiTable` dynamic width calculation process (`uiTable.png`).
+
+### Team-Based Tasks & Project Management
+* **Consistency & Code Quality:** Unified the definition of "low quantity/stock" across various commands and reports, ensuring the entire team used a consistent, standardized metric throughout the codebase, User Guide, and Developer Guide.

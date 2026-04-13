@@ -114,7 +114,7 @@ The current system time is: AY2024/25 Sem1
 ===================================================
 ===================================================
 Success: Minimum threshold for Ghost set to 15
-Warning: Item is currently below this new threshold!
+Warning: Item is currently at or below this new threshold!
 ===================================================
 ===================================================
 Success: Minimum threshold for Resistor set to 80
@@ -132,6 +132,7 @@ Invalid format! Use: setmin n/NAME min/QUANTITY or setmin INDEX min/QUANTITY
 ===================================================
 ===================================================
 Success: Minimum threshold for Ghost set to 10
+Warning: Item is currently at or below this new threshold!
 ===================================================
 ===================================================
 Minimum threshold cannot be negative.
@@ -160,7 +161,7 @@ Invalid index. List size is 5
 ===================================================
 ===================================================
 Successfully LOANED 5 units of Ghost.
-!!! LOW STOCK ALERT: Ghost is below minimum threshold!
+!!! LOW STOCK ALERT: Ghost is at or below minimum threshold!
 ===================================================
 ===================================================
 Successfully returned 3 units of Ghost to AVAILABLE.
@@ -203,7 +204,7 @@ Quantity must be a valid whole number.
 ===================================================
 ===================================================
 Deleted 1 available unit(s) of Ghost.
-!!! LOW STOCK ALERT: Ghost is below threshold!
+!!! LOW STOCK ALERT: Ghost is at or below threshold!
 ===================================================
 ===================================================
 Only 7 unit(s) are available. Cannot delete 10.
@@ -213,7 +214,7 @@ Deleted 5 available unit(s) of STM32.
 ===================================================
 ===================================================
 Success: Minimum threshold for Soldering Iron set to 20
-Warning: Item is currently below this new threshold!
+Warning: Item is currently at or below this new threshold!
 ===================================================
 ===================================================
 Please specify the report type. Usage: report aging [Semester] OR report lowstock OR report procurement
@@ -223,13 +224,13 @@ Invalid report type. Currently supported: aging, lowstock, procurement.
 ===================================================
 ===================================================
 Low Stock Alert (Items below minimum threshold):
-1. Ghost | Quantity: 9 | Min: 10 -> RESTOCK NEEDED
-2. Soldering Iron | Quantity: 10 | Min: 20 -> RESTOCK NEEDED
+1. Ghost | Available: 7 | Min: 10 -> RESTOCK NEEDED
+2. Soldering Iron | Available: 10 | Min: 20 -> RESTOCK NEEDED
 ===================================================
 ===================================================
 Low Stock Alert (Items below minimum threshold):
-1. Ghost | Quantity: 9 | Min: 10 -> RESTOCK NEEDED
-2. Soldering Iron | Quantity: 10 | Min: 20 -> RESTOCK NEEDED
+1. Ghost | Available: 7 | Min: 10 -> RESTOCK NEEDED
+2. Soldering Iron | Available: 10 | Min: 20 -> RESTOCK NEEDED
 ===================================================
 ===================================================
 Aging Equipment Report (Calculated for: AY2024/25 Sem1):

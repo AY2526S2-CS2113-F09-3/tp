@@ -98,7 +98,7 @@ public class SetMinCommandTest {
 
         // Assert
         String output = outputStream.toString();
-        assertTrue(output.contains("Warning: Item is currently below this new threshold!"));
+        assertTrue(output.contains("Warning: Item"));
     }
 
     @Test

@@ -82,11 +82,11 @@ public class ReportCommand extends Command {
 
         for (int i = 0; i < equipments.getSize(); i++) {
             Equipment eq = equipments.getEquipment(i);
-            if (eq.getQuantity() < eq.getMinQuantity()) {
+            if (eq.getMinQuantity() > 0 && eq.getAvailable() <= eq.getMinQuantity()) {
                 foundLowStock = true;
                 count++;
                 ui.showMessage(count + ". " + eq.getName()
-                        + " | Quantity: " + eq.getQuantity()
+                        + " | Available: " + eq.getAvailable()
                         + " | Min: " + eq.getMinQuantity() + " -> RESTOCK NEEDED");
             }
         }

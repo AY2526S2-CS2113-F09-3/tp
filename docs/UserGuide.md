@@ -177,7 +177,7 @@ Scans the inventory and generates a report of all equipment whose age (calculate
 Forecast your laboratory equipment needs and proactively identify critical shortages to justify budgeting and purchasing requests.
 
 #### Generating the Low Stock Report: `report lowstock`
-Scans your entire inventory and generates a report of all equipment where the current total quantity (`q/`, including items that may be on loan) is strictly less than its configured minimum threshold (`min/`). This allows you to quickly identify immediate shortages before a busy lab session.
+Scans your entire inventory and generates a report of all equipment where the current available quantity (`q/` minus items on loan) is less than or equal to its configured minimum threshold (`min/`). This allows you to quickly identify immediate shortages before a busy lab session.
 * **Format:** `report lowstock`
 
 * **Example Output:**
@@ -337,10 +337,10 @@ When an error occurs, the system will reject the invalid input, print a clear er
 
 **Q: What happens if a deletion causes my inventory to drop below the safety threshold I set when I added the equipment?**
 
-**A:** The system will immediately catch it! If a delete command drops your total quantity down to or below your configured minimum stock threshold, a LOW STOCK ALERT will be prominently displayed on your terminal.
+**A:** The system will immediately catch it! If a delete command drops your available quantity down to or below your configured minimum stock threshold, a LOW STOCK ALERT will be prominently displayed on your terminal.
 
 
-**Q: What happens if I use setmin to set a threshold that is actually higher than my current total stock?**
+**Q: What happens if I use setmin to set a threshold that is actually higher than my current available stock?**
 
 **A:** The system will successfully update your threshold, but it will immediately display a warning message: "Warning: Item is currently below this new threshold!" This ensures you are instantly aware that you are already in a state of shortage based on your new safety standards.
 

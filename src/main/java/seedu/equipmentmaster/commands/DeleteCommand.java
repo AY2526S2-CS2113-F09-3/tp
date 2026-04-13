@@ -169,8 +169,9 @@ public class DeleteCommand extends Command {
                     }
                 }
             }
-        } else if (target.getQuantity() <= target.getMinQuantity()) {
-            ui.showMessage("!!! LOW STOCK ALERT: " + target.getName() + " is below threshold!");
+        } else if (target.getMinQuantity() > 0
+                && target.getAvailable() <= target.getMinQuantity()) {
+            ui.showMessage("!!! LOW STOCK ALERT: " + target.getName() + " is at or below threshold!");
         }
 
         return isModuleModified;

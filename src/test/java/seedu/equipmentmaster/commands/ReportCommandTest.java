@@ -141,10 +141,10 @@ public class ReportCommandTest {
     // @@author
 
     @Test
-    public void execute_lowStockReport_sufficientTotalNoWarning() throws EquipmentMasterException {
-        // Arrange: Set up an equipment item where Total = 10, Min Threshold = 10.
-        // Simulate all 10 items being loaned out (Available = 0, Loaned = 10).
-        Equipment ghost = new Equipment("Ghost", 10, 0, 10, null, 0.0, 10);
+    public void execute_lowStockReport_sufficientAvailableNoWarning() throws EquipmentMasterException {
+        // Arrange: Set up an equipment item where Total = 21, Min Threshold = 10.
+        // Simulate 21 items being loaned out (Available = 11, Loaned = 10).
+        Equipment ghost = new Equipment("Ghost", 21, 11, 10, null, 0.0, 10);
         equipments.addEquipment(ghost);
         ModuleList moduleList = new ModuleList();
 
@@ -175,7 +175,7 @@ public class ReportCommandTest {
 
         // Assert: Verify the exact output format matches expectations
         String output = outContent.toString();
-        String expectedString = "Soldering Iron | Quantity: 10 | Min: 20 -> RESTOCK NEEDED";
+        String expectedString = "Soldering Iron | Available: 10 | Min: 20 -> RESTOCK NEEDED";
 
         assertTrue(output.contains(expectedString),
                 "The output formatting for low stock items does not match the expected string.");

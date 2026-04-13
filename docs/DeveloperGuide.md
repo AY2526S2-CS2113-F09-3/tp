@@ -473,7 +473,7 @@ The execution flow follows these steps:
 1. **Threshold Definition**: Each `Equipment` object maintains a `minQuantity` integer attribute.
 2. **Configuration**: The user can set this threshold using the `setmin` command (e.g., `setmin 1 min/10`). The `SetMinCommand` validates the input and updates the `Equipment` object.
 3. **Quantity Reduction**: When a user loans out an item (via `setstatus`) or removes items (via `delete`), the respective `Command` object updates the `Equipment` quantity.
-4. **Logic Check**: Immediately after the update, the `Command` invokes `target.isBelowThreshold()`.
+4. **Logic Check**: Immediately after the update, the `Command` checks if `target.getAvailable() <= target.getMinQuantity()`.
 5. **UI Trigger**: If the check returns `true`, the `Command` calls `ui.showLowStockAlert(target)`, which displays the current stock levels and the required minimum to the user.
 
 #### 3. Sequence Diagram
@@ -1201,9 +1201,9 @@ To test the system with pre-populated data without typing everything manually:
 
 ### 8. Testing Additional Reports
 1. **Low Stock Report:**
-  * **Prerequisite:** Ensure at least one item's total quantity is strictly less than its minimum threshold (e.g., total quantity=3, min=5), regardless of how many units are currently LOANED vs AVAILABLE.
+  * **Prerequisite:** Ensure at least one item's available quantity is less than or equal to its minimum threshold (e.g., available quantity=5, min=5).
   * **Test Case:** Type `report lowstock`.
-  * **Expected:** System lists only the items whose total quantity has fallen below their set minimum threshold (loaned-vs-available is ignored), alerting the technician of shortages.
+  * **Expected:** System lists only the items whose available quantity is less than or equal to their set minimum threshold, alerting the technician of shortages.
 2. **Procurement Report:**
   * **Test Case:** Type `report procurement`.
   * **Expected:** System calculates and displays a formatted report suggesting how many new units need to be purchased based on current stock, buffers, and module demands.
