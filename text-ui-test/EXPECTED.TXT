@@ -132,6 +132,7 @@ Invalid format! Use: setmin n/NAME min/QUANTITY or setmin INDEX min/QUANTITY
 ===================================================
 ===================================================
 Success: Minimum threshold for Ghost set to 10
+Warning: Item is currently below this new threshold!
 ===================================================
 ===================================================
 Minimum threshold cannot be negative.
@@ -204,11 +205,13 @@ Invalid report type. Currently supported: aging, lowstock, procurement.
 ===================================================
 ===================================================
 Low Stock Alert (Items below minimum threshold):
-1. Soldering Iron | Quantity: 10 | Min: 20 -> RESTOCK NEEDED
+1. Ghost | Available: 0 | Min: 10 -> RESTOCK NEEDED
+2. Soldering Iron | Available: 10 | Min: 20 -> RESTOCK NEEDED
 ===================================================
 ===================================================
 Low Stock Alert (Items below minimum threshold):
-1. Soldering Iron | Quantity: 10 | Min: 20 -> RESTOCK NEEDED
+1. Ghost | Available: 0 | Min: 10 -> RESTOCK NEEDED
+2. Soldering Iron | Available: 10 | Min: 20 -> RESTOCK NEEDED
 ===================================================
 ===================================================
 Aging Equipment Report (Calculated for: AY2024/25 Sem1):
