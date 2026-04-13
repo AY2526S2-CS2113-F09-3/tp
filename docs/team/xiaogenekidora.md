@@ -36,3 +36,6 @@ I contributed significantly to the foundational architecture and user interface 
 * **Contributed UML Diagrams:** Authored PlantUML diagrams mapping out my specific architectural contributions, including:
     * Class Diagram detailing the new `Parser` Command Factory logic.
     * Visual representation of the `UiTable` dynamic width calculation process (`uiTable.png`).
+
+### Team-Based Tasks & Project Management
+* **Consistency & Code Quality:** Unified the definition of "low quantity/stock" across various commands and reports, ensuring the entire team used a consistent, standardized metric throughout the codebase, User Guide, and Developer Guide.
