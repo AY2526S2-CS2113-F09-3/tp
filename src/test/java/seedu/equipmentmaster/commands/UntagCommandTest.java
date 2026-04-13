@@ -83,15 +83,16 @@ class UntagCommandTest {
     // ==========================================
 
     @Test
-    void execute_bothModuleAndEquipmentMissing_throwsException() {
+    void execute_equipmentMissing_throwsException() {
+        // Even if the module is also missing ("GhostMod"), the equipment check fails first
         UntagCommand command = new UntagCommand("GhostMod", "GhostEq");
 
         EquipmentMasterException exception = assertThrows(EquipmentMasterException.class, () -> {
             command.execute(context);
         });
 
-        assertTrue(exception.getMessage().contains
-                ("Neither the module 'GhostMod' nor the equipment 'GhostEq' exists."));
+        // The system now throws the standard missing equipment message
+        assertTrue(exception.getMessage().contains("Aborted: Equipment 'GhostEq' does not exist."));
     }
 
     @Test
@@ -141,5 +142,32 @@ class UntagCommandTest {
         });
 
         assertTrue(exception.getMessage().contains("does not currently have stm32 as a requirement"));
+    }
+
+    @Test
+    void execute_moduleMissingButEquipmentExists_cleansUpGhostReference() {
+        // 1. Setup Initial State
+        String itemName = "beer";
+        String ghostModName = "GHOST101";
+
+        // Create the equipment and manually inject a ghost module reference
+        Equipment targetEquipment = new Equipment(itemName, 5, 5, 0, null, 0.0, null, 0, 0.0);
+        targetEquipment.addModuleCode(ghostModName);
+        equipmentList.addEquipment(targetEquipment);
+
+        assertFalse(moduleList.hasModule(ghostModName), "Setup error: Ghost module should not exist.");
+
+        // 2. Initialize Command
+        UntagCommand command = new UntagCommand(ghostModName, itemName);
+
+        // 3. Execution & Validation
+        // Assert that executing the command DOES NOT throw an exception
+        assertDoesNotThrow(() -> {
+            command.execute(context);
+        }, "The command should gracefully handle missing modules without throwing an exception.");
+
+        // 4. Verify the ghost reference was successfully scrubbed from the equipment
+        assertFalse(targetEquipment.getModuleCodes().contains(ghostModName),
+                "The ghost module reference was not removed from the equipment.");
     }
 }

@@ -59,61 +59,82 @@ activate Context
 Context --> UntagCommand : storage
 deactivate Context
 
+== Existence Validation ==
 UntagCommand -> ModuleList : hasModule(moduleName)
 activate ModuleList
-ModuleList --> UntagCommand : true
+ModuleList --> UntagCommand : moduleExists
 deactivate ModuleList
 
 UntagCommand -> EquipmentList : hasEquipment(equipmentName)
 activate EquipmentList
-EquipmentList --> UntagCommand : true
+EquipmentList --> UntagCommand : equipmentExists
 deactivate EquipmentList
 
-UntagCommand -> ModuleList : getModule(moduleName)
-activate ModuleList
-ModuleList --> UntagCommand : targetModule
-deactivate ModuleList
-
-UntagCommand -> EquipmentList : findByName(equipmentName)
-activate EquipmentList
-EquipmentList --> UntagCommand : targetEquipment
-deactivate EquipmentList
-
-== Bidirectional Removal ==
-UntagCommand -> Module : removeEquipmentRequirement(name)
-activate Module
-Module --> UntagCommand : isRemovedFromModule
-deactivate Module
-
-UntagCommand -> Equipment : removeModuleCode(name)
-activate Equipment
-Equipment --> UntagCommand
-deactivate Equipment
-
-== Conditional Saving ==
-alt isRemovedFromModule == true
-    UntagCommand -> Ui : showMessage("Successfully untagged...")
-    activate Ui
-    Ui --> UntagCommand
-    deactivate Ui
-
-    UntagCommand -> Storage : saveModules(modules)
-    activate Storage
-    Storage --> UntagCommand
-    deactivate Storage
-
-    UntagCommand -> Storage : saveEquipments(equipments)
-    activate Storage
-    Storage --> UntagCommand
-    deactivate Storage
-else isRemovedFromModule == false
+alt !equipmentExists
     UntagCommand -> UntagCommand : throw EquipmentMasterException
+else equipmentExists == true
+
+    UntagCommand -> EquipmentList : findByName(equipmentName)
+    activate EquipmentList
+    EquipmentList --> UntagCommand : targetEquipment
+    deactivate EquipmentList
+
+    alt !moduleExists (Ghost Cleanup Path)
+        UntagCommand -> Equipment : removeModuleCode(moduleName)
+        activate Equipment
+        Equipment --> UntagCommand
+        deactivate Equipment
+
+        UntagCommand -> Ui : showMessage("Notice: cleaned up invalid links...")
+        activate Ui
+        Ui --> UntagCommand
+        deactivate Ui
+
+        UntagCommand -> Storage : saveEquipments(equipments)
+        activate Storage
+        Storage --> UntagCommand
+        deactivate Storage
+
+    else moduleExists == true (Normal Bidirectional Removal)
+        UntagCommand -> ModuleList : getModule(moduleName)
+        activate ModuleList
+        ModuleList --> UntagCommand : targetModule
+        deactivate ModuleList
+
+        UntagCommand -> Module : removeEquipmentRequirement(name)
+        activate Module
+        Module --> UntagCommand : isRemovedFromModule
+        deactivate Module
+
+        UntagCommand -> Equipment : removeModuleCode(officialModuleName)
+        activate Equipment
+        Equipment --> UntagCommand
+        deactivate Equipment
+
+        alt isRemovedFromModule == true
+            UntagCommand -> Ui : showMessage("Successfully untagged...")
+            activate Ui
+            Ui --> UntagCommand
+            deactivate Ui
+
+            UntagCommand -> Storage : saveModules(modules)
+            activate Storage
+            Storage --> UntagCommand
+            deactivate Storage
+            UntagCommand -> Storage : saveEquipments(equipments)
+            activate Storage
+            Storage --> UntagCommand
+            deactivate Storage
+        else isRemovedFromModule == false
+            UntagCommand -> UntagCommand : throw EquipmentMasterException
+        end
+    end
 end
 
 UntagCommand --> Logic
 deactivate UntagCommand
 
-Logic --> User : display result or error
+Logic --> User : display success or error
 deactivate Logic
 
 @enduml

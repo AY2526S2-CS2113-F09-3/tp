@@ -32,7 +32,7 @@
     -   _Highlights:_ Engineered defensive "Ghost Reference" checks. During `TagCommand#execute` and `UntagCommand#execute`, the system strictly verifies the existence of _both_ the module and the equipment before allowing a link to be created or destroyed, preventing orphaned data and fatal errors during forecasting calculations.
 
 ### Contributions to the User Guide (UG)
--   Authored the **Equipment Inventory Management** section of the User Guide (documenting `add`, `delete`, `setstatus`, and `setmin`).
+-   Authored the **Equipment Inventory Management** section of the User Guide (documenting `add`, `tag`, and `untag`).
 
 -   Structured the documentation to prioritize user readability, providing clear formats and practical daily-use examples. I specifically focused on explaining the mathematical impact of the `req/FRACTION` parameter in the `tag` command so technicians understand how to represent shared lab equipment.
 ### Contributions to the Developer Guide (DG)

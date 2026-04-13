@@ -59,55 +59,66 @@ activate Context
 Context --> TagCommand : storage
 deactivate Context
 
+== Existence Validation ==
 TagCommand -> ModuleList : hasModule(moduleName)
 activate ModuleList
-ModuleList --> TagCommand : true
+ModuleList --> TagCommand : moduleExists
 deactivate ModuleList
 
 TagCommand -> EquipmentList : hasEquipment(equipmentName)
 activate EquipmentList
-EquipmentList --> TagCommand : true
+EquipmentList --> TagCommand : equipmentExists
 deactivate EquipmentList
 
-TagCommand -> ModuleList : getModule(moduleName)
-activate ModuleList
-ModuleList --> TagCommand : targetModule
-deactivate ModuleList
+alt !moduleExists && !equipmentExists
+    TagCommand -> TagCommand : throw EquipmentMasterException
+else !moduleExists
+    TagCommand -> TagCommand : throw EquipmentMasterException
+else !equipmentExists
+    TagCommand -> TagCommand : throw EquipmentMasterException
+else Both Exist (Happy Path)
 
-TagCommand -> EquipmentList : findByName(equipmentName)
-activate EquipmentList
-EquipmentList --> TagCommand : targetEquipment
-deactivate EquipmentList
+    TagCommand -> ModuleList : getModule(moduleName)
+    activate ModuleList
+    ModuleList --> TagCommand : targetModule
+    deactivate ModuleList
 
-TagCommand -> Module : addEquipmentRequirement(name, ratio)
-activate Module
-Module --> TagCommand
-deactivate Module
+    TagCommand -> EquipmentList : findByName(equipmentName)
+    activate EquipmentList
+    EquipmentList --> TagCommand : targetEquipment
+    deactivate EquipmentList
 
-TagCommand -> Equipment : addModuleCode(moduleName)
-activate Equipment
-Equipment --> TagCommand
-deactivate Equipment
+    TagCommand -> Module : addEquipmentRequirement(name, ratio)
+    activate Module
+    Module --> TagCommand
+    deactivate Module
 
-TagCommand -> Ui : showMessage(successMessage)
-activate Ui
-Ui --> TagCommand
-deactivate Ui
+    TagCommand -> Equipment : addModuleCode(targetModule.getName())
+    activate Equipment
+    Equipment --> TagCommand
+    deactivate Equipment
 
-TagCommand -> Storage : saveModules(modules)
-activate Storage
-Storage --> TagCommand
-deactivate Storage
+    TagCommand -> Ui : showMessage(successMessage)
+    activate Ui
+    Ui --> TagCommand
+    deactivate Ui
 
-TagCommand -> Storage : saveEquipments(equipments)
-activate Storage
-Storage --> TagCommand
-deactivate Storage
+    TagCommand -> Storage : saveModules(modules)
+    activate Storage
+    Storage --> TagCommand
+    deactivate Storage
+
+    TagCommand -> Storage : saveEquipments(equipments)
+    activate Storage
+    Storage --> TagCommand
+    deactivate Storage
+
+end
 
 TagCommand --> Logic
 deactivate TagCommand
 
-Logic --> User : display success
+Logic --> User : display success or error
 deactivate Logic
 
 @enduml

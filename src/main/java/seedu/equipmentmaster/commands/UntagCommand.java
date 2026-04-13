@@ -57,25 +57,41 @@ public class UntagCommand extends Command {
         boolean moduleExists = modules.hasModule(moduleName);
         boolean equipmentExists = equipments.hasEquipment(equipmentName);
 
-        if (!moduleExists && !equipmentExists) {
-            throw new EquipmentMasterException("Aborted: Neither the module '" + moduleName +
-                    "' nor the equipment '" + equipmentName + "' exists.");
-        } else if (!moduleExists) {
-            throw new EquipmentMasterException("Aborted: Module '" + moduleName + "' does not exist.");
-        } else if (!equipmentExists) {
+        if (!equipmentExists) {
             throw new EquipmentMasterException("Aborted: Equipment '" + equipmentName + "' does not exist.");
         }
 
         // 2. Retrieve the objects
-        Module targetModule = modules.getModule(moduleName);
+
         Equipment targetEquipment = equipments.findByName(equipmentName);
 
         // Grab the official names to ensure a perfect match in the internal lists
         String officialEquipmentName = targetEquipment.getName();
-        String officialModuleName = targetModule.getName();
+
+        if (!moduleExists) {
+            boolean hadGhostModuleCode = targetEquipment.hasModuleCode(moduleName);
+            if (hadGhostModuleCode) {
+                targetEquipment.removeModuleCode(moduleName);
+                ui.showMessage("Notice: Module '" + moduleName +
+                        "' does not exist in the system, but invalid links were cleaned up from "
+                        + officialEquipmentName + ".");
+                try {
+                    storage.saveEquipments(equipments); // Save the cleaned equipment
+                } catch (EquipmentMasterException e) {
+                    ui.showMessage("Warning: Failed to save the data file. " + e.getMessage());
+                }
+            } else {
+                ui.showMessage("Notice: Module '" + moduleName +
+                        "' does not exist in the system, and " + officialEquipmentName
+                        + " had no invalid link to clean up.");
+            }
+            return; // Exit early, since there is no module to update
+        }
 
         // 3. Bidirectional Removal (Safe Dereferencing)
         // Remove from Module's requirement map
+        Module targetModule = modules.getModule(moduleName);
+        String officialModuleName = targetModule.getName();
         boolean isRemovedFromModule = targetModule.removeEquipmentRequirement(officialEquipmentName);
 
         // FIX 1: Also remove the module code from the Equipment's internal tag list
