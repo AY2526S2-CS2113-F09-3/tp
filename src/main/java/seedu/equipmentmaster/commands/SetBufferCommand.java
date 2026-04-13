@@ -18,6 +18,7 @@ import static seedu.equipmentmaster.common.Messages.MESSAGE_INVALID_SETBUFFER_FO
  */
 public class SetBufferCommand extends Command {
     private static final Logger logger = Logger.getLogger(SetBufferCommand.class.getName());
+    private static final double MAX_BUFFER_PERCENTAGE = 1000.0;
 
     private final String name;
     private final int index; // -1 if using name
@@ -33,7 +34,7 @@ public class SetBufferCommand extends Command {
         if (percentage < 0) {
             throw new IllegalArgumentException("Buffer percentage cannot be negative.");
         }
-        if (percentage > 1000) {
+        if (percentage > MAX_BUFFER_PERCENTAGE) {
             throw new IllegalArgumentException("Buffer percentage cannot exceed 1000.");
         }
         this.name = name;
@@ -56,7 +57,7 @@ public class SetBufferCommand extends Command {
             throw new IllegalArgumentException("Buffer percentage cannot be negative.");
         }
 
-        if (percentage > 1000) {
+        if (percentage > MAX_BUFFER_PERCENTAGE) {
             throw new IllegalArgumentException("Buffer percentage cannot exceed 1000.");
         }
 
@@ -117,7 +118,7 @@ public class SetBufferCommand extends Command {
                     if (percentage < 0) {
                         throw new EquipmentMasterException("Buffer percentage cannot be negative.");
                     }
-                    if (percentage > 1000) {
+                    if (percentage > MAX_BUFFER_PERCENTAGE) {
                         throw new EquipmentMasterException("Buffer percentage cannot exceed 1000.");
                     }
                 } catch (NumberFormatException e) {
@@ -153,7 +154,7 @@ public class SetBufferCommand extends Command {
             if (percentage < 0) {
                 throw new EquipmentMasterException("Buffer percentage cannot be negative.");
             }
-            if (percentage > 1000) {
+            if (percentage > MAX_BUFFER_PERCENTAGE) {
                 throw new EquipmentMasterException("Buffer percentage cannot exceed 1000.");
             }
         } catch (NumberFormatException e) {
@@ -181,7 +182,7 @@ public class SetBufferCommand extends Command {
         }
         startIdx += searchPrefix.length();
         int endIdx = paddedCommand.length();
-        String[] allPrefixes = {" n/", " i/", " b/", " q/", " sem/", " bought/", " life/", " m/", " min/"};
+        String[] allPrefixes = {" n/", " b/", " q/", " sem/", " bought/", " life/", " m/", " min/"};
         for (String p : allPrefixes) {
             int pIdx = paddedCommand.indexOf(p, startIdx);
             if (pIdx != -1 && pIdx < endIdx) {

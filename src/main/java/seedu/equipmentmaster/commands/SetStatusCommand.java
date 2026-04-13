@@ -153,7 +153,7 @@ public class SetStatusCommand extends Command {
         }
         startIdx += searchPrefix.length();
         int endIdx = paddedCommand.length();
-        String[] allPrefixes = {" n/", " i/", " q/", " s/"};
+        String[] allPrefixes = {" n/", " q/", " s/"};
         for (String p : allPrefixes) {
             int pIdx = paddedCommand.indexOf(p, startIdx);
             if (pIdx != -1 && pIdx < endIdx) {
