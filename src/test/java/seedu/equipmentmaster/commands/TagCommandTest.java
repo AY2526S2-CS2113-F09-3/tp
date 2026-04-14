@@ -120,7 +120,7 @@ class TagCommandTest {
     }
 
     @Test
-    void execute_moduleMissing_throwsException() {
+    void execute_moduleMissing_throwsException() throws EquipmentMasterException {
         // Add an equipment to the dummy context, but NO module
         equipmentList.addEquipment(new Equipment("stm32", 50, 50, 0, null, 5.0, new ArrayList<>(), 5, 0.0));
 

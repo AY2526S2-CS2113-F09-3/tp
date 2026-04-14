@@ -21,7 +21,7 @@
 
     -   _Justification:_ This forms the foundational database of the entire application. Without a robust way to ingest and structure the physical stock, downstream forecasting and module mapping features would not function.
 
-    -   _Highlights:_ Built a highly flexible parser capable of safely extracting multiple optional and repeating flags without collision.
+    -   _Highlights:_ Built a highly flexible parser capable of safely extracting multiple optional and repeating flags without collision. Engineered Strict Batch Validation. Implemented defensive logic during equipment restocking. If a user attempts to merge new stock into an existing record but provides conflicting batch metadata (different purchase semester or lifespan), the system actively rejects the input to prevent "silent data loss" and protect the mathematical integrity of the Aging Reports.
 
 -   **Academic Dependency Mapping (`tag` and `untag` commands):**
 
@@ -35,8 +35,10 @@
 -   Authored the **Equipment Inventory Management** section of the User Guide (documenting `add`, `tag`, and `untag`).
 
 -   Structured the documentation to prioritize user readability, providing clear formats and practical daily-use examples. I specifically focused on explaining the mathematical impact of the `req/FRACTION` parameter in the `tag` command so technicians understand how to represent shared lab equipment.
+
+-   Authored specific FAQ entries and Error Handling documentation detailing the strict batch tracking rules, ensuring users understand why the system rejects conflicting equipment lifespans during restocking.
 ### Contributions to the Developer Guide (DG)
--   **Authored Feature Implementation Sections:** Detailed the architecture, execution flow, and design considerations for the **Core Inventory Ingestion** (`AddCommand`) and the **Academic Dependency Mapping System** (`TagCommand` & `UntagCommand`), with a strong focus on defensive programming mechanisms like the Double Ghost Reference Check.
+-   **Authored Feature Implementation Sections:** Detailed the architecture, execution flow, and design considerations for the **Core Inventory Ingestion** (`AddCommand`) and the **Academic Dependency Mapping System** (`TagCommand` & `UntagCommand`). Strongly emphasized defensive programming mechanisms, specifically documenting the Double Ghost Reference Check and the Anti-Data Loss Batch Validation protocol.
 
 -   **Contributed UML Diagrams:** Authored PlantUML diagrams mapping out my specific architectural contributions, including:
 

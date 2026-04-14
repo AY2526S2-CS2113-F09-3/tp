@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Objects;
 
 import seedu.equipmentmaster.equipment.Equipment;
+import seedu.equipmentmaster.exception.EquipmentMasterException;
 
 /**
  * Represents a list that stores all equipment objects in the system.
@@ -32,22 +33,55 @@ public class EquipmentList {
      *
      * @param newEquipment Equipment object to be added.
      */
-    public void addEquipment(Equipment newEquipment) {
-        for (Equipment existingItem : equipments) {
-            boolean isNameMatch = existingItem.getName().equalsIgnoreCase(newEquipment.getName());
-            boolean isLifespanMatch = Objects.equals(existingItem.getLifespanYears(), newEquipment.getLifespanYears());
-            boolean isPurchaseSemMatch = Objects.equals(existingItem.getPurchaseSem(), newEquipment.getPurchaseSem());
-            if (isNameMatch && isLifespanMatch && isPurchaseSemMatch) {
-                existingItem.setQuantity(existingItem.getQuantity() + newEquipment.getQuantity());
-                existingItem.setAvailable(existingItem.getAvailable() + newEquipment.getAvailable());
-                existingItem.setLoaned(existingItem.getLoaned() + newEquipment.getLoaned());
+    public void addEquipment(Equipment newEquipment) throws EquipmentMasterException {
+        boolean hasNameMatch = false;
+        Equipment conflictingItem = null; // Store for the error message
 
-                for (String moduleCode : newEquipment.getModuleCodes()) {
-                    existingItem.addModuleCode(moduleCode);
+        for (Equipment existingItem : equipments) {
+
+            // 1. Check if the name matches
+            if (existingItem.getName().equalsIgnoreCase(newEquipment.getName())) {
+                hasNameMatch = true;
+
+                // Save the first conflicting item we see so we can use its stats in the error message later
+                if (conflictingItem == null) {
+                    conflictingItem = existingItem;
                 }
-                return;
+
+                // 2. Check if the batch details match exactly
+                boolean isLifespanMatch = Objects.equals(existingItem.getLifespanYears(),
+                        newEquipment.getLifespanYears());
+                boolean isPurchaseSemMatch = Objects.equals(existingItem.getPurchaseSem(),
+                        newEquipment.getPurchaseSem());
+
+                if (isLifespanMatch && isPurchaseSemMatch) {
+                    // EXACT MATCH FOUND: It is safe to merge the quantities.
+                    existingItem.setQuantity(existingItem.getQuantity() + newEquipment.getQuantity());
+                    existingItem.setAvailable(existingItem.getAvailable() + newEquipment.getAvailable());
+                    existingItem.setLoaned(existingItem.getLoaned() + newEquipment.getLoaned());
+
+                    for (String moduleCode : newEquipment.getModuleCodes()) {
+                        existingItem.addModuleCode(moduleCode);
+                    }
+                    return; // Exit early, we successfully merged!
+                }
             }
         }
+
+        // 3. Post-Loop Check
+        if (hasNameMatch && conflictingItem != null) {
+            // We searched the whole list. The name exists, but the batch details didn't match any of them.
+            throw new EquipmentMasterException("An item named '" + newEquipment.getName()
+                    + "' already exists with different batch details. Existing values: "
+                    + "bought/" + conflictingItem.getPurchaseSem() + ", life/"
+                    + conflictingItem.getLifespanYears() + ". Attempted values: bought/"
+                    + newEquipment.getPurchaseSem() + ", life/"
+                    + newEquipment.getLifespanYears() + ". "
+                    + "To track this new batch, please give it a unique name (e.g., "
+                    + newEquipment.getName() + "_New).");
+        }
+
+        // If we reach here, the name is completely unique in the system. Add it.
         equipments.add(newEquipment);
     }
 

@@ -120,7 +120,7 @@ class UntagCommandTest {
     }
 
     @Test
-    void execute_untagNonExistentRequirement_throwsException() {
+    void execute_untagNonExistentRequirement_throwsException() throws EquipmentMasterException {
         // 1. Setup Context, but DO NOT pre-tag the module
         Module testModule = null;
         try {
@@ -145,7 +145,7 @@ class UntagCommandTest {
     }
 
     @Test
-    void execute_moduleMissingButEquipmentExists_cleansUpGhostReference() {
+    void execute_moduleMissingButEquipmentExists_cleansUpGhostReference() throws EquipmentMasterException {
         // 1. Setup Initial State
         String itemName = "beer";
         String ghostModName = "GHOST101";

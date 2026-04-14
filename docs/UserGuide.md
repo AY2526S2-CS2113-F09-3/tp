@@ -87,6 +87,7 @@ Registers new physical equipment into your laboratory inventory. You can perform
 * **Adding with a low-stock alert threshold:** `add n/Jumper Wires q/500 min/100`
 * **Adding with all parameters:** `add n/Raspberry Pi 4 q/30 m/CG2111A bought/AY2024/25 Sem1 life/4.0 min/5`
 
+**Important Note on Restocking (Batch Tracking):** If you `add` an item with a name that already exists in your inventory, the system will merge the new quantity into your existing stock. However, to protect the accuracy of your Aging Reports, the system enforces **strict batch tracking**. If you try to restock an item but provide a _different_ `bought/` semester or `life/` span than the original, the system will reject the command to prevent old and new hardware from being mixed. To track a brand-new generation of hardware, please give it a unique name (e.g., `add n/Oscilloscope_AY25 ...`).
 
 ### 2. Module Tracking System
 To accurately forecast laboratory demands, the system allows you to register academic modules, track their student enrollment (pax), and dynamically map equipment requirements to them.
@@ -314,6 +315,7 @@ Equipment Master is built with robust validation to prevent accidental data corr
 * Providing negative numbers or text where positive integers are expected (e.g., quantities, pax).
 * Entering reserved characters (`|`, `=`, `,`) in equipment names.
 * Referencing a module or equipment that does not exist in the registry.
+* Attempting to restock an existing equipment item with a `bought/` semester or `life/` span that conflicts with the original batch record.
 
 When an error occurs, the system will reject the invalid input, print a clear error message explaining what went wrong, and safely wait for your next command without crashing.
 
@@ -378,6 +380,11 @@ When an error occurs, the system will reject the invalid input, print a clear er
 **Q: A student is returning equipment but I only remember the item's position in the list, not its full name. Do I need to look up the name first?**
 
 **A:** No, the `setstatus` command supports both name-based and index-based targeting. You can simply use the item's position in the list (e.g., `setstatus 1 q/3 s/available`) to log a return instantly without needing to recall the full equipment name, keeping the process fast during busy peak hours.
+
+
+**Q: I tried to add more stock to an existing item, but I got an error saying the purchase semester or lifespan is different. Why?**
+
+**A:** Equipment Master strictly tracks hardware lifecycles to ensure your Aging Reports are mathematically accurate. To prevent "silent data loss"—where mixing a brand-new batch of hardware with a 5-year-old batch ruins the expiration data for both—the system prevents you from merging items with conflicting lifespans under the exact same name. For the new shipment, please use a distinct name (e.g., `Oscilloscope_Batch2` or `Oscilloscope_AY25`) to track its lifecycle independently.
 
 ---
 

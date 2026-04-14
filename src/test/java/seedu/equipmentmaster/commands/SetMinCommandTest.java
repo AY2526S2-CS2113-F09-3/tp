@@ -66,7 +66,7 @@ public class SetMinCommandTest {
     }
 
     @Test
-    public void execute_invalidIndex_throwsException() {
+    public void execute_invalidIndex_throwsException() throws EquipmentMasterException {
         // Arrange
         equipments.addEquipment(new Equipment("Resistor", 10));
 
@@ -76,7 +76,7 @@ public class SetMinCommandTest {
     }
 
     @Test
-    public void execute_nameNotFound_throwsException() {
+    public void execute_nameNotFound_throwsException() throws EquipmentMasterException {
         // Arrange
         equipments.addEquipment(new Equipment("Resistor", 10));
 
