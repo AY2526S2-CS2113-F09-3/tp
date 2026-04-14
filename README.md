@@ -1,66 +1,68 @@
-# Equipment Master
+# Equipment Master (v2.1)
 
-This is a project template for a greenfield Java project. It's named after the Java mascot _Duke_. Given below are instructions on how to use it.
+> **The professional asset management expert tailored for University Lab Technicians.**
 
-## Setting up in Intellij
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![Java Version](https://img.shields.io/badge/Java-11%2F17-orange)](https://www.oracle.com/java/)
 
-Prerequisites: JDK 17 (use the exact version), update Intellij to the most recent version.
+**Equipment Master** is a desktop Command Line Interface (CLI) inventory management system. It replaces error-prone manual logbooks and scattered Excel sheets by establishing a relational digital registry between lab hardware and academic modules. It empowers technicians to track inventory precisely, predict lifecycle replacements, and optimize procurement decisions based on enrollment data.
 
-1. **Ensure Intellij JDK 17 is defined as an SDK**, as described [here](https://www.jetbrains.com/help/idea/sdk.html#set-up-jdk) -- this step is not needed if you have used JDK 17 in a previous Intellij project.
-1. **Import the project _as a Gradle project_**, as described [here](https://se-education.org/guides/tutorials/intellijImportGradleProject.html).
-1. **Verify the setup**: After the importing is complete, locate the `src/main/java/seedu/duke/Duke.java` file, right-click it, and choose `Run Duke.main()`. If the setup is correct, you should see something like the below:
-   ```
-   > Task :compileJava
-   > Task :processResources NO-SOURCE
-   > Task :classes
-   
-   > Task :Duke.main()
-   Hello from
-    ____        _        
-   |  _ \ _   _| | _____ 
-   | | | | | | | |/ / _ \
-   | |_| | |_| |   <  __/
-   |____/ \__,_|_|\_\___|
-   
-   What is your name?
-   ```
-   Type some word and press enter to let the execution proceed to the end.
+---
 
-**Warning:** Keep the `src\main\java` folder as the root folder for Java files (i.e., don't rename those folders or move Java files to another folder outside of this folder path), as this is the default location some tools (e.g., Gradle) expect to find Java files.
+## 🚀 Core Features
 
-## Build automation using Gradle
+* **Relational Module Tracking:** Goes beyond simple lists. It links equipment to specific academic courses (e.g., `CG2111A`, `EE2026`) with bidirectional synchronization, allowing you to instantly identify hardware shortages for upcoming experiments.
+* **Semantic Academic Time Engine:** Features a pioneering normalization algorithm tailored for university timelines (e.g., `AY24/25 Sem1`), supporting precise asset depreciation calculations on non-standard academic calendars.
+* **Predictive Aging Report:** Automatically tracks hardware lifecycles. Based on purchase dates and expected lifespan, it proactively alerts technicians about aging tools that require replacement.
+* **Atomic Persistence (Dual-Save):** Utilizes a robust `Dual-Save` storage protocol. This ensures absolute data consistency across linked database files, completely eliminating "ghost references" or data desynchronization after application restarts.
+* **Defensive Engineering:** Deeply integrates the **SLAP** principle and the **Context Object** design pattern. Features comprehensive exception handling and line-level storage diagnostics to guarantee system stability under edge cases.
 
-* This project uses Gradle for build automation and dependency management. It includes a basic build script as well (i.e. the `build.gradle` file).
-* If you are new to Gradle, refer to the [Gradle Tutorial at se-education.org/guides](https://se-education.org/guides/tutorials/gradle.html).
+---
 
-## Testing
+## 🛠️ Quick Start
 
-### I/O redirection tests
+### Prerequisites
+* Ensure you have **Java 11** or above installed on your computer (Java 17 is recommended).
 
-* To run _I/O redirection_ tests (aka _Text UI tests_), navigate to the `text-ui-test` and run the `runtest(.bat/.sh)` script.
+### Running the Application
+1. Download the latest `tp.jar` file from the [Releases](https://github.com/AY2526S2-CS2113-F09-3/tp/releases) page.
+2. Place the JAR file into an empty folder.
+3. Open your Terminal (or Command Prompt / PowerShell) and navigate to that folder.
+4. Run the following command to start the application:
+   `java -jar tp.jar`
 
-### JUnit tests
+---
 
-* A skeleton JUnit test (`src/test/java/seedu/duke/DukeTest.java`) is provided with this project template. 
-* If you are new to JUnit, refer to the [JUnit Tutorial at se-education.org/guides](https://se-education.org/guides/tutorials/junit.html).
+## 📖 Documentation
 
-## Checkstyle
+Our documentation is structured to support both end-users and developers:
 
-* A sample CheckStyle rule configuration is provided in this project.
-* If you are new to Checkstyle, refer to the [Checkstyle Tutorial at se-education.org/guides](https://se-education.org/guides/tutorials/checkstyle.html).
+* **[User Guide (UG)](docs/UserGuide.md):** Detailed command formats, visual ASCII examples, and a comprehensive FAQ/Error Handling section.
+* **[Developer Guide (DG)](docs/DeveloperGuide.md):** In-depth architectural deep-dives, PlantUML diagrams, data models, and core algorithm logic (e.g., Aging Report & Persistence).
 
-## CI using GitHub Actions
+---
 
-The project uses [GitHub actions](https://github.com/features/actions) for CI. When you push a commit to this repo or PR against it, GitHub actions will run automatically to build and verify the code as updated by the commit/PR.
+## ⌨️ Command Sneak Peek
 
-## Documentation
+| Action | Example Command |
+| :--- | :--- |
+| **Add Equipment** | `add n/STM32 q/50 m/CG2111A bought/AY24/25 Sem1 life/2.5` |
+| **Aging Report** | `report aging AY2024/25 Sem1` |
+| **Multi-keyword Find** | `find STM32 CG2111A` |
+| **Update Loan Status** | `setstatus n/STM32 q/10 s/loaned` |
+| **Set Safety Buffer** | `setbuffer n/STM32 b/10` |
 
-`/docs` folder contains a skeleton version of the project documentation.
+---
 
-Steps for publishing documentation to the public: 
-1. If you are using this project template for an individual project, go your fork on GitHub.<br>
-   If you are using this project template for a team project, go to the team fork on GitHub.
-1. Click on the `settings` tab.
-1. Scroll down to the `GitHub Pages` section.
-1. Set the `source` as `master branch /docs folder`.
-1. Optionally, use the `choose a theme` button to choose a theme for your documentation.
+## 👥 Contributors
+
+This project was developed by the **NUS CS2113-F09-3** team.
+
+* **Hongyu Chen** - *Core Logic Design, Architectural Refactoring (Context Pattern), Persistence Mechanism, Predictive Algorithms.*
+* *(Add other team members here)*
+
+---
+
+## ⚖️ License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
