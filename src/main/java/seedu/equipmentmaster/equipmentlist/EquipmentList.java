@@ -49,8 +49,10 @@ public class EquipmentList {
                 }
 
                 // 2. Check if the batch details match exactly
-                boolean isLifespanMatch = Objects.equals(existingItem.getLifespanYears(), newEquipment.getLifespanYears());
-                boolean isPurchaseSemMatch = Objects.equals(existingItem.getPurchaseSem(), newEquipment.getPurchaseSem());
+                boolean isLifespanMatch = Objects.equals(existingItem.getLifespanYears(),
+                        newEquipment.getLifespanYears());
+                boolean isPurchaseSemMatch = Objects.equals(existingItem.getPurchaseSem(),
+                        newEquipment.getPurchaseSem());
 
                 if (isLifespanMatch && isPurchaseSemMatch) {
                     // EXACT MATCH FOUND: It is safe to merge the quantities.

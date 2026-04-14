@@ -132,7 +132,7 @@ class EquipmentListTest {
     }
 
     @Test
-    public void findByName_and_hasEquipment_caseInsensitive_success() throws Exception {
+    public void findAndHasEquipment_caseInsensitive_success() throws Exception {
         EquipmentList equipmentList = new EquipmentList();
         Equipment eq1 = new Equipment("Raspberry Pi", 10, 10, 0, null, 0.0, new ArrayList<>(), 0, 0.0);
         equipmentList.addEquipment(eq1);
