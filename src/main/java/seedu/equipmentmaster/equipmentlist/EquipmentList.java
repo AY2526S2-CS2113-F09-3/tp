@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Objects;
 
 import seedu.equipmentmaster.equipment.Equipment;
+import seedu.equipmentmaster.exception.EquipmentMasterException;
 
 /**
  * Represents a list that stores all equipment objects in the system.
@@ -32,22 +33,38 @@ public class EquipmentList {
      *
      * @param newEquipment Equipment object to be added.
      */
-    public void addEquipment(Equipment newEquipment) {
+    public void addEquipment(Equipment newEquipment) throws EquipmentMasterException {
         for (Equipment existingItem : equipments) {
-            boolean isNameMatch = existingItem.getName().equalsIgnoreCase(newEquipment.getName());
-            boolean isLifespanMatch = Objects.equals(existingItem.getLifespanYears(), newEquipment.getLifespanYears());
-            boolean isPurchaseSemMatch = Objects.equals(existingItem.getPurchaseSem(), newEquipment.getPurchaseSem());
-            if (isNameMatch && isLifespanMatch && isPurchaseSemMatch) {
-                existingItem.setQuantity(existingItem.getQuantity() + newEquipment.getQuantity());
-                existingItem.setAvailable(existingItem.getAvailable() + newEquipment.getAvailable());
-                existingItem.setLoaned(existingItem.getLoaned() + newEquipment.getLoaned());
 
-                for (String moduleCode : newEquipment.getModuleCodes()) {
-                    existingItem.addModuleCode(moduleCode);
+            // 1. Check if the name matches
+            if (existingItem.getName().equalsIgnoreCase(newEquipment.getName())) {
+
+                // 2. Check if the batch details match
+                boolean isLifespanMatch = Objects.equals(existingItem.getLifespanYears(),
+                        newEquipment.getLifespanYears());
+                boolean isPurchaseSemMatch = Objects.equals(existingItem.getPurchaseSem(),
+                        newEquipment.getPurchaseSem());
+
+                if (isLifespanMatch && isPurchaseSemMatch) {
+                    // EXACT MATCH: It is safe to merge the quantities.
+                    existingItem.setQuantity(existingItem.getQuantity() + newEquipment.getQuantity());
+                    existingItem.setAvailable(existingItem.getAvailable() + newEquipment.getAvailable());
+                    existingItem.setLoaned(existingItem.getLoaned() + newEquipment.getLoaned());
+
+                    for (String moduleCode : newEquipment.getModuleCodes()) {
+                        existingItem.addModuleCode(moduleCode);
+                    }
+                    return; // Exit early, we are done updating
+                } else {
+                    // CONFLICT: Name is the same, but it's a different batch. Reject it!
+                    throw new EquipmentMasterException("An item named '" + newEquipment.getName() +
+                            "' already exists with a different Purchase Semester or Lifespan! " +
+                            "To track this new batch, please give it a unique name (e.g., " +
+                            newEquipment.getName() + "_New).");
                 }
-                return;
             }
         }
+        // If the loop finishes, the name is completely unique. Add it.
         equipments.add(newEquipment);
     }
 
