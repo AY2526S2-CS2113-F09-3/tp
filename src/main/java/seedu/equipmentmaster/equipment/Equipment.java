@@ -170,6 +170,7 @@ public class Equipment {
      * @param available Updated available quantity
      */
     public void setAvailable(int available) {
+        assert available >= 0 : "Available quantity in model cannot be negative";
         this.available = available;
     }
 
@@ -179,6 +180,7 @@ public class Equipment {
      * @param loaned Updated loaned quantity.
      */
     public void setLoaned(int loaned) {
+        assert loaned >= 0 : "Loaned quantity in model cannot be negative";
         this.loaned = loaned;
     }
 
@@ -197,6 +199,7 @@ public class Equipment {
      * @param quantity New total quantity.
      */
     public void setQuantity(int quantity) {
+        assert quantity >= 0 : "Total quantity in model cannot be negative";
         this.quantity = quantity;
     }
 
