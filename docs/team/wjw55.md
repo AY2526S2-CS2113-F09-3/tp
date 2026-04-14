@@ -5,7 +5,7 @@
 ## Summary of Contributions
 
 ### Code Contributed
-* https://nus-cs2113-ay2526-s2.github.io/tp-dashboard/?search=wjw55&breakdown=true&sort=groupTitle%20dsc&sortWithin=title&since=2026-02-20T00%3A00%3A00&timeframe=commit&mergegroup=&groupSelect=groupByRepos&checkedFileTypes=docs~functional-code~test-code~other&filteredFileName=
+[RepoSense Dashboard Link](https://nus-cs2113-ay2526-s2.github.io/tp-dashboard/?search=wjw55&breakdown=true&sort=groupTitle%20dsc&sortWithin=title&since=2026-02-20T00%3A00%3A00&timeframe=commit&mergegroup=&groupSelect=groupByRepos&checkedFileTypes=docs~functional-code~test-code~other&filteredFileName=)
 
 ### Enhancements Implemented
 
@@ -22,6 +22,7 @@
     -   Developed the core relational logic to dynamically link equipment to modules using requirement ratios for procurement forecasting.
 
     -   **Highlight:** Implemented defensive **"Double Ghost Reference" checks** to verify entity existence before mapping, entirely preventing orphaned data and fatal crashes.
+
 ### Contributions to the User Guide (UG)
 
 -   Authored the **Equipment Inventory Management** section (`add`, `tag`, `untag`), prioritizing readable formats and practical daily-use examples.
