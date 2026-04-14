@@ -13,13 +13,13 @@
 ### Enhancements Implemented
 
 #### **Core Logic & Predictive Analytics**
-* **Semantic Academic Time Engine:** Designed and implemented the `AcademicSemester` normalization engine. This algorithm performs floating-point mathematical operations on non-standard university timelines (e.g., `AY24/25 Sem1`), providing the underlying logic for time-based calculations.
+* **Semantic Academic Time Engine:** Designed and implemented the `AcademicSemester` normalization engine. This algorithm performs floating-point mathematical operations on non-standard university timelines (e.g., `AY2024/25 Sem1`), providing the underlying logic for time-based calculations.
 * **Automated Aging & Lifespan Audits:** Engineered the **Aging Report** feature, which utilizes the time engine to calculate the real-time age of hardware against its expected lifespan. This allows technicians to proactively identify aging equipment and forecast replacement cycles.
 * **Relational Module Tracking:** Developed the entity structure linking `Equipment` to `Module` requirements. Implemented **Bidirectional Entity Synchronization** and **Safe Dereferencing** to ensure a Single Source of Truth, preventing "ghost references" during module deletions and tag updates.
 * **Multi-Keyword Search Optimization (Find):** Refactored the `find` command to support complex multi-keyword cross-referencing across both item names and module codes, strictly adhering to the **Single Level of Abstraction Principle (SLAP)** to eliminate deeply nested iterations.
 
 #### **System Architecture & Robustness (Technical Hardening)**
-* **Atomic Persistence Strategy (Dual-Save):** Implemented a **Dual-Save protocol** to prevent data desynchronization between database files (`equipment.txt` and `module.txt`). This ensures cross-linked data is written atomically, maintaining integrity after application restarts.
+* **Coordinated Persistence Strategy (Dual-Save):** Implemented a **Dual-Save protocol** to reduce data desynchronization between database files (`equipment.txt` and `module.txt`). This keeps cross-linked data consistently persisted across both files during normal saves, helping maintain integrity after application restarts.
 * **Architectural Decoupling (Context Pattern):** Led the system-wide integration of the **Context Object Pattern**. By encapsulating Storage, UI, and state into a unified `Context`, I decoupled command logic from infrastructure, significantly improving testability via dependency injection.
 * **State Management & UX Optimization:** Refactored configuration commands (e.g., `getsem`) to distinguish between "implicit system defaults" and "explicit user values" via persistence file checks, eliminating confusing UI prompts and enhancing initialization logic.
 * **Defensive API Hardening & Diagnostics:** Systematically migrated critical business logic from Java assertions to explicit **Defensive Exception Handling**. Enhanced the `Storage` component with line-level validation to identify exact corruption locations, preventing silent data loss.
