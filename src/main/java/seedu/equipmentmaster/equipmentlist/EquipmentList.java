@@ -34,19 +34,26 @@ public class EquipmentList {
      * @param newEquipment Equipment object to be added.
      */
     public void addEquipment(Equipment newEquipment) throws EquipmentMasterException {
+        boolean hasNameMatch = false;
+        Equipment conflictingItem = null; // Store for the error message
+
         for (Equipment existingItem : equipments) {
 
             // 1. Check if the name matches
             if (existingItem.getName().equalsIgnoreCase(newEquipment.getName())) {
+                hasNameMatch = true;
 
-                // 2. Check if the batch details match
-                boolean isLifespanMatch = Objects.equals(existingItem.getLifespanYears(),
-                        newEquipment.getLifespanYears());
-                boolean isPurchaseSemMatch = Objects.equals(existingItem.getPurchaseSem(),
-                        newEquipment.getPurchaseSem());
+                // Save the first conflicting item we see so we can use its stats in the error message later
+                if (conflictingItem == null) {
+                    conflictingItem = existingItem;
+                }
+
+                // 2. Check if the batch details match exactly
+                boolean isLifespanMatch = Objects.equals(existingItem.getLifespanYears(), newEquipment.getLifespanYears());
+                boolean isPurchaseSemMatch = Objects.equals(existingItem.getPurchaseSem(), newEquipment.getPurchaseSem());
 
                 if (isLifespanMatch && isPurchaseSemMatch) {
-                    // EXACT MATCH: It is safe to merge the quantities.
+                    // EXACT MATCH FOUND: It is safe to merge the quantities.
                     existingItem.setQuantity(existingItem.getQuantity() + newEquipment.getQuantity());
                     existingItem.setAvailable(existingItem.getAvailable() + newEquipment.getAvailable());
                     existingItem.setLoaned(existingItem.getLoaned() + newEquipment.getLoaned());
@@ -54,17 +61,25 @@ public class EquipmentList {
                     for (String moduleCode : newEquipment.getModuleCodes()) {
                         existingItem.addModuleCode(moduleCode);
                     }
-                    return; // Exit early, we are done updating
-                } else {
-                    // CONFLICT: Name is the same, but it's a different batch. Reject it!
-                    throw new EquipmentMasterException("An item named '" + newEquipment.getName() +
-                            "' already exists with a different Purchase Semester or Lifespan! " +
-                            "To track this new batch, please give it a unique name (e.g., " +
-                            newEquipment.getName() + "_New).");
+                    return; // Exit early, we successfully merged!
                 }
             }
         }
-        // If the loop finishes, the name is completely unique. Add it.
+
+        // 3. Post-Loop Check
+        if (hasNameMatch && conflictingItem != null) {
+            // We searched the whole list. The name exists, but the batch details didn't match any of them.
+            throw new EquipmentMasterException("An item named '" + newEquipment.getName()
+                    + "' already exists with different batch details. Existing values: "
+                    + "bought/" + conflictingItem.getPurchaseSem() + ", life/"
+                    + conflictingItem.getLifespanYears() + ". Attempted values: bought/"
+                    + newEquipment.getPurchaseSem() + ", life/"
+                    + newEquipment.getLifespanYears() + ". "
+                    + "To track this new batch, please give it a unique name (e.g., "
+                    + newEquipment.getName() + "_New).");
+        }
+
+        // If we reach here, the name is completely unique in the system. Add it.
         equipments.add(newEquipment);
     }
 
