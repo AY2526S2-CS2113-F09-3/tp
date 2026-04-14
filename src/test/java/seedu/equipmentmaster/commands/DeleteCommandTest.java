@@ -115,7 +115,7 @@ public class DeleteCommandTest {
     }
 
     @Test
-    public void execute_deleteMoreThanAvailable_throwsException() {
+    public void execute_deleteMoreThanAvailable_throwsException() throws EquipmentMasterException {
         // Setup: Total 5, Available 2, Loaned 3
         Equipment eq = new Equipment("Breadboard", 5);
         eq.setAvailable(2);
@@ -135,7 +135,7 @@ public class DeleteCommandTest {
     }
 
     @Test
-    public void execute_deleteMoreThanLoaned_throwsException() {
+    public void execute_deleteMoreThanLoaned_throwsException() throws EquipmentMasterException {
         // Setup: Total 5, Available 4, Loaned 1
         Equipment eq = new Equipment("Raspberry Pi", 5);
         eq.setAvailable(4);
@@ -203,7 +203,7 @@ public class DeleteCommandTest {
     }
 
     @Test
-    public void execute_invalidIndex_throwsException() {
+    public void execute_invalidIndex_throwsException() throws EquipmentMasterException {
         // Arrange
         EquipmentList equipments = new EquipmentList();
         Ui ui = new Ui();

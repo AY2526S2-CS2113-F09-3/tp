@@ -24,7 +24,7 @@ public class FindCommandTest {
     }
 
     @Test
-    public void getMatchingEquipments_keywordMatches_returnsMatchedList() {
+    public void getMatchingEquipments_keywordMatches_returnsMatchedList() throws EquipmentMasterException {
         // Arrange
         EquipmentList equipments = new EquipmentList();
         equipments.addEquipment(new Equipment("STM32 Development Board", 50));
@@ -42,7 +42,7 @@ public class FindCommandTest {
     }
 
     @Test
-    public void getMatchingEquipments_keywordNoMatch_returnsEmptyList() {
+    public void getMatchingEquipments_keywordNoMatch_returnsEmptyList() throws EquipmentMasterException {
         // Arrange
         EquipmentList equipments = new EquipmentList();
         equipments.addEquipment(new Equipment("STM32 Development Board", 50));
@@ -58,7 +58,7 @@ public class FindCommandTest {
     }
 
     @Test
-    public void getMatchingEquipments_multipleKeywords_returnsMatchedList() {
+    public void getMatchingEquipments_multipleKeywords_returnsMatchedList() throws EquipmentMasterException {
         // Arrange
         EquipmentList equipments = new EquipmentList();
         equipments.addEquipment(new Equipment("STM32 Development Board", 50));
@@ -81,7 +81,7 @@ public class FindCommandTest {
     }
 
     @Test
-    public void getMatchingEquipments_moduleCodeCaseInsensitive_returnsMatchedList() {
+    public void getMatchingEquipments_moduleCodeCaseInsensitive_returnsMatchedList() throws EquipmentMasterException {
         // Arrange
         EquipmentList equipments = new EquipmentList();
         equipments.addEquipment(createEquipmentWithModules("FPGA", 40, "EE2026"));
@@ -97,7 +97,7 @@ public class FindCommandTest {
     }
 
     @Test
-    public void getMatchingEquipments_searchByModuleCode_returnsMatchedList() {
+    public void getMatchingEquipments_searchByModuleCode_returnsMatchedList() throws EquipmentMasterException {
         // Arrange
         EquipmentList equipments = new EquipmentList();
         equipments.addEquipment(createEquipmentWithModules("FPGA", 40, "EE2026", "CG2028"));
@@ -147,7 +147,7 @@ public class FindCommandTest {
      * This uses a local anonymous stub to bypass the standard Equipment constructor normalization.
      */
     @Test
-    public void getMatchingEquipments_nullModuleCodes_handledDefensively() {
+    public void getMatchingEquipments_nullModuleCodes_handledDefensively() throws EquipmentMasterException {
         // 1. ARRANGE
         EquipmentList equipments = new EquipmentList();
 
@@ -185,7 +185,7 @@ public class FindCommandTest {
     }
 
     @Test
-    public void execute_noMatchesFound_printsMessage() {
+    public void execute_noMatchesFound_printsMessage() throws EquipmentMasterException {
         // Triggers line 157: "There is no matching equipment in your list."
         EquipmentList equipments = new EquipmentList();
         equipments.addEquipment(new Equipment("HDMI", 10));
@@ -199,7 +199,7 @@ public class FindCommandTest {
     }
 
     @Test
-    public void execute_singleMatch_printsSingularMessage() {
+    public void execute_singleMatch_printsSingularMessage() throws EquipmentMasterException {
         // Triggers line 159 and 166: singular "1 equipment listed!" without index
         EquipmentList equipments = new EquipmentList();
         equipments.addEquipment(new Equipment("STM32", 10));
@@ -213,7 +213,7 @@ public class FindCommandTest {
     }
 
     @Test
-    public void execute_multipleMatches_printsPluralMessage() {
+    public void execute_multipleMatches_printsPluralMessage() throws EquipmentMasterException {
         // Triggers line 161 and 168: plural "X equipments listed!" with indexes (1. ..., 2. ...)
         EquipmentList equipments = new EquipmentList();
         equipments.addEquipment(new Equipment("STM32 Board", 10));
@@ -244,7 +244,7 @@ public class FindCommandTest {
     }
 
     @Test
-    public void getMatchingEquipments_extraSpacesInKeyword_triggersContinue() {
+    public void getMatchingEquipments_extraSpacesInKeyword_triggersContinue() throws EquipmentMasterException {
         // Multiple spaces result in empty strings in the tokens array, triggering line 88
         EquipmentList equipments = new EquipmentList();
         equipments.addEquipment(new Equipment("STM32 Board", 10));
@@ -256,7 +256,7 @@ public class FindCommandTest {
     }
 
     @Test
-    public void getMatchingEquipments_modulesExistButNoMatch_returnsFalse() {
+    public void getMatchingEquipments_modulesExistButNoMatch_returnsFalse() throws EquipmentMasterException {
         // Item has modules, but keyword matches neither name nor modules, triggering line 124
         EquipmentList equipments = new EquipmentList();
         Equipment eq = new Equipment("Oscilloscope", 5);
@@ -285,7 +285,7 @@ public class FindCommandTest {
     }
 
     @Test
-    public void getMatchingEquipments_multipleSpaces_coversContinue() {
+    public void getMatchingEquipments_multipleSpaces_coversContinue() throws EquipmentMasterException {
         // While \\s+ usually prevents empty tokens, providing a keyword with
         // unusual spacing helps ensure the 'continue' branch (line 88) is evaluated.
         EquipmentList equipments = new EquipmentList();
@@ -296,7 +296,7 @@ public class FindCommandTest {
     }
 
     @Test
-    public void matchesNameOrModule_nullAndEmptyModules_coversLine114() {
+    public void matchesNameOrModule_nullAndEmptyModules_coversLine114() throws EquipmentMasterException {
         EquipmentList equipments = new EquipmentList();
 
         // Case 1: Trigger eq.getModuleCodes() == null
@@ -314,7 +314,7 @@ public class FindCommandTest {
     }
 
     @Test
-    public void matchesNameOrModule_noMatchInExistingModules_coversLine124() {
+    public void matchesNameOrModule_noMatchInExistingModules_coversLine124() throws EquipmentMasterException {
         // Covers the red 'return false' at line 124
         EquipmentList equipments = new EquipmentList();
         Equipment eq = new Equipment("Oscilloscope", 5);
@@ -340,7 +340,7 @@ public class FindCommandTest {
      * Since parse() blocks empty inputs, we must invoke the constructor directly.
      */
     @Test
-    public void getMatchingEquipments_emptyKeyword_returnsAllEquipments() {
+    public void getMatchingEquipments_emptyKeyword_returnsAllEquipments() throws EquipmentMasterException {
         EquipmentList equipments = new EquipmentList();
         equipments.addEquipment(new Equipment("Item A", 10));
         equipments.addEquipment(new Equipment("Item B", 20));
@@ -358,7 +358,7 @@ public class FindCommandTest {
      * In Java, split("\\s+") only produces an empty token if the string STARTS with spaces.
      */
     @Test
-    public void getMatchingEquipments_leadingSpaces_triggersEmptyTokenContinue() {
+    public void getMatchingEquipments_leadingSpaces_triggersEmptyTokenContinue() throws EquipmentMasterException {
         EquipmentList equipments = new EquipmentList();
         equipments.addEquipment(new Equipment("STM32", 10));
 
@@ -383,7 +383,7 @@ public class FindCommandTest {
     }
 
     @Test
-    public void getMatchingEquipments_handlingSpaces_success() {
+    public void getMatchingEquipments_handlingSpaces_success() throws EquipmentMasterException {
         EquipmentList equipments = new EquipmentList();
         equipments.addEquipment(new Equipment("STM32", 10));
 

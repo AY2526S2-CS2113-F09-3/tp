@@ -325,7 +325,7 @@ public class ReportCommandTest {
      * Targets displayAgingEquipments(): Exercises the catch(EquipmentMasterException) block.
      */
     @Test
-    public void execute_calcAgeException_caught() {
+    public void execute_calcAgeException_caught() throws EquipmentMasterException {
         // We use an anonymous subclass to FORCE calculateAgeInYears to throw an exception
         Equipment faultyEq = new Equipment("FaultyEq", 10) {
             @Override
