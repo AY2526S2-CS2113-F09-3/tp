@@ -1,49 +1,51 @@
 # Wang Jiawei - Project Portfolio Page
 
 ## Overview
-**Equipment Master** is a desktop CLI (Command Line Interface) application engineered for University Laboratory Technicians. It replaces highly inefficient, paper-based inventory logbooks with a 100% accountable digital registry. The system allows technicians to manage high-volume equipment loans during peak academic weeks, instantly track assets by course modules, and proactively forecast procurement needs based on equipment aging and student enrollment sizes.
-
+**Equipment Master** is a desktop CLI application for University Laboratory Technicians, replacing inefficient paper logbooks with a 100% accountable digital registry. It streamlines high-volume equipment loans, tracks assets by course modules, and proactively forecasts procurement needs based on equipment aging and student enrollment sizes.
 ## Summary of Contributions
 
 ### Code Contributed
 * https://nus-cs2113-ay2526-s2.github.io/tp-dashboard/?search=wjw55&breakdown=true&sort=groupTitle%20dsc&sortWithin=title&since=2026-02-20T00%3A00%3A00&timeframe=commit&mergegroup=&groupSelect=groupByRepos&checkedFileTypes=docs~functional-code~test-code~other&filteredFileName=
 
 ### Enhancements Implemented
--   **Foundation Architecture (Initial OOP Setup):**
 
-    -   _What it does:_ Designed and implemented the core Object-Oriented Programming (OOP) class structures and project skeleton at the project's inception.
+-   **Foundation Architecture (OOP Setup):** Designed the core project skeleton, establishing a clean separation of concerns to eliminate bottlenecks and enable parallel, conflict-free team development.
 
-    -   _Justification:_ Establishing a solid architectural baseline early on was critical for team velocity. It cleanly separated the system components, allowing the rest of the team to immediately work in parallel on different classes and features without architectural bottlenecks or constant merge conflicts.
-  
--   **Core Inventory Ingestion (`add` command):**
+-   **Core Inventory Ingestion (`add`):**
 
-    -   _What it does:_ Allows technicians to register physical equipment into the system. It supports basic additions as well as highly detailed records (including inline module tagging, expected lifespans, purchase semesters, and low-stock thresholds) in a single command.
+    -   Built a flexible, collision-free parser for detailed, single-command equipment registration.
 
-    -   _Justification:_ This forms the foundational database of the entire application. Without a robust way to ingest and structure the physical stock, downstream forecasting and module mapping features would not function.
+    -   **Highlight:** Engineered **Strict Batch Validation** to reject restocks with conflicting metadata, preventing "silent data loss" and protecting Aging Report accuracy.
 
-    -   _Highlights:_ Built a highly flexible parser capable of safely extracting multiple optional and repeating flags without collision. Engineered Strict Batch Validation. Implemented defensive logic during equipment restocking. If a user attempts to merge new stock into an existing record but provides conflicting batch metadata (different purchase semester or lifespan), the system actively rejects the input to prevent "silent data loss" and protect the mathematical integrity of the Aging Reports.
+-   **Academic Dependency Mapping (`tag` / `untag`):**
 
--   **Academic Dependency Mapping (`tag` and `untag` commands):**
+    -   Developed the core relational logic to dynamically link equipment to modules using requirement ratios for procurement forecasting.
 
-    -   _What it does:_ Allows technicians to dynamically link (or unlink) specific equipment to academic modules using a configurable `requirementRatio` (e.g., 0.5 means 1 piece of equipment is shared between 2 students).
-
-    -   _Justification:_ This is the core logic that enables the application's most powerful feature: the Procurement Report. By allowing variable requirement ratios, the system can accurately calculate exactly how much equipment is needed based on real-world lab sharing constraints.
-
-    -   _Highlights:_ Engineered defensive "Ghost Reference" checks. During `TagCommand#execute` and `UntagCommand#execute`, the system strictly verifies the existence of _both_ the module and the equipment before allowing a link to be created or destroyed, preventing orphaned data and fatal errors during forecasting calculations.
-
+    -   **Highlight:** Implemented defensive **"Double Ghost Reference" checks** to verify entity existence before mapping, entirely preventing orphaned data and fatal crashes.
 ### Contributions to the User Guide (UG)
--   Authored the **Equipment Inventory Management** section of the User Guide (documenting `add`, `tag`, and `untag`).
 
--   Structured the documentation to prioritize user readability, providing clear formats and practical daily-use examples. I specifically focused on explaining the mathematical impact of the `req/FRACTION` parameter in the `tag` command so technicians understand how to represent shared lab equipment.
+-   Authored the **Equipment Inventory Management** section (`add`, `tag`, `untag`), prioritizing readable formats and practical daily-use examples.
 
--   Authored specific FAQ entries and Error Handling documentation detailing the strict batch tracking rules, ensuring users understand why the system rejects conflicting equipment lifespans during restocking.
+-   Detailed the mathematical impact of the `req/FRACTION` parameter so technicians easily understand how to represent shared lab equipment constraints.
+
+-   Added specific FAQ and Error Handling documentation explaining the system's strict batch-tracking rules to clarify why conflicting restocking attempts are rejected.
+
+
 ### Contributions to the Developer Guide (DG)
--   **Authored Feature Implementation Sections:** Detailed the architecture, execution flow, and design considerations for the **Core Inventory Ingestion** (`AddCommand`) and the **Academic Dependency Mapping System** (`TagCommand` & `UntagCommand`). Strongly emphasized defensive programming mechanisms, specifically documenting the Double Ghost Reference Check and the Anti-Data Loss Batch Validation protocol.
 
--   **Contributed UML Diagrams:** Authored PlantUML diagrams mapping out my specific architectural contributions, including:
+-   **Authored Feature Implementation Sections:** Detailed the architecture, execution flow, and design considerations for **Core Inventory Ingestion** and **Academic Dependency Mapping**. Strongly emphasized defensive programming mechanisms (Double Ghost Reference Check and Anti-Data Loss Batch Validation).
 
-    -   Class and Sequence Diagrams detailing the parsing and execution flow of the Core Inventory Ingestion (AddCommand.png).
+-   **Contributed UML Diagrams:** Authored PlantUML diagrams mapping my architectural contributions, including:
 
-    -   Sequence Diagram illustrating the strict two-way validation and execution flow of the Academic Dependency Mapping process (`TagCommand.png`).
+    -   Class and Sequence diagrams detailing parsing and execution flow (`AddCommand.png`).
 
-    -   Sequence Diagram detailing the safe dereferencing and removal of module dependencies (`UntagCommand.png`).
+    -   Sequence diagram illustrating strict two-way validation (`TagCommand.png`).
+
+    -   Sequence diagram detailing safe dereferencing and dependency removal (`UntagCommand.png`).
+
+### Review / Mentoring Contributions
+
+-   Actively reviewed teammate Pull Requests (PRs) to ensure architectural consistency and proper exception handling.
+### Contributions Beyond the Project Team
+
+-   **Inter-team Quality Assurance:** Participated heavily in the peer-testing phase (PE dry-run) for other groups. Conducted rigorous stress tests on competing CLI parsers using boundary values and malformed inputs.
