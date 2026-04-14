@@ -199,6 +199,9 @@ The application uses **Java Assertions** to document and verify internal assumpt
 #### 4. Safe Data Persistence
 The `Storage` component is designed to be "Fail-Safe." During the loading phase, if a specific line in the save file is corrupted (e.g., contains an illegal character `|`), the system catches the error, logs a warning, and skips only that specific line. This ensures that a single corrupted record does not prevent the user from accessing the rest of their inventory.
 
+#### 5. Prevention of Silent Data Loss (Batch Conflicts)
+In inventory systems, merging new hardware batches into old ones can destroy depreciation data. The `EquipmentList` enforces strict batch consistency. It intercepts `add` commands that try to merge items with identical names but differing lifespans or purchase semesters, throwing a descriptive exception instead of silently corrupting the laboratory's aging data.
+
 ---
 
 ### Parser Component (Command Factory Pattern)
@@ -265,6 +268,8 @@ The `AddCommand` is instantiated via its static `parse` method. The execution fl
 3.  **Defensive Validation:** The parser strictly rejects names containing reserved storage characters (`|`, `,`, `=`) to prevent save file corruption. Lifespan (`life/`) and purchase semester (`bought/`) are optional flags whose values are only applied when both are provided together; supplying only one of them does not cause a validation error and the partial information is ignored.
 
 4.  **Execution & Save:** Once validated, the `AddCommand` is returned. When executed, it instantiates the `Equipment`, adds it to the `EquipmentList`, and triggers `Storage#save()` to persist the new inventory state.
+
+**5. Strict Batch Validation (Anti-Data Loss):** During insertion into the `EquipmentList`, the system employs a strict batch-matching protocol. If a user attempts to add an item with an existing name but conflicting `purchaseSem` or `lifespanYears`, the `addEquipment` method halts execution and throws an `EquipmentMasterException`. This prevents "silent data loss" where new batch metadata would otherwise overwrite or mix with old inventory records, forcing the user to use unique naming conventions for distinct hardware generations.
 
 #### 3. UML Diagrams
 **Class Diagram: AddCommand**
@@ -1235,6 +1240,9 @@ To test the system with pre-populated data without typing everything manually:
 * **Expected**: Error message: "Quantity must be a valid positive integer." No item is added.
 * **Test Case**: `tag m/NON_EXISTENT n/STM32` (Missing module)
 * **Expected**: Error message: "Module NON_EXISTENT not found in registry."
+
+-   **Test Case**: `add n/Oscilloscope q/5 bought/AY2024/25 Sem2 life/5` (Execute this _after_ an Oscilloscope with `bought/AY2024/25 Sem1` already exists in the system).
+-   **Expected**: The system rejects the addition to protect batch integrity. Error message: "An item named 'Oscilloscope' already exists with a different Purchase Semester or Lifespan! To track this new batch, please give it a unique name..."
 
 #### 11.2 Storage Corruption Recovery
 1. Open `data/equipment.txt` and add a blank line between two items.
