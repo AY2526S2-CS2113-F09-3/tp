@@ -26,7 +26,7 @@
 ### Documentation Contributions
 
 * **User Guide (UG):** Authored the *Introduction*, *FAQ*, and tutorials for *Aging Reports* and *Module Tracking*. Designed the *Error Handling* section and established syntax standards (`[...]` vs `UPPER_CASE`).
-* **Developer Guide (DG):** 
+* **Developer Guide (DG):**
   * **Technical Deep-dives:** Authored deep-dives for **Storage Persistence**, **Multi-keyword Find**, **Context Object Pattern**, **Academic Semester Calculation**, and **Aging Report Logic**.
   * **System Modeling:** Integrated complex **PlantUML Sequence, Class, and State diagrams** detailing entity relationships and command execution lifecycles.
   * **Project Framework:** Wrote the *Project Scope*, *Target User Profile*, and a comprehensive list of *Prioritized User Stories*.
