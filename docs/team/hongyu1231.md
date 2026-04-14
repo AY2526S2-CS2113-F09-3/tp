@@ -12,32 +12,29 @@
 
 ### Enhancements Implemented
 
-#### **Core Logic & Predictive Analytics**
-* **Semantic Academic Time Engine:** Designed and implemented the `AcademicSemester` normalization engine. This algorithm performs floating-point mathematical operations on non-standard university timelines (e.g., `AY2024/25 Sem1`), providing the underlying logic for time-based calculations.
-* **Automated Aging & Lifespan Audits:** Engineered the **Aging Report** feature, which utilizes the time engine to calculate the real-time age of hardware against its expected lifespan. This allows technicians to proactively identify aging equipment and forecast replacement cycles.
-* **Relational Module Tracking:** Developed the entity structure linking `Equipment` to `Module` requirements. Implemented **Bidirectional Entity Synchronization** and **Safe Dereferencing** to ensure a Single Source of Truth, preventing "ghost references" during module deletions and tag updates.
-* **Multi-Keyword Search Optimization (Find):** Refactored the `find` command to support complex multi-keyword cross-referencing across both item names and module codes, strictly adhering to the **Single Level of Abstraction Principle (SLAP)** to eliminate deeply nested iterations.
+#### **Core Logic & Asset Intelligence**
+* **Semantic Academic Time Engine:** Designed the `AcademicSemester` normalization algorithm to perform floating-point calculations on non-standard university timelines (e.g., `AY2024/25 Sem1`), providing the logic base for time-dependent operations.
+* **Automated Aging & Lifespan Audits:** Engineered the **Aging Report** feature, which utilizes the time engine to calculate the real-time age of hardware against its expected lifespan to forecast replacement cycles.
+* **Relational Mapping & Bidirectional Sync:** Developed the entity structure linking `Equipment` to `Module`. Implemented a synchronization protocol and **Safe Dereferencing** to maintain a Single Source of Truth during deletions and tag updates.
+* **Algorithmic Search Optimization (Find):** Refactored the `find` command for multi-keyword cross-referencing, strictly adhering to **SLAP** to eliminate deeply nested iterations.
 
-#### **System Architecture & Robustness (Technical Hardening)**
-* **Coordinated Persistence Strategy (Dual-Save):** Implemented a **Dual-Save protocol** to reduce data desynchronization between database files (`equipment.txt` and `module.txt`). This keeps cross-linked data consistently persisted across both files during normal saves, helping maintain integrity after application restarts.
-* **Architectural Decoupling (Context Pattern):** Led the system-wide integration of the **Context Object Pattern**. By encapsulating Storage, UI, and state into a unified `Context`, I decoupled command logic from infrastructure, significantly improving testability via dependency injection.
-* **State Management & UX Optimization:** Refactored configuration commands (e.g., `getsem`) to distinguish between "implicit system defaults" and "explicit user values" via persistence file checks, eliminating confusing UI prompts and enhancing initialization logic.
-* **Defensive API Hardening & Diagnostics:** Systematically migrated critical business logic from Java assertions to explicit **Defensive Exception Handling**. Enhanced the `Storage` component with line-level validation to identify exact corruption locations, preventing silent data loss.
+#### **Architecture & System Reliability**
+* **Context Object Pattern:** Led the architectural refactoring to decouple logic from Storage and UI components, significantly improving system testability through dependency injection.
+* **Atomic Persistence (Dual-Save):** Developed a **Dual-Save protocol** to ensure cross-file data consistency between linked database files, preventing data loss after application restarts.
+* **Defensive Engineering & Diagnostics:** Migrated business logic to production-grade **Defensive Exception Handling**. Enhanced `Storage` with line-level diagnostics to identify exact corruption points in text files.
 
 ### Documentation Contributions
 
-* **User Guide (UG):** 
-  * **Core Feature Tutorials:** Authored the *Introduction*, *Quick Start*, *FAQ*, and comprehensive tutorials for *Module Tracking*, *Advanced Find*, and *Aging Reports*.
-  * **UX Design:** Designed the *Error Handling* section and integrated **responsive ASCII screenshots** to visually demonstrate command outcomes.
-  * **Standardization:** Established strict syntax guidelines (`[...]` vs `UPPER_CASE`) and formatted the *Command Summary (Cheat Sheet)*.
+* **User Guide (UG):** Authored the *Introduction*, *FAQ*, and tutorials for *Aging Reports* and *Module Tracking*. Designed the *Error Handling* section and established syntax standards (`[...]` vs `UPPER_CASE`).
 * **Developer Guide (DG):** 
-  * **Architectural Deep-dives:** Authored technical documentation for the **Storage Persistence Mechanism**, **Multi-keyword Find logic**, **Context Object Pattern**, and **Academic Semester calculation**.
-  * **Visual Modeling:** Integrated complex **PlantUML Sequence, Class, and State diagrams** detailing the execution lifecycle, relational mapping, and component interactions.
-  * **Requirements Engineering:** Drafted comprehensive **Use Cases (MSS & Extensions)**, the *Target User Profile*, and *User Stories*.
-  * **Project Effort & Grading Justification:** Drafted the *Appendix* to explicitly defend the team's technical complexity, articulating the engineering challenges of relational mapping and lifecycle forecasting to justify the grading criteria.
+  * **Technical Deep-dives:** Authored deep-dives for **Storage Persistence**, **Multi-keyword Find**, **Context Object Pattern**, **Academic Semester Calculation**, and **Aging Report Logic**.
+  * **System Modeling:** Integrated complex **PlantUML Sequence, Class, and State diagrams** detailing entity relationships and command execution lifecycles.
+  * **Project Framework:** Wrote the *Project Scope*, *Target User Profile*, and a comprehensive list of *Prioritized User Stories*.
+  * **Quality & Validation:** Drafted detailed **Use Cases (MSS & Extensions)** and **Manual Testing Instructions** to guide systematic verification of system features.
+* **Grading Justification:** Authored the *Project Effort Appendix* to defend the technical complexity of relational mapping and predictive forecasting.
 
 ### Team-Based Tasks & Quality Assurance
 
-* **Release & Deliverable Management:** Spearheaded the end-to-end release cycle (JAR packaging and GitHub Releases) across all iterations. Managed the final typesetting, Markdown standardization, and dynamic TOC generation for all PDF deliverables (UG/DG).
-* **Quality Assurance (Chief Debugger):** Led the triage phase during internal testing and PE-D. Coordinated integration testing to maintain Storage backward compatibility and successfully resolved 10+ high-severity vulnerabilities.
-* **Code Gatekeeping & Mentorship:** Acted as the primary reviewer for team PRs, rigorously enforcing Checkstyle compliance, SLAP, and robust exception handling. Guided the team through architectural refactoring (e.g., transitioning to the **Command Factory pattern**) and mentored peers on effective JUnit 5 testing strategies.
+* **Release & Project Management:** Spearheaded the end-to-end release cycle (v1.0 - v2.1) and managed final typesetting and TOC generation for all PDF deliverables.
+* **Quality Assurance (Chief Debugger):** Led the triage phase during PE-D, resolving 10+ high-severity synchronization and persistence vulnerabilities.
+* **Mentorship:** Guided the team through the **Command Factory** refactoring and mentored peers on effective JUnit 5 testing strategies.
